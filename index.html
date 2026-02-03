@@ -6,21 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-   body {
+ body {
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
-  color: #e5e7eb;
   line-height: 1.6;
 
-  /* Background: depth + calm */
-  background: radial-gradient(circle at 20% 10%, rgba(34,197,94,0.10), transparent 45%),
-              radial-gradient(circle at 80% 30%, rgba(59,130,246,0.10), transparent 50%),
-              linear-gradient(180deg, #0f172a 0%, #020617 100%);
+  /* LICHTE ACHTERGROND */
+  background: linear-gradient(
+    180deg,
+    #f1f5f9 0%,
+    #e2e8f0 100%
+  );
+
+  color: #0f172a;
 }
 
-/* Make text blocks easier to read */
 section {
-  padding: 2.2rem 1.5rem;
+  padding: 2.5rem 1.5rem;
   max-width: 900px;
   margin: auto;
 }
@@ -31,90 +33,95 @@ section {
   align-items: center;
   justify-content: center;
   text-align: center;
+
+  /* subtiele gloed */
+  background: radial-gradient(
+    circle at center,
+    rgba(34,197,94,0.10),
+    transparent 60%
+  );
 }
 
-/* Typography polish */
 h1 {
   font-size: 3rem;
   margin-bottom: 1rem;
-  letter-spacing: -0.02em;
+  color: #020617;
 }
 
 h2 {
   font-size: 2rem;
   margin-bottom: 0.8rem;
-  letter-spacing: -0.01em;
+  color: #020617;
 }
 
 p {
-  opacity: 0.88;
   margin-bottom: 1rem;
-  max-width: 68ch;   /* keeps lines readable */
+  max-width: 68ch;
+  color: #334155;
 }
 
 .highlight {
-  font-weight: 650;
-  opacity: 1;
+  font-weight: 600;
+  color: #020617;
 }
 
-/* Cards: lighter than bg + subtle border + shadow */
+/* LICHTE KAARTEN */
 .card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-  padding: 1.5rem;
-  border-radius: 14px;
-  margin-top: 1.4rem;
-  backdrop-filter: blur(6px);
+  background: #ffffff;
+  padding: 1.6rem;
+  border-radius: 16px;
+  margin-top: 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.08);
 }
 
 label {
   display: block;
   margin-top: 0.8rem;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.3rem;
   font-size: 0.9rem;
-  opacity: 0.85;
+  color: #475569;
 }
 
 input {
   width: 100%;
   padding: 0.85rem;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(2, 6, 23, 0.55);
-  color: #e5e7eb;
+  border: 1px solid #cbd5f5;
+  background: #f8fafc;
+  color: #020617;
   font-size: 1rem;
-  outline: none;
 }
 
 input:focus {
-  border-color: rgba(34,197,94,0.65);
-  box-shadow: 0 0 0 4px rgba(34,197,94,0.15);
+  outline: none;
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.2);
 }
 
 button {
-  margin-top: 1.1rem;
-  padding: 0.85rem 1.5rem;
+  margin-top: 1.2rem;
+  padding: 0.9rem 1.6rem;
   font-size: 1rem;
   border-radius: 10px;
   border: none;
   background: #22c55e;
-  color: #020617;
+  color: #ffffff;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 button:hover {
-  transform: translateY(-1px);
-  opacity: 0.95;
+  opacity: 0.9;
 }
 
 footer {
   text-align: center;
   padding: 2rem;
-  opacity: 0.55;
+  color: #64748b;
   font-size: 0.9rem;
 }
+
 
   </style>
 </head>
