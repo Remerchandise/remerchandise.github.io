@@ -6,93 +6,116 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, sans-serif;
-  background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
-      color: #e5e7eb;
-      line-height: 1.6;
-    }
+   body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #e5e7eb;
+  line-height: 1.6;
 
-    section {
-      padding: 2.5rem 1.5rem;
-      max-width: 900px;
-      margin: auto;
-    }
+  /* Background: depth + calm */
+  background: radial-gradient(circle at 20% 10%, rgba(34,197,94,0.10), transparent 45%),
+              radial-gradient(circle at 80% 30%, rgba(59,130,246,0.10), transparent 50%),
+              linear-gradient(180deg, #0f172a 0%, #020617 100%);
+}
 
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
+/* Make text blocks easier to read */
+section {
+  padding: 2.2rem 1.5rem;
+  max-width: 900px;
+  margin: auto;
+}
 
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
 
-    h2 {
-      font-size: 2rem;
-      margin-bottom: 0.8rem;
-    }
+/* Typography polish */
+h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
 
-    p {
-      opacity: 0.85;
-      margin-bottom: 1rem;
-    }
+h2 {
+  font-size: 2rem;
+  margin-bottom: 0.8rem;
+  letter-spacing: -0.01em;
+}
 
-    .highlight {
-      font-weight: 600;
-      opacity: 1;
-    }
+p {
+  opacity: 0.88;
+  margin-bottom: 1rem;
+  max-width: 68ch;   /* keeps lines readable */
+}
 
-    .card {
-      background: #020c2b;
-      padding: 1.5rem;
-      border-radius: 12px;
-      margin-top: 1.5rem;
-    }
+.highlight {
+  font-weight: 650;
+  opacity: 1;
+}
 
-    label {
-      display: block;
-      margin-top: 0.8rem;
-      margin-bottom: 0.3rem;
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
+/* Cards: lighter than bg + subtle border + shadow */
+.card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  padding: 1.5rem;
+  border-radius: 14px;
+  margin-top: 1.4rem;
+  backdrop-filter: blur(6px);
+}
 
-    input {
-      width: 100%;
-      padding: 0.8rem;
-      border-radius: 6px;
-      border: none;
-      font-size: 1rem;
-    }
+label {
+  display: block;
+  margin-top: 0.8rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
 
-    button {
-      margin-top: 1.2rem;
-      padding: 0.8rem 1.5rem;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: none;
-      background: #22c55e;
-      color: #020617;
-      cursor: pointer;
-      font-weight: 600;
-    }
+input {
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(2, 6, 23, 0.55);
+  color: #e5e7eb;
+  font-size: 1rem;
+  outline: none;
+}
 
-    button:hover {
-      opacity: 0.9;
-    }
+input:focus {
+  border-color: rgba(34,197,94,0.65);
+  box-shadow: 0 0 0 4px rgba(34,197,94,0.15);
+}
 
-    footer {
-      text-align: center;
-      padding: 2rem;
-      opacity: 0.5;
-      font-size: 0.9rem;
-    }
+button {
+  margin-top: 1.1rem;
+  padding: 0.85rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: none;
+  background: #22c55e;
+  color: #020617;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+footer {
+  text-align: center;
+  padding: 2rem;
+  opacity: 0.55;
+  font-size: 0.9rem;
+}
+
   </style>
 </head>
 
