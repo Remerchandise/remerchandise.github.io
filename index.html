@@ -2,29 +2,164 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Coming Soon</title>
+  <title>ReMerchandise – Circular Merchandise</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
     body {
       margin: 0;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-family: system-ui, -apple-system, sans-serif;
       background: #0f172a;
       color: #e5e7eb;
+      line-height: 1.6;
+    }
+
+    section {
+      padding: 4rem 1.5rem;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
     }
-    h1 { font-size: 3rem; margin-bottom: .5rem; }
-    p { opacity: .8; }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      opacity: 0.85;
+      margin-bottom: 1.2rem;
+    }
+
+    .highlight {
+      font-weight: 600;
+      opacity: 1;
+    }
+
+    .example {
+      background: #020617;
+      padding: 2rem;
+      border-radius: 12px;
+      margin-top: 2rem;
+    }
+
+    .form-box {
+      background: #020617;
+      padding: 2rem;
+      border-radius: 12px;
+      margin-top: 2rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: none;
+      background: #22c55e;
+      color: #020617;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      opacity: 0.5;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
+
 <body>
-  <div>
- 
-    <h1>PIECE BY PIECE UNIQUE, BETTER TOGETHER</h1>
-    <p>ENABLING AND INCENTIVIZING THE SHIFT TOWARDS A CIRCULAR ECONOMY</p>
-  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <h1>
+        PIECE BY PIECE UNIQUE,<br>
+        BETTER TOGETHER
+      </h1>
+      <p class="highlight">
+        Unique, sustainable and price-competitive merchandise
+      </p>
+    </div>
+  </section>
+
+  <!-- WHAT WE DO -->
+  <section>
+    <h2>What we do</h2>
+
+    <p>
+      We create merchandise for unique projects using finely curated
+      second-hand clothing.
+    </p>
+
+    <p>
+      By working with existing garments, we unlock a broader range of
+      merchandise possibilities — while keeping costs lower than traditional
+      first-hand production.
+    </p>
+
+    <div class="example">
+      <p>
+        Our approach reduces textile waste by giving high-quality clothing
+        a second life, while still delivering meaningful and distinctive
+        merchandise for organizations and initiatives.
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section>
+    <h2>Interested?</h2>
+
+    <p>
+      Curious whether circular merchandise could work for your project?
+      Leave your phone number and I’ll reach out for a short, informal conversation.
+    </p>
+
+    <div class="form-box">
+      <form>
+        <label for="phone">Phone number</label>
+        <input type="tel" id="phone" placeholder="+31 6 12345678" required>
+        <button type="submit">Get in touch</button>
+      </form>
+
+      <p style="font-size:0.9rem; opacity:0.6;">
+        No spam. No obligation. Just a conversation.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    © ReMerchandise – Unique, circular merchandise
+  </footer>
+
 </body>
 </html>
