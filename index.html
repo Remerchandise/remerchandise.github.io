@@ -2,242 +2,194 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>Remerchandise </title>
+  <title>remerchandise</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-  /* ===============================
-     KLEURENPALET – remerchandise
-     =============================== */
-  :root {
-    --green-dark: #515F4B;     /* donker mosgroen */
-    --green-forest: #668363;  /* diep bosgroen */
-    --green-sage: #85A087;    /* gedempt saliegroen */
-    --green-olive: #AABAA5;   /* licht olijf */
-    --green-light: #DAE3DC;   /* licht groen-grijs */
-    --off-white: #F5F5EC;     /* warm gebroken wit */
-  }
+    :root {
+      --green-dark: #515F4B;
+      --green-forest: #668363;
+      --green-sage: #85A087;
+      --green-olive: #AABAA5;
+      --green-light: #DAE3DC;
+      --off-white: #F5F5EC;
+    }
 
-  /* ===============================
-     BASIS
-     =============================== */
-  body {
-    margin: 0;
-    font-family: system-ui, -apple-system, sans-serif;
-    background: var(--off-white);
-    color: var(--green-dark);
-    line-height: 1.6;
-  }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--off-white);
+      color: var(--green-dark);
+      line-height: 1.6;
+      text-align: center;
+    }
 
-  section {
-    padding: 2.5rem 1.5rem;
-    max-width: 900px;
-    margin: auto;
-  }
+    .wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
 
-  /* ===============================
-     HERO
-     =============================== */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    .container {
+      max-width: 800px;
+      width: 100%;
+    }
 
-    background: radial-gradient(
-      circle at center,
-      rgba(102, 131, 99, 0.25),
-      transparent 65%
-    );
-  }
+    /* subtle glow */
+    .glow {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(102, 131, 99, 0.18), transparent 55%),
+        radial-gradient(circle at 20% 20%, rgba(133, 160, 135, 0.18), transparent 45%);
+      pointer-events: none;
+      z-index: -1;
+    }
 
-  /* ===============================
-     TYPOGRAFIE
-     =============================== */
-h1 {
-  font-size: 3.2rem;
-  margin-bottom: 1rem;
-  color: #2f3a2c; /* donkerder dan green-dark */
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
+    h1 {
+      font-size: 3.2rem;
+      margin-bottom: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
 
-h2 {
-  font-size: 2rem;
-  margin-bottom: 0.8rem;
-  color: var(--green-dark);   /* zelfde, voor consistentie */
-  font-weight: 600;
-}
+    .tagline {
+      font-size: 1.25rem;
+      color: var(--green-forest);
+      font-weight: 600;
+      margin-bottom: 2rem;
+    }
 
+    .card {
+      background: var(--green-light);
+      border: 1px solid var(--green-olive);
+      border-radius: 18px;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
 
-  p {
-    margin-bottom: 1rem;
-    max-width: 68ch;
-    color: var(--green-dark);
-    opacity: 0.9;
-  }
+    h2 {
+      margin-top: 0;
+      font-size: 1.5rem;
+    }
 
-  .highlight {
-    font-weight: 600;
-    color: var(--green-forest);
-  }
+    label {
+      display: block;
+      margin-top: 1rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.9rem;
+      text-align: left;
+    }
 
-  /* ===============================
-     CARDS / VLAKKEN
-     =============================== */
-  .card {
-    background: var(--green-light);
-    padding: 1.6rem;
-    border-radius: 16px;
-    margin-top: 1.5rem;
-    border: 1px solid var(--green-olive);
-  }
+    input {
+      width: 100%;
+      padding: 0.85rem;
+      border-radius: 10px;
+      border: 1px solid var(--green-sage);
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
 
-  /* ===============================
-     FORMULIER
-     =============================== */
-  label {
-    display: block;
-    margin-top: 0.9rem;
-    margin-bottom: 0.3rem;
-    font-size: 0.9rem;
-    color: var(--green-dark);
-  }
+    input:focus {
+      outline: none;
+      border-color: var(--green-forest);
+      box-shadow: 0 0 0 3px rgba(102,131,99,0.25);
+    }
 
-  input {
-    width: 100%;
-    padding: 0.85rem;
-    border-radius: 10px;
-    border: 1px solid var(--green-sage);
-    background: #ffffff;
-    color: var(--green-dark);
-    font-size: 1rem;
-  }
+    button {
+      margin-top: 1.5rem;
+      padding: 0.9rem 1.6rem;
+      border-radius: 10px;
+      border: none;
+      background: var(--green-forest);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      width: 100%;
+    }
 
-  input:focus {
-    outline: none;
-    border-color: var(--green-forest);
-    box-shadow: 0 0 0 3px rgba(102, 131, 99, 0.25);
-  }
+    button:hover {
+      background: var(--green-dark);
+    }
 
-  /* ===============================
-     BUTTON
-     =============================== */
-  button {
-    margin-top: 1.2rem;
-    padding: 0.9rem 1.6rem;
-    font-size: 1rem;
-    border-radius: 10px;
-    border: none;
-    background: var(--green-forest);
-    color: #ffffff;
-    cursor: pointer;
-    font-weight: 600;
-  }
+    .subtle {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: var(--green-sage);
+    }
 
-  button:hover {
-    background: var(--green-dark);
-  }
-
-  /* ===============================
-     FOOTER
-     =============================== */
-  footer {
-    text-align: center;
-    padding: 2rem;
-    color: var(--green-sage);
-    font-size: 0.9rem;
-  }
-</style>
-
+    footer {
+      margin-top: 3rem;
+      font-size: 0.85rem;
+      color: var(--green-sage);
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div>
-      <h1>
-        Piece by Piece Unique,<br>
-        Better Together
-      </h1>
-      <p class="highlight">
-        Unique, Sustainable and Price-competitive merchandise
+  <div class="glow"></div>
+
+  <div class="wrapper">
+    <div class="container">
+
+      <h1>remerchandise</h1>
+
+      <p class="tagline">
+        Your marketplace for unique, local and sustainable creatives.
       </p>
-    </div>
-  </section>
 
-  <!-- WAT WE DOEN -->
-  <section>
-    <h2>Wat we doen</h2>
+      <div class="card">
+        <h2>Stay connected</h2>
+        <p>
+          Interested in joining as a creative or being part of the launch?
+          Leave your details and we’ll keep you updated.
+        </p>
 
-    <p>
-      Wij maken merchandise voor unieke projecten met zorgvuldig geselecteerde
-      tweedehands kleding.
-    </p>
+        <form action="https://formspree.io/f/mjgodbzv" method="POST">
 
-    <p>
-    Doordat we werken met bestaande kledingstukken, zijn we niet beperkt tot 
-      standaard merchandise: vrijwel alles wat ooit is gemaakt, kan worden 
-      aangepast en opnieuw ingezet.
-    </p>
+          <label for="name">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Your name"
+            required
+          >
 
-    <div class="card">
-      <p>
-        Deze aanpak vermindert textielafval door kleding een tweede leven te geven,
-        terwijl organisaties toch unieke merchandise kunnen inzetten.
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Your email address"
+            required
+          >
+
+          <input
+            type="hidden"
+            name="_subject"
+            value="New signup via remerchandise"
+          >
+
+          <button type="submit">Join the launch</button>
+
+        </form>
+      </div>
+
+      <p class="subtle">
+        Launching soon.
       </p>
+
+      <footer>
+        © remerchandise
+      </footer>
+
     </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section>
-    <h2>Interesse?</h2>
-
-    <p>
-      Benieuwd of circulaire merchandise iets kan zijn voor jouw project?
-      Laat je gegevens achter en ik neem vrijblijvend contact met je op.
-    </p>
-
-    <div class="card">
-      <form action="https://formspree.io/f/mjgodbzv" method="POST">
-        <label for="name">Naam</label>
-        <input
-          type="text"
-          id="name"
-          name="naam"
-          placeholder="Je naam"
-          required
-        >
-
-        <label for="phone">Telefoonnummer</label>
-        <input
-          type="tel"
-          id="phone"
-          name="telefoonnummer"
-          placeholder="+31 6 12345678"
-          required
-        >
-
-        <input
-          type="hidden"
-          name="_subject"
-          value="Nieuwe contactaanvraag via remerchandise"
-        >
-
-        <button type="submit">Neem contact op</button>
-      </form>
-
-      <p style="font-size:0.85rem; opacity:0.6; margin-top:0.8rem;">
-        Geen spam. Geen verplichtingen. Gewoon een gesprek.
-      </p>
-    </div>
-  </section>
-
-  <footer>
-    © Remerchandise – unieke, circulaire merchandise
-  </footer>
+  </div>
 
 </body>
 </html>
