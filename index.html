@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>Remerchandise</title>
+  <title>remerchandise</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
@@ -21,31 +21,26 @@
       background: var(--off-white);
       color: var(--green-dark);
       line-height: 1.6;
-      text-align: center;
     }
 
-    .wrapper {
+    section {
+      padding: 3rem 1.5rem;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    /* HERO */
+    .hero {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem;
-    }
-
-    .container {
-      max-width: 800px;
-      width: 100%;
-    }
-
-    /* subtle glow */
-    .glow {
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(circle at 50% 40%, rgba(102, 131, 99, 0.18), transparent 55%),
-        radial-gradient(circle at 20% 20%, rgba(133, 160, 135, 0.18), transparent 45%);
-      pointer-events: none;
-      z-index: -1;
+      text-align: center;
+      background: radial-gradient(
+        circle at center,
+        rgba(102, 131, 99, 0.25),
+        transparent 65%
+      );
     }
 
     h1 {
@@ -55,37 +50,42 @@
       letter-spacing: -0.03em;
     }
 
-    .tagline {
+    .highlight {
       font-size: 1.25rem;
       color: var(--green-forest);
       font-weight: 600;
-      margin-bottom: 2rem;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    p {
+      max-width: 70ch;
+      margin-bottom: 1.2rem;
     }
 
     .card {
       background: var(--green-light);
-      border: 1px solid var(--green-olive);
+      padding: 1.8rem;
       border-radius: 18px;
-      padding: 2rem;
-      margin-top: 2rem;
+      margin-top: 1.8rem;
+      border: 1px solid var(--green-olive);
     }
 
-    h2 {
-      margin-top: 0;
-      font-size: 1.5rem;
-    }
-
+    /* FORM */
     label {
       display: block;
       margin-top: 1rem;
       margin-bottom: 0.3rem;
       font-size: 0.9rem;
-      text-align: left;
     }
 
     input {
       width: 100%;
-      padding: 0.85rem;
+      padding: 0.9rem;
       border-radius: 10px;
       border: 1px solid var(--green-sage);
       font-size: 1rem;
@@ -100,14 +100,14 @@
 
     button {
       margin-top: 1.5rem;
-      padding: 0.9rem 1.6rem;
+      padding: 1rem;
       border-radius: 10px;
       border: none;
       background: var(--green-forest);
       color: white;
       font-weight: 600;
-      cursor: pointer;
       font-size: 1rem;
+      cursor: pointer;
       width: 100%;
     }
 
@@ -115,15 +115,10 @@
       background: var(--green-dark);
     }
 
-    .subtle {
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: var(--green-sage);
-    }
-
     footer {
-      margin-top: 3rem;
-      font-size: 0.85rem;
+      text-align: center;
+      padding: 3rem 1rem;
+      font-size: 0.9rem;
       color: var(--green-sage);
     }
   </style>
@@ -131,68 +126,86 @@
 
 <body>
 
-  <div class="glow"></div>
-
-  <div class="wrapper">
-    <div class="container">
-
-      <h1>Remerchandise</h1>
-
-      <p class="tagline">
-        The marketplace for unique, local and sustainable creativity.
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <h1>
+        Piece by Piece Unique,<br>
+        Better Together
+      </h1>
+      <p class="highlight">
+        Unique, sustainable and price-competitive merchandise
       </p>
-
-
-
-      
-      <div class="card">
-        <h2>Stay connected</h2>
-        <p>
-          Interested in joining as a creative or being part of the launch?
-          Leave your details and we’ll keep you updated.
-        </p>
-
-        <form action="https://formspree.io/f/mjgodbzv" method="POST">
-
-          <label for="name">Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            placeholder="Your name"
-            required
-          >
-
-          <label for="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Your email address"
-            required
-          >
-
-          <input
-            type="hidden"
-            name="_subject"
-            value="New signup via remerchandise"
-          >
-
-          <button type="submit">Join the launch</button>
-
-        </form>
-      </div>
-
-      <p class="subtle">
-        Launching soon.
-      </p>
-
-      <footer>
-        © Remerchandise
-      </footer>
-
     </div>
-  </div>
+  </section>
+
+  <!-- WAT WE DOEN -->
+  <section>
+    <h2>Wat we doen</h2>
+
+    <p>
+      Wij maken merchandise voor unieke projecten met zorgvuldig geselecteerde tweedehands kleding.
+    </p>
+
+    <p>
+      Doordat we werken met bestaande kledingstukken, zijn we niet beperkt tot standaard merchandise:
+      vrijwel alles wat ooit is gemaakt, kan worden aangepast en opnieuw ingezet.
+    </p>
+
+    <div class="card">
+      <p>
+        Deze aanpak vermindert textielafval door kleding een tweede leven te geven,
+        terwijl organisaties toch unieke, onderscheidende merchandise kunnen inzetten —
+        tegen lagere kosten dan traditionele productie.
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section>
+    <h2>Interesse?</h2>
+
+    <p>
+      Benieuwd of circulaire merchandise iets kan zijn voor jouw project?
+      Laat je gegevens achter en ik neem vrijblijvend contact met je op.
+    </p>
+
+    <div class="card">
+      <form action="https://formspree.io/f/mjgodbzv" method="POST">
+
+        <label for="name">Naam</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          placeholder="Je naam"
+          required
+        >
+
+        <label for="phone">Telefoonnummer</label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          placeholder="+31 6 12345678"
+          required
+        >
+
+        <input
+          type="hidden"
+          name="_subject"
+          value="Nieuwe contactaanvraag via remerchandise"
+        >
+
+        <button type="submit">Neem contact op</button>
+
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    © remerchandise – unieke, circulaire merchandise
+  </footer>
 
 </body>
 </html>
