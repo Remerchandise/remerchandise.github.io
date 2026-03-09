@@ -6,17 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-:root {
-  --green-dark: #3F6441;
-  --green-forest: #5F915B;
-  --green-light: #7FB978;
-  --off-white: #F6F8F4;
-}
+    :root {
+      --green-dark: #3f6441;
+      --green-forest: #5f915b;
+      --green-soft: #7fb978;
+      --green-light: #e8f0e6;
+      --green-border: #cfe0cb;
+      --off-white: #f7f8f4;
     }
 
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--off-white);
       color: var(--green-dark);
       line-height: 1.6;
@@ -28,18 +29,15 @@
       margin: auto;
     }
 
-    /* HERO */
     .hero {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      background: radial-gradient(
-        circle at center,
-        rgba(102, 131, 99, 0.25),
-        transparent 65%
-      );
+      background:
+        radial-gradient(circle at center, rgba(127, 185, 120, 0.18), transparent 60%),
+        linear-gradient(180deg, #f7f8f4 0%, #eef4ec 100%);
     }
 
     h1 {
@@ -47,23 +45,27 @@
       margin-bottom: 1rem;
       font-weight: 800;
       letter-spacing: -0.03em;
+      color: var(--green-dark);
     }
 
     .highlight {
-      font-size: 1.25rem;
-      color: var(--green-forest);
-      font-weight: 600;
+      font-size: 1.2rem;
+      color: #6f8e69;
+      font-weight: 500;
+      margin: 0 auto;
     }
 
     h2 {
       font-size: 2rem;
       margin-bottom: 1rem;
       font-weight: 700;
+      color: var(--green-dark);
     }
 
     p {
       max-width: 70ch;
       margin-bottom: 1.2rem;
+      color: #546651;
     }
 
     .card {
@@ -71,30 +73,33 @@
       padding: 1.8rem;
       border-radius: 18px;
       margin-top: 1.8rem;
-      border: 1px solid var(--green-olive);
+      border: 1px solid var(--green-border);
     }
 
-    /* FORM */
     label {
       display: block;
       margin-top: 1rem;
       margin-bottom: 0.3rem;
       font-size: 0.9rem;
+      color: var(--green-dark);
     }
 
     input {
       width: 100%;
       padding: 0.9rem;
       border-radius: 10px;
-      border: 1px solid var(--green-sage);
+      border: 1px solid #a9c3a6;
       font-size: 1rem;
       box-sizing: border-box;
+      background: #ffffff;
+      color: var(--green-dark);
+      font-family: inherit;
     }
 
     input:focus {
       outline: none;
       border-color: var(--green-forest);
-      box-shadow: 0 0 0 3px rgba(102,131,99,0.25);
+      box-shadow: 0 0 0 3px rgba(95, 145, 91, 0.2);
     }
 
     button {
@@ -108,6 +113,7 @@
       font-size: 1rem;
       cursor: pointer;
       width: 100%;
+      font-family: inherit;
     }
 
     button:hover {
@@ -118,14 +124,31 @@
       text-align: center;
       padding: 3rem 1rem;
       font-size: 0.9rem;
-      color: var(--green-sage);
+      color: #7a9374;
+    }
+
+    @media (max-width: 700px) {
+      h1 {
+        font-size: 2.4rem;
+      }
+
+      .highlight {
+        font-size: 1.05rem;
+      }
+
+      h2 {
+        font-size: 1.6rem;
+      }
+
+      section {
+        padding: 2.2rem 1.2rem;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- HERO -->
   <section class="hero">
     <div>
       <h1>
@@ -138,7 +161,6 @@
     </div>
   </section>
 
-  <!-- WAT WE DOEN -->
   <section>
     <h2>Wat we doen</h2>
 
@@ -160,7 +182,6 @@
     </div>
   </section>
 
-  <!-- CONTACT -->
   <section>
     <h2>Interesse?</h2>
 
@@ -171,7 +192,6 @@
 
     <div class="card">
       <form action="https://formspree.io/f/mjgodbzv" method="POST">
-
         <label for="name">Naam</label>
         <input
           type="text"
@@ -197,7 +217,6 @@
         >
 
         <button type="submit">Neem contact op</button>
-
       </form>
     </div>
   </section>
