@@ -1,0 +1,11 @@
+id,naam,detectie,kosten,eenvoud,inpasbaarheid,juridisch,waarde,gewogen,knockout,oordeel,betrouwbaarheid
+K1,Strandmetaaldetector (VLF) in trommel,1,3,4,3,5,1,2.55,"Discriminatie fysiek onvoldoende: PPV 5 %, recall Li-zak 5 %; abonnement > vermeden schade",NIET AANBEVOLEN (knock-out),hoog
+K2,"Pakketwachter (PI, OEM pas-zuil)",1.5,3,3,3,5,1,2.52,"Vals alarm onwerkbaar (PPV pakket 4–7 %); niet beter dan B0 zonder sensor; abonnement EUR 10,7 vs schade EUR 0,08/mnd",NIET AANBEVOLEN (knock-out),middel
+K3a,Röntgen ≤30 kV vast per zuil,3,1,2,1,3,2,2.0,"Prijs EUR 90/mnd ≫ schade; 1,2–5,5 Wh/dag niet off-grid op batterij",NIET AANBEVOLEN (knock-out),middel
+K3b,Röntgen-ijkpaal (rouleert),3,2,2,3,3,2,2.5,"Als abonnement EUR 26,7/mnd vs schade ~0; alleen zinvol als eenmalig validatie-instrument",NIET AANBEVOLEN (knock-out),middel
+K4,Deksel-eventmodule (IR + CO),2,4,4,4,5,2,3.3,"Geen accudetector (PPV accu ≤ 0,2 %); als losse module abonnement EUR 13,9 > schade",NIET AANBEVOLEN (knock-out),middel
+K4add,K4 als add-on op bestaande vulgraadsensor (hotspots),2,5,4,5,5,2,3.65,,CONDITIONEEL,laag
+K5,Hybride K2 + K4 + protocol,1.5,2,2,3,4,2,2.23,"Erft vals-alarm K2; abonnement EUR 18,6 vs schade EUR 0,3/mnd",NIET AANBEVOLEN (knock-out),middel
+B1,"Thermische camera laadbak, als abonnement",4,3,4,4,4,3,3.65,"Abonnement EUR 8,4/mnd vs schade EUR 1,4/mnd bij 1.000 containers",NIET AANBEVOLEN (knock-out),middel
+B1oem,"Thermische camera laadbak, fabrieksoptie wagen (benchmark)",4,4,4,4,4,4,4.0,,CONDITIONEEL,middel
+B0,"Accu-brievenbus aan zuil, betaald door PRO (geen sensor)",2,3,5,4,5,3,3.4,,CONDITIONEEL,laag

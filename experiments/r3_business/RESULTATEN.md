@@ -1,61 +1,88 @@
-# R3 – A7 Business: resultaten FASE 1
+# R3 – A7 Business: resultaten (FASE 2, definitief)
 
-Script: `python3 experiments/r3_business/business.py` (deterministisch, < 2 s). Output: `tables.md`, `results.json`, `fig_unit_economics.png`, `fig_business_case.png`. EUR 2026 excl. btw. **Status FASE 1: eigen BOM-schattingen en placeholder-recall** (A5-BOM en A6-MC nog niet aanwezig).
+Script: `python3 experiments/r3_business/business.py` (deterministisch, < 3 s). Output: `tables.md` (alle tabellen), `results.json`, figuren `fig_prijs_vs_schade.png`, `fig_schaal.png`, `fig_unit_economics.png`, `fig_business_case.png`. EUR 2026 excl. btw.
 
-## Koppelpunten voor FASE 2 (parametrisering)
-| Input | Bestand | Formaat | Effect |
-|---|---|---|---|
-| BOM A5 | `product/BOM_<ID>.csv` (ID = K1…K5, B1, B0) | kolommen `laag,basis,hoog` (of `prijs_laag`/`eur_basis`…), optioneel `aantal`; of een rij `totaal` | overschrijft `hw` (laag/basis/hoog) |
-| MC A6 | `experiments/r3_classificatie/mc_results.json` (of `r3_business/mc_input.json`) | `{"K2": {"recall_energy":[l,b,h], "alarms_per_1000_emptyings":[l,b,h], "avoided_fire_fraction":[l,b,h]?, "fires_per_1000_containers_year":[l,b,h]?}}` | overschrijft recall, aantal meldingen, (optioneel) vermeden fractie en A1-brandfrequentie |
-| Overige | `run(overrides={"K2": {...}, "cost_per_alarm": (..)})` | dict | gevoeligheidsanalyse |
+**Inputs FASE 2:**
+- BOM van A5: `product/BOM_samenvatting.csv`. Daaruit komen HW, installatie, kosten per maand en per jaar, eenmalige kosten (NRE/certificering, bv. de OEM-adapter EUR 50–150k) en het aantal containers per unit.
+- MC van A6: `experiments/r3_classificatie/mc_results.json`. Daaruit komen de vermeden fractie wagenbranden, het aantal meldingen per 1.000 ledigingen en de brandfrequentie **0,07 / 1,27 / 48 per 1.000 containerjaar** (A1 R3).
 
-## Test 1 – Unit economics en prijs (100 / 1.000 / 10.000 containers)
-**Vraag:** wat kost het per container per maand, en tegen welke prijs moet het verkocht worden?
-**Methode:** kostprijs = (hardware + installatie)/6 jaar + connectiviteit + cloud + onderhoud + support (platform + per eenheid) + CAC. Prijs = kostprijs bij 40 % brutomarge.
+**Afwijkingen [A]:**
+- **K3b** dekt 1/35 van de containers tegelijk.
+- **K4**: A6 rekent 0 vermeden wagenbranden. A7 telt wel containerbranden mee, plus 0 / 30 / 60 % effect van de "niet legen"-vlag bij incidenten die in de container beginnen.
+- **B0** gebruikt een eigen preventiemodel: 3 / 8 / 15 % minder Li-energie in het restafval. De rangorde-MC van A6 past niet bij een inzamelsleuf.
+- Bij **B1** telt de vermeden schade bij de verwerker voor 50 %.
+- Nieuwe varianten:
+  - **K4add**: K4 als add-on op een bestaande vulgraad- of zuilmodule.
+  - **B1oem**: B1 als fabrieksoptie in de voertuigaanbesteding, zonder eigen sales.
 
-| EUR/container/mnd (basis [laag–hoog]) | 100 | 1.000 | 10.000 | Prijs bij 1.000 |
+Overige aannames:
+- Schade per incident: wagen 10k / 25k / 50k, verwerker 5k / 25k / 75k, container 3k / 8k / 15k.
+- Kosten per melding: EUR 10 / 40 / 150.
+- Marge 40 %, levensduur 6 jaar.
+
+## 1. Abonnementsprijs incl. marge, NRE en support (EUR per container per maand, basis [laag–hoog])
+
+| Concept | 100 | 1.000 | 10.000 | Opmerking |
 |---|---|---|---|---|
-| K1 VLF-detector | 16,7 | 8,1 [4,7–13,2] | 5,4 | 13,6 |
-| **K2 Pakketwachter (OEM)** | 10,8 | **5,1** [2,9–8,4] | **3,3** | 8,5 |
-| K3a Röntgen vast | 50,6 | 35,9 [17–76] | 29,1 | 59,8 |
-| K3b Röntgen rouleert (1 per 35) | 18,0 | 9,8 | 7,1 | 16,4 (≈ EUR 570 per unit/mnd) |
-| K4 Deksel-event | 16,9 | 8,3 | 5,5 | 13,8 |
-| K5 Hybride K2+K4 | 18,3 | 8,7 [5,2–13,9] | 5,7 | 14,5 |
-| **B1 Thermisch laadbak** | 13,7 | **4,9** | **2,3** | 8,1 (≈ EUR 1.550–3.200 per wagen/mnd) |
-| B0 Brievenbus + sortering | 29,8 | 16,7 | 11,7 | 27,8 |
+| K1 VLF | 34,8 | 14,6 [8,8–23,9] | 9,3 | |
+| K2 Pakketwachter (OEM) | 40,7 | 10,7 [6,5–17,3] | 5,7 | NRE EUR 100k drukt hard op kleine schaal |
+| K3a Röntgen vast | 130 | 90 [48–168] | 78 | |
+| K3b Röntgen rouleert | 57 | 26,7 [12–49] | 20,6 | ≈ EUR 930 per unit per maand |
+| K4 Deksel standalone | 32,8 | 13,9 [8,3–21,8] | 8,8 | |
+| K5 Hybride | 65,7 | 18,6 [11,5–29,7] | 10,4 | NRE EUR 150k |
+| B1 Wagencamera (eigen sales) | 25,8 | 8,4 [5,0–13,2] | 3,9 | ≈ EUR 1.180–2.530 per wagen per maand |
+| **K4add** add-on | 11,3 | **3,6** [2,1–5,8] | **2,2** | sensoren EUR 40 + NRE; verkocht door vulgraad- of zuilleverancier |
+| **B1oem** fabrieksoptie | 9,4 | **2,3** [1,3–3,7] | **0,97** | ≈ EUR 290–680 per wagen per maand |
+| B0 Brievenbus + sortering | 44 | 23 [12–50] | 15 | sortering EUR 20k per klant per jaar domineert |
 
-**Conclusie:** behalve bij röntgen zijn support en CAC de grootste kostenpost, niet de hardware. Hardware is EUR 0,1–1,0 per maand, support + CAC EUR 3–5 per maand. Alleen OEM- of wagenzijdige routes komen onder EUR 5 per maand.
+Support, CAC en NRE vormen 50–85 % van de kostprijs (behalve bij röntgen). Schaal werkt sterk: van 100 naar 10.000 containers wordt een abonnement 3–7× goedkoper (`fig_schaal.png`).
 
-## Test 2 – Business case (klant met 1.000 containers, A1-brandkans)
-**Aannames [A]:** branden 0,3 / 1,7 / 15 per 1.000 containerjaar (A1). Schade per incident: wagen 10k / 25k / 50k (params.ECON), verwerker 5k / 25k / 75k (verwachtingswaarde van een AVI-brand van EUR 1–5 mln), container 3k / 8k / 15k × 10–30 % dat in de container begint. Effectiviteit van de actie: wagen 0,3–0,7, verwerker 0,1–0,4. Kosten per melding EUR 10 / 40 / 150. Bruto schade basis ≈ **EUR 88 per container per jaar (EUR 7,3/mnd)**.
+## 2. Business case: gemeente met 1.000 containers (EUR per container per jaar)
 
-| Concept | Abonnement + acties (EUR/container/jr) | Vermeden laag / basis / hoog | Ratio basis | Benodigde branden per 1.000 cj voor ratio 1 |
-|---|---|---|---|---|
-| K1 | 246 | 0,1 / 7 / 390 | 0,03 | 56 |
-| K2 | 133 | 0,3 / 13 / 634 | 0,10 | 17 |
-| K3a | 730 | 0,6 / 24 / 878 | 0,03 | 52 |
-| K3b | 209 | ~0 / 0,7 / 25 | 0,003 | 522 (waarde = ground truth, geen bescherming) |
-| K4 | 168 | 0,1 / 10 / 492 | 0,06 | 27 |
-| K5 | 205 | 0,4 / 19 / 806 | 0,09 | 18 |
-| **B1** | **98** | 1,1 / **31** / 998 | **0,31** | **5** |
-| B0 | 333 | 0,1 / 7 / 291 | 0,02 | 81 |
+| Concept | Abonnement + acties | Vermeden schade laag / basis / hoog | Ratio basis | Knock-out? | Benodigde branden per 1.000 cj voor ratio 1 (basis 1,27) |
+|---|---|---|---|---|---|
+| K1 | 216 | 0,0 / 0,9 / 79 | 0,004 | **JA** | 318 |
+| K2 | 170 | 0,0 / 1,0 / 117 | 0,006 | **JA** | 220 |
+| K3a | 1.122 | 0,0 / 2,2 / 200 | 0,002 | **JA** | 647 |
+| K3b | 361 | ~0 / 0,06 / 6 | 0,000 | **JA** (als bescherming) | 7.298 |
+| K4 | 168 | 0,0 / 3,7 / 1.090 | 0,02 | **JA** | 58 |
+| K5 | 268 | 0,0 / 1,0 / 117 | 0,004 | **JA** | 347 |
+| B1 | 102 | 0,1 / 16,3 / 2.702 | 0,16 | **JA** | 8 |
+| K4add | 45 | 0,0 / 3,7 / 1.090 | 0,08 | **JA** | 15 |
+| **B1oem** | 28 | 0,1 / 16,3 / 2.702 | **0,58** (1,33 bij 10.000 containers) | **nee bij schaal ≥ ~3.000 containers / 10 wagens** | 2 |
+| B0 | 278 | 0,0 / 5,2 / 934 | 0,02 | **JA** | 67 |
 
 **Conclusie:**
-1. **Geen enkel concept is rendabel in het basisscenario** (ratio ≤ 0,3). Alle concepten worden rendabel in het hoge A1-scenario (15 branden per 1.000 cj), behalve K3b.
-2. **B1 domineert** (D3-test). K5 en K2 moeten 3–4× meer branden per 1.000 cj hebben dan B1 om quitte te spelen.
-3. **De kosten van vervolgacties bij vals alarm zijn al hoger dan de vermeden schade** voor K1 (EUR 83/jr) en K2/K5 (EUR 31/jr) tegenover EUR 7–19 vermeden. A6 moet de meldingen terugbrengen naar ≤ 5 per 1.000 ledigingen, of oranje moet gratis zijn ("laatst in route").
-4. Max. prijs die de vermeden schade dekt (zonder acties): K2 EUR 1,1, K5 EUR 1,6, B1 EUR 2,6 per container per maand. **Een prijs van EUR 1–2,5 per maand is het plafond op basis van schade.**
+- In het basisscenario (1,27 branden per 1.000 containerjaar) haalt **geen enkel zuil- of containerconcept** de vermeden schade. Ze zitten een factor 50–600 te laag.
+- Alleen de **wagencamera als fabrieksoptie (B1oem)** komt bij schaal boven break-even.
+- In het hoge scenario (48 branden per 1.000 cj) wordt alles behalve K1/K2/K3/K5 rendabel.
+- De **kosten van vervolgacties (EUR 42 per container per jaar bij 20 meldingen per 1.000 ledigingen)** zijn bij K1/K2/K5 al 40× hoger dan wat ze aan schade voorkomen. Het werkpunt "oranje ≤ 20 per 1.000" van A6 is dus te ruim als oranje geld kost.
 
-## Test 3 – Betalers
-| Betaler | Aandeel baat (basis) | Beoordeling |
-|---|---|---|
-| Gemeente / eigenaar container | 0–8 % (alleen K4/K5 container-events) | Betaalt via afvalstoffenheffing, maar heeft nauwelijks eigen baat. Koopt alleen voor beleid/data (B0/K3b-kaart) of veiligheid |
-| Inzamelaar (wagen + chauffeur) | 50–75 % | **Logische betaler voor B1 en K2/K5**; plus Arbo-argument (niet in euro's) |
-| Verwerker / AVI | 25–48 % | Mede-betaler. Bij een overheids-NV die ook AVI is (HVC-model) valt de baat op één balans: 75–100 % |
-| Verzekeraar | via verwerker/inzamelaar | Premiekorting als hefboom, geen financier (geen bron die betaling aantoont) |
-| PRO (Stichting OPEN) | 0 % brandschade (OPEN, 28-10-2025) | Alleen co-financiering van data (B0/K3b), orde EUR 10–50k per jaar |
+## 3. Betaalmodel per overlevende optie
+
+| Optie | Betaler | Model | Waarom |
+|---|---|---|---|
+| **B1 wagencamera** | **Inzamelaar/vlooteigenaar** (overheids-NV of Renewi/PreZero), met korting van de verzekeraar | **Fabrieksoptie in de voertuigaanbesteding** (EUR 3–7k per wagen) + data/service EUR 15–40 per wagen per maand. Valt onder het voertuigbestek (Almere 2026: ~EUR 1 mln per wagen), dus geen eigen aanbesteding | 67 % van de baat ligt bij de wageneigenaar, 33 % bij de verwerker. Chauffeursveiligheid (Arbo) is een tweede argument. Eigen sales per wagen is te duur (ratio 0,16) |
+| **K4 als add-on** | Gemeente/eigenaar container, via de bestaande vulgraad- of zuilleverancier | Optie EUR 1–2 per container per maand op een bestaand abonnement, of eenmalig EUR 60–80 bij nieuwe containers | Waarde (EUR 0,3 per maand) dekt de prijs niet. Verkopen als **veiligheids- en "niet legen"-functie** op hotspots (flats, stations), niet voor alle containers |
+| **B0 preventie / inzamelsleuf** | **Stichting OPEN (EPR)** voor de buizen en het legen; gemeente voor de plaatsing | Buis bij de zuil = uitbreiding van het bestaande OPEN-inzamelnet (kosten EUR 25–50 per jaar). Sorteeranalyse als co-financiering (OPEN/IenW, EUR 10–50k per jaar) | OPEN moet naar 63 % inzameling in 2027 (Batterijverordening). Het verlaagt de prevalentie bij **alle** schakels. Geen abonnement van ons |
+| **K3b ijk- of meetdienst** | **Wij zelf (R&D) + OPEN/IenW** | Projectdienst EUR 5–15k per campagne per gemeente, geen abonnement | Waarde = ground truth en hotspotkaart, niet bescherming (vermeden schade ≈ 0). Valt ruim onder de drempel van EUR 216k, dus onderhands te gunnen |
+
+## 4. Markt en beslissers (uit `research/A7_business.md`)
+
+**Markt**
+- Aantal ondergrondse containers NL: **geen landelijk cijfer gevonden**. Schatting restafval 30k / **45k** / 65k **[A]**. "Ruim 100.000" is alleen aannemelijk als je alle fracties meetelt.
+- Gemeenten: 342 (CBS 2026), gemiddeld ~130 rest-UGC per gemeente, sterk scheef verdeeld. Utrecht heeft 2.189 UGC (2024).
+- Voor B1: ~400–600 kraanwagens voor UGC **[A]**.
+
+**Wie beslist**
+- De gemeente heeft de zorgplicht en betaalt via de afvalstoffenheffing.
+- De uitvoering en vaak het eigendom van containers en wagens liggen bij een overheids-NV (HVC ~44 aandeelhouders, ROVA, Cyclus, Circulus, RMN), een gemeenschappelijke regeling (Avalex) of een private inzamelaar (Renewi, PreZero) op contract.
+
+**Inkoop**
+- Europese drempel EUR 216k (2026–2027). Een abonnement van EUR 10 per maand haalt die bij ~300 containers over 6 jaar.
+- Launching customer: een NV die inzamelaar én AVI is (HVC).
 
 ## Alleen met prototype/veld te bevestigen
-- **Kosten van vervolgacties en echte meldingsdruk:** in een veldpilot (1 inzamelaar, 50–100 containers, 3 maanden) registreren per melding: actie (laatst in route / apart / niets), extra minuten en kilometers, en uitkomst (steekproefsortering als ground truth, A8 power-analyse).
-- **Effectiviteit van de actie** (eff_truck): kan "niet persen / apart storten" een brand na crush echt voorkomen? Logboek van wagenincidenten bij de pilot-inzamelaar, vóór en na (alleen indicatief: Poisson-limiet, zie A6/A8).
-- **Betaalbereidheid:** 5 gesprekken (HVC, ROVA, Cyclus, Renewi, een verzekeraar) met prijsvraag (Van Westendorp) voor B1 per wagen en K2 per container.
+- Werkelijke kosten per melding en wat de chauffeur doet: pilot met 1 inzamelaar, 2–3 wagens met B1 en 50–100 containers, 3 maanden logboek.
+- Effect van B1 in de wagen (blustijd, schade per incident tegenover historie): incidentregistratie bij de inzamelaar, minstens 12 maanden. Statistisch alleen indicatief, zie A6/A8.
+- Betaalbereidheid: gesprekken met HVC, ROVA, Cyclus, Renewi, een verzekeraar en Stichting OPEN.

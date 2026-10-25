@@ -83,7 +83,8 @@ CONCEPTS = {
                hw=(45, 70, 110), install=(20, 35, 60), conn_pm=(0.4, 0.9, 1.5),
                maint_rate=(0.05, 0.08, 0.12), maint_cost=(60, 100, 150), cac_factor=1.0,
                recall=(0.6, 0.8, 0.9), event_only=True,      # alleen incidenten die in container starten
-               eff={"truck": (0.5, 0.7, 0.9), "proc": (0.5, 0.7, 0.9), "cont": (0.2, 0.4, 0.6)},
+               # FASE 2: A6 rekent 0 wagenbranden; A7 laat 'niet legen' bij container-start beperkt meetellen [A]
+               eff={"truck": (0.0, 0.3, 0.6), "proc": (0.0, 0.3, 0.6), "cont": (0.2, 0.4, 0.6)},
                alarms=(3, 1, 0.5)),
     "K5": dict(name="Hybride K2+K4 + actieprotocol", unit="container", cpu=(1, 1, 1),
                hw=(55, 90, 140), install=(35, 60, 100), conn_pm=(0.3, 0.7, 1.2),
@@ -94,7 +95,22 @@ CONCEPTS = {
                hw=(3000, 5000, 8000), install=(500, 1000, 2000), conn_pm=(5, 10, 20),
                maint_rate=(0.05, 0.10, 0.15), maint_cost=(300, 500, 800), cac_factor=1.0,
                recall=(0.8, 0.9, 0.95),            # detectie van brand in de laadbak
-               eff={"truck": (0.4, 0.6, 0.8), "proc": (0.1, 0.2, 0.4), "cont": (0, 0, 0)},   # schadebeperking
+               eff={"truck": (0.4, 0.6, 0.8), "proc": (0.1, 0.2, 0.4), "cont": (0, 0, 0)}, proc_factor=0.5,  # schadebeperking
+               alarms=(0.5, 0.3, 0.2)),
+    # FASE 2 varianten voor betaalmodel (niet in A5-BOM; afgeleid) [A]
+    "K4add": dict(name="K4 als add-on op bestaande vulgraad-/zuilmodule", unit="container", cpu=(1, 1, 1),
+               hw=(27, 40, 57),                       # alleen sensoren uit BOM_K4 (IR 8x8 + CO + NTC/RH)
+               install=(0, 10, 20), conn_pm=(0.05, 0.1, 0.2), cloud_included=True, maint_y=(2, 4, 8),
+               maint_rate=(0, 0, 0), maint_cost=(0, 0, 0), nre=(15000, 25000, 40000),
+               cac_factor=0.1, support_factor=0.2,       # verkocht door vulgraad-/zuilleverancier
+               recall=(0.6, 0.8, 0.9), event_only=True,
+               eff={"truck": (0.0, 0.3, 0.6), "proc": (0.0, 0.3, 0.6), "cont": (0.2, 0.4, 0.6)},
+               alarms=(3, 1, 0.5)),
+    "B1oem": dict(name="B1 als fabrieksoptie in voertuigaanbesteding", unit="wagen", cpu=(500, 300, 200),
+               hw=(700, 2050, 4800), install=(100, 200, 400), conn_pm=(5, 10, 20), cloud_included=True,
+               maint_y=(100, 200, 400), maint_rate=(0, 0, 0), maint_cost=(0, 0, 0), nre=(5000, 15000, 30000),
+               cac_factor=0.1, support_factor=0.3, proc_factor=0.5,
+               recall=(0.8, 0.9, 0.95), eff={"truck": (0.4, 0.6, 0.8), "proc": (0.1, 0.2, 0.4), "cont": (0, 0, 0)},
                alarms=(0.5, 0.3, 0.2)),
     "B0": dict(name="Accu-brievenbus + steekproefsortering", unit="container", cpu=(1, 1, 1),
                hw=(50, 100, 200), install=(20, 40, 80), conn_pm=(0, 0, 0),
@@ -115,46 +131,45 @@ def _num(x):
 
 
 def load_bom(concepts, bom_dir=os.path.join(ROOT, "product")):
-    """Overschrijf hw met A5-BOM als product/BOM_<ID>.csv bestaat. Retourneert lijst van ingelezen ID's."""
+    """FASE 2: lees A5-BOM. Voorkeur product/BOM_samenvatting.csv (kolommen hw_*, installatie_*, per_maand_*,
+    per_jaar_*, eenmalig_*, containers_per_unit_*); anders TOTAAL_*-rijen in product/BOM_<ID>.csv.
+    Zet hw, install, conn_pm (= connectiviteit + cloud), maint_y, nre en cpu. Retourneert ingelezen ID's."""
     used = []
-    for cid, c in concepts.items():
-        for fn in (f"BOM_{cid}.csv", f"BOM_{cid.lower()}.csv"):
-            p = os.path.join(bom_dir, fn)
-            if not os.path.exists(p):
-                continue
-            with open(p, newline="", encoding="utf-8") as f:
-                rows = list(csv.DictReader(f, delimiter=";" if ";" in f.readline() else ","))
-            if not rows:
-                continue
-            keys = {k: k.lower() for k in rows[0].keys() if k}
-            cols = {}
-            for s in S:
-                cand = [k for k, kl in keys.items() if kl == s or kl.endswith("_" + s) or kl.startswith(s + "_")
-                        or kl == f"eur_{s}" or kl == f"prijs_{s}"]
-                if cand:
-                    cols[s] = cand[0]
-            if len(cols) < 3:
-                continue
-            first = list(rows[0].keys())[0]
-            tot = [r for r in rows if str(r.get(first, "")).strip().lower() in ("totaal", "total", "som")]
-            if tot:
-                vals = tuple(_num(tot[0][cols[s]]) for s in S)
-            else:
-                qty_col = next((k for k, kl in keys.items() if kl in ("aantal", "qty", "n")), None)
-                vals = []
-                for s in S:
-                    t = 0.0
-                    for r in rows:
-                        v = _num(r[cols[s]])
-                        q = _num(r[qty_col]) if qty_col and _num(r[qty_col]) is not None else 1.0
-                        t += (v or 0) * q
-                    vals.append(t)
-                vals = tuple(vals)
-            if all(v is not None and v > 0 for v in vals):
-                c["hw"] = vals
-                c["hw_source"] = p.replace(ROOT + "/", "")
-                used.append(cid)
-                break
+    def apply(cid, d, src):
+        c = concepts[cid]
+        if "hw" in d: c["hw"] = d["hw"]
+        if "installatie" in d: c["install"] = d["installatie"]
+        if "per_maand" in d: c["conn_pm"] = d["per_maand"]; c["cloud_included"] = True
+        if "per_jaar" in d: c["maint_y"] = d["per_jaar"]
+        if "eenmalig" in d: c["nre"] = d["eenmalig"]
+        if "containers_per_unit" in d and c["unit"] != "container":
+            c["cpu"] = d["containers_per_unit"]
+        c["hw_source"] = src
+        used.append(cid)
+    p = os.path.join(bom_dir, "BOM_samenvatting.csv")
+    if os.path.exists(p):
+        for r in csv.DictReader(open(p, encoding="utf-8")):
+            cid = r["concept"].strip()
+            if cid not in concepts: continue
+            d = {}
+            for k in ("hw", "installatie", "per_maand", "per_jaar", "eenmalig", "containers_per_unit"):
+                vals = [_num(r.get(f"{k}_{s}", "")) for s in S]
+                if all(v is not None for v in vals): d[k] = tuple(vals)
+            apply(cid, d, "product/BOM_samenvatting.csv")
+    for cid in concepts:
+        if cid in used: continue
+        p = os.path.join(bom_dir, f"BOM_{cid}.csv")
+        if not os.path.exists(p): continue
+        d = {}
+        for r in csv.DictReader(open(p, encoding="utf-8")):
+            post = r.get("post", "")
+            if post.startswith("TOTAAL_"):
+                k = post[len("TOTAAL_"):]
+                k = {"hw": "hw", "installatie": "installatie", "per_maand": "per_maand", "per_jaar": "per_jaar", "eenmalig": "eenmalig"}.get(k)
+                if k: d[k] = tuple(_num(r[s]) for s in S)
+            if post.lower().startswith("containers per unit"):
+                d["containers_per_unit"] = tuple(_num(r[s]) for s in S)
+        if d: apply(cid, d, p.replace(ROOT + "/", ""))
     return used
 
 
@@ -168,13 +183,27 @@ def load_mc(concepts, glob):
             except Exception:
                 continue
             used = []
+            items = []
             for cid, d in mc.items():
-                if cid not in concepts or not isinstance(d, dict):
+                if not isinstance(d, dict) or cid.startswith("_"): continue
+                if cid == "K3": items += [("K3a", d), ("K3b", d)]
+                elif cid == "B1": items += [("B1", d), ("B1oem", d)]
+                else: items.append((cid, d))
+            for cid, d in items:
+                if cid not in concepts or cid in ("B0",):   # B0 = preventie, eigen model (zie RESULTATEN)
                     continue
                 c = concepts[cid]
-                if "recall_energy" in d: c["recall"] = tuple(d["recall_energy"])
-                if "alarms_per_1000_emptyings" in d: c["alarms"] = tuple(d["alarms_per_1000_emptyings"])
-                if "avoided_fire_fraction" in d: c["avoided_fraction"] = tuple(d["avoided_fire_fraction"])
+                if cid == "K4":   # A6: 0 wagenbranden; A7 houdt event-model voor container-starts aan
+                    if "fires_per_1000_containers_year" in d: glob["fires_per_1000_cy"] = tuple(d["fires_per_1000_containers_year"])
+                    c["mc_source"] = p.replace(ROOT + "/", ""); c["mc_note"] = "A6 avoided=0 (wagen); A7 event-model"; used.append(cid)
+                    continue
+                if d.get("recall_energy") and None not in d["recall_energy"]: c["recall"] = tuple(d["recall_energy"])
+                if d.get("alarms_per_1000_emptyings") and None not in d["alarms_per_1000_emptyings"]:
+                    c["alarms"] = tuple(d["alarms_per_1000_emptyings"])
+                if "avoided_fire_fraction" in d:
+                    af = tuple(d["avoided_fire_fraction"])
+                    if cid == "K3b": af = tuple(a / c["cpu"][1] for a in af)   # rouleert: dekt 1/cpu tegelijk
+                    c["avoided_fraction"] = af
                 if "fires_per_1000_containers_year" in d: glob["fires_per_1000_cy"] = tuple(d["fires_per_1000_containers_year"])
                 c["mc_source"] = p.replace(ROOT + "/", "")
                 used.append(cid)
@@ -196,18 +225,19 @@ def cost_pm(c, n, s, g=GLOBAL):
         "hardware": hw / L,
         "installatie": inst / L,
         "connectiviteit": c["conn_pm"][i] * 12,
-        "cloud": g["cloud_pm"][i] * {100: 3, 1000: 1.5, 10000: 1}[n] * 12,
-        "onderhoud": c["maint_rate"][i] * c["maint_cost"][i],
+        "cloud": 0.0 if c.get("cloud_included") else g["cloud_pm"][i] * {100: 3, 1000: 1.5, 10000: 1}[n] * 12,
+        "onderhoud": c["maint_y"][i] if "maint_y" in c else c["maint_rate"][i] * c["maint_cost"][i],
     }
-    if "moves_per_y" in c:
+    if "moves_per_y" in c and "maint_y" not in c:
         per_unit_y["onderhoud"] += c["moves_per_y"][i] * c["move_cost"][i]
-    if "opex_y" in c:
+    if "opex_y" in c and "maint_y" not in c:
         per_unit_y["onderhoud"] += c["opex_y"][i]
     out = {k: v * units / n / 12 for k, v in per_unit_y.items()}
     fixed = (g["support_fixed_y"][n] + g["support_per_unit_y"][c["unit"]] * units) * [0.7, 1, 1.4][i] * c.get("support_factor", 1.0)
     if c.get("unit") == "container" and "sorting_y_per_customer" in c:
         fixed = 0.5 * fixed + g["customers"][n] * c["sorting_y_per_customer"][i]
     out["support"] = fixed / n / 12
+    out["NRE"] = c.get("nre", (0, 0, 0))[i] / L / n / 12          # eenmalig (certificering/OEM-adapter), verdeeld over installed base n
     out["CAC"] = g["customers"][n] * g["cac_per_customer"][i] * c["cac_factor"] / L / n / 12
     if c.get("combine_with"):
         out["support"] *= 1.3   # K5: K4-hardware zit al in hw/install; twee kanalen = 30 % meer support [A]
@@ -232,9 +262,10 @@ def avoided_y(c, s, g, cid=None):
     if "prevalence_reduction" in c:                        # B0
         f = c["prevalence_reduction"][i]
         return {k: v * f for k, v in gross.items()}, gross
-    if "avoided_fraction" in c:                            # direct uit MC
+    if "avoided_fraction" in c:                            # direct uit MC (fractie wagenbranden vermeden)
         f = c["avoided_fraction"][i]
-        return {k: v * f for k, v in gross.items()}, gross
+        pf = c.get("proc_factor", 1.0)                     # zelfde fractie bij verwerker (zuil: container apart) [A]
+        return {"container": 0.0, "inzamelaar": gross["inzamelaar"] * f, "verwerker": gross["verwerker"] * f * pf}, gross
     r = c["recall"][i]
     if c.get("coverage_is_fraction"):
         r = r / c["cpu"][1]
@@ -331,20 +362,20 @@ def _write(res, concepts, g):
         L.append(f"| {cid} {r['name']} | {f(cp[100])} | {f(cp[1000])} | {f(cp[10000])} | "
                  f"{pp[1000]['basis']:.2f} [{pp[1000]['laag']:.1f}–{pp[1000]['hoog']:.1f}] | {pp[10000]['basis']:.2f} |")
     L.append("\n## Opbouw kostprijs bij 1.000 containers (basis, EUR/container/maand)\n")
-    keys = ["hardware", "installatie", "connectiviteit", "cloud", "onderhoud", "support", "CAC", "kostprijs"]
+    keys = ["hardware", "installatie", "connectiviteit", "cloud", "onderhoud", "support", "NRE", "CAC", "kostprijs"]
     L.append("| Concept | " + " | ".join(keys) + " |"); L.append("|---" * (len(keys) + 1) + "|")
     for cid, r in res["concepts"].items():
         L.append(f"| {cid} | " + " | ".join(f"{r['cost_pm'][1000]['basis'][k]:.2f}" for k in keys) + " |")
     L.append("\n## Business case per container per jaar, klant met 1.000 containers (EUR)\n")
-    L.append("| Concept | abonnement + vervolgacties (basis) | vermeden schade laag / basis / hoog | ratio basis | ratio pessimistisch / optimistisch | TCO 6 jr per 1.000 (basis) |")
-    L.append("|---|---|---|---|---|---|")
+    L.append("| Concept | abonnement + vervolgacties (basis) | vermeden schade laag / basis / hoog | ratio basis | ratio pessimistisch / optimistisch | TCO 6 jr per 1.000 (basis) | knock-out (ratio basis < 1) |")
+    L.append("|---|---|---|---|---|---|---|")
     for cid, r in res["concepts"].items():
         b = r["business_case_1000"]
         av = [sum(r["avoided_y"][s].values()) for s in S]
         L.append(f"| {cid} | {b['basis']['cost_y']:.0f} | {av[0]:.1f} / {av[1]:.1f} / {av[2]:.0f} | {b['basis']['ratio']:.2f} | "
-                 f"{b['pessimistisch']['ratio']:.3f} / {b['optimistisch']['ratio']:.2f} | {r['tco6_per_1000']['basis']/1e3:.0f}k |")
+                 f"{b['pessimistisch']['ratio']:.3f} / {b['optimistisch']['ratio']:.2f} | {r['tco6_per_1000']['basis']/1e3:.0f}k | {'JA' if b['basis']['ratio'] < 1 else 'nee'} |")
     L.append("\n## Break-even (basis)\n")
-    L.append("| Concept | max. prijs die vermeden schade dekt (EUR/container/mnd) | idem zonder kosten vervolgacties | kosten vervolgacties EUR/container/jr | benodigde brandfrequentie voor ratio 1 (per 1.000 containerjaar; A1: 0,3 / 1,7 / 15) |")
+    L.append("| Concept | max. prijs die vermeden schade dekt (EUR/container/mnd) | idem zonder kosten vervolgacties | kosten vervolgacties EUR/container/jr | benodigde brandfrequentie voor ratio 1 (per 1.000 containerjaar; gebruikt: " + " / ".join(f"{v:.2f}" for v in g["fires_per_1000_cy"]) + ") |")
     L.append("|---|---|---|---|---|")
     for cid, r in res["concepts"].items():
         extra = f" (prijs per eenheid {r['price_per_unit_pm_1000']['basis']:.0f} EUR/mnd)" if "price_per_unit_pm_1000" in r else ""
@@ -357,6 +388,7 @@ def _write(res, concepts, g):
     open(os.path.join(OUT, "tables.md"), "w").write("\n".join(L) + "\n")
     print("\n".join(L))
     _figs(res)
+    _figs_deck(res)
 
 
 def _figs(res):
@@ -374,7 +406,7 @@ def _figs(res):
     ax[0].set_yscale("log"); ax[0].set_xticks(x); ax[0].set_xticklabels(ids)
     ax[0].set_ylabel("EUR per container per maand (log)"); ax[0].set_title("Kostprijs leverancier vs vermeden schade")
     ax[0].legend(fontsize=8)
-    keys = ["hardware", "installatie", "connectiviteit", "cloud", "onderhoud", "support", "CAC"]
+    keys = ["hardware", "installatie", "connectiviteit", "cloud", "onderhoud", "support", "NRE", "CAC"]
     bottom = np.zeros(len(ids))
     for k in keys:
         v = np.array([res["concepts"][c]["cost_pm"][1000]["basis"][k] for c in ids])
@@ -396,6 +428,39 @@ def _figs(res):
     ax[1].set_xticks(x); ax[1].set_xticklabels(ids); ax[1].set_ylabel("EUR per container per jaar")
     ax[1].set_title("Wie heeft de vermeden schade? (basis)"); ax[1].legend(fontsize=8)
     fig.tight_layout(); fig.savefig(os.path.join(OUT, "fig_business_case.png"), dpi=130); plt.close(fig)
+
+
+def _figs_deck(res):
+    ids = list(res["concepts"].keys())
+    x = np.arange(len(ids))
+    # fig_prijs_vs_schade: abonnementsprijs (1.000 containers, basis, band laag-hoog) vs vermeden schade per maand
+    fig, ax = plt.subplots(figsize=(10, 5))
+    pb = np.array([res["concepts"][c]["price_pm"][1000]["basis"] for c in ids])
+    pl = np.array([res["concepts"][c]["price_pm"][1000]["laag"] for c in ids])
+    ph = np.array([res["concepts"][c]["price_pm"][1000]["hoog"] for c in ids])
+    ax.errorbar(x - 0.12, pb, yerr=[pb - pl, ph - pb], fmt="s", ms=8, capsize=4, color="#c0392b", label="abonnementsprijs (1.000 containers, 40 % marge)")
+    ab = np.array([sum(res["concepts"][c]["avoided_y"]["basis"].values()) / 12 for c in ids])
+    al = np.array([sum(res["concepts"][c]["avoided_y"]["laag"].values()) / 12 for c in ids])
+    ah = np.array([sum(res["concepts"][c]["avoided_y"]["hoog"].values()) / 12 for c in ids])
+    ax.errorbar(x + 0.12, np.maximum(ab, 1e-4), yerr=[np.maximum(ab, 1e-4) - np.maximum(al, 1e-5), ah - ab], fmt="o", ms=8, capsize=4,
+                color="#27ae60", label="vermeden schade (laag–basis–hoog brandkans)")
+    ax.set_yscale("log"); ax.set_xticks(x); ax.set_xticklabels(ids)
+    ax.set_ylabel("EUR per container per maand (log)")
+    ax.set_title("Abonnementsprijs vs vermeden schade per container")
+    ax.grid(axis="y", which="both", alpha=0.3); ax.legend(loc="lower left", fontsize=9)
+    fig.tight_layout(); fig.savefig(os.path.join(OUT, "fig_prijs_vs_schade.png"), dpi=140); plt.close(fig)
+    # fig_schaal: kostprijs en marge bij 100/1.000/10.000
+    fig, ax = plt.subplots(figsize=(11, 5))
+    w = 0.26
+    for j, n in enumerate(SCALES):
+        cost = np.array([res["concepts"][c]["cost_pm"][n]["basis"]["kostprijs"] for c in ids])
+        price = np.array([res["concepts"][c]["price_pm"][n]["basis"] for c in ids])
+        ax.bar(x + (j - 1) * w, cost, w, color=f"C{j}", label=f"kostprijs {n}")
+        ax.bar(x + (j - 1) * w, price - cost, w, bottom=cost, color=f"C{j}", alpha=0.35, hatch="//", label=f"marge {n}")
+    ax.set_yscale("log"); ax.set_xticks(x); ax.set_xticklabels(ids)
+    ax.set_ylim(0.3, None); ax.set_ylabel("EUR per container per maand (log)"); ax.set_title("Schaaleffect: kostprijs + marge bij 100 / 1.000 / 10.000 containers")
+    ax.legend(ncol=3, fontsize=8); ax.grid(axis="y", which="both", alpha=0.3)
+    fig.tight_layout(); fig.savefig(os.path.join(OUT, "fig_schaal.png"), dpi=140); plt.close(fig)
 
 
 if __name__ == "__main__":
