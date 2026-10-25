@@ -261,7 +261,7 @@ def run(n_cont, seed, scenarios, outdir):
         scores["random"] = rng.random(n_cont)
         concepts = {  # concept -> scorefunctie (zie RESULTATEN.md)
             "K1 VLF teller": "K1_teller", "K1 VLF bayes": "K1_bayes",
-            "K2 pakketwachter": "K2_bayes", "K3 rontgen": "K3_bayes",
+            "K2 pakketwachter": "K2_bayes", "K2 pakket-teller": "K2_pakket", "K3 rontgen": "K3_bayes",
             "B0 risicokaart": "B0_risicokaart", "perfect (bovengrens)": "perfect_bayes", "willekeurig": "random",
         }
         for cname, skey in concepts.items():
@@ -345,7 +345,7 @@ def plot(outdir, results, bagres, curves, meta):
     import matplotlib.pyplot as plt
     ink, ink2, grid = "#0b0b0b", "#52514e", "#e4e3df"
     col = {"K1 VLF teller": "#2a78d6", "K1 VLF bayes": "#eb6834", "K2 pakketwachter": "#1baf7a",
-           "K3 rontgen": "#eda100", "B0 risicokaart": "#6250d6", "perfect (bovengrens)": "#52514e", "willekeurig": "#a9a8a2"}
+           "K3 rontgen": "#eda100", "K2 pakket-teller": "#e87ba4", "B0 risicokaart": "#6250d6", "perfect (bovengrens)": "#52514e", "willekeurig": "#a9a8a2"}
     tag = "  [PLACEHOLDER-sensormodellen]" if meta["placeholder_any"] else ""
     plt.rcParams.update({"font.size": 9, "axes.edgecolor": grid, "axes.labelcolor": ink2,
                          "xtick.color": ink2, "ytick.color": ink2, "axes.spines.top": False, "axes.spines.right": False})
@@ -418,7 +418,7 @@ def plot(outdir, results, bagres, curves, meta):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--n", type=int, default=20000, help="aantal containerledigingen per scenario")
+    ap.add_argument("--n", type=int, default=30000, help="aantal containerledigingen per scenario")
     ap.add_argument("--seed", type=int, default=20261025)
     ap.add_argument("--fast", action="store_true")
     ap.add_argument("--out", default=HERE)

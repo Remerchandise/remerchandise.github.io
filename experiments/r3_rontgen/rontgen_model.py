@@ -81,10 +81,13 @@ def loginterp(tab, e):
     return np.exp(np.interp(np.log(e), np.log(tab[0]), np.log(tab[1])))
 
 
-def spectrum(kv, p_w, filt=(('Al', 0.135),), self_abs=0.5, n=300):
+WINDOWS = (('Al', 0.135), ('PE', 0.57))  # [A] 0,5 mm Al buisfilter + 2 PE-vensters 3 mm in trommelwanden (R2b)
+
+
+def spectrum(kv, p_w, filt=WINDOWS, self_abs=0.5, n=300):
     """Kramers-spectrum W-anode. Retour: E [keV], N [fotonen/s/sr per bin].
     eta = 1.1e-9*Z*V (Kramers/Compton). Isotroop in 4pi, factor self_abs voor anode-zelfabsorptie [A].
-    filt: lijst (materiaal, g/cm2); standaard 0.5 mm Al (0.135 g/cm2)."""
+    filt: lijst (materiaal, g/cm2); standaard WINDOWS."""
     E = np.linspace(8, kv, n)[:-1] + (kv - 8) / n / 2
     dE = (kv - 8) / n
     eta = 1.1e-9 * 74 * kv * 1e3

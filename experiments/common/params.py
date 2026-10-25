@@ -50,7 +50,7 @@ K_PER_WHEQ = {"laag": 1.7e-7, "basis": 1.5e-6, "hoog": 2.3e-5}
 # Drempels (A1)
 THRESH_THROW = {"oranje": 10, "rood": 50}       # Wh-eq per inworp
 THRESH_CONTAINER = {"oranje": 50, "rood": 150}  # Wh-eq per container sinds lediging
-PACK_WHEQ = 50  # 'pakket' klasse
+PACK_WHEQ = 20  # sensorklasse "pakket" = powerbank en groter (Orchestrator-besluit R3: met params-Wh valt bij 50 alleen e-bike erboven; A8/A1 Pareto: >=powerbank = ~58 % risico)
 
 # Sensor-uitgangsklassen (gemeenschappelijk formaat voor A2/A3/A4 -> A6)
 # Per concept levert een agent experiments/<map>/sensor_model_<concept>.json:

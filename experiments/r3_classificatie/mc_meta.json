@@ -1,0 +1,36 @@
+{
+ "n_containers": 3000,
+ "bags": 100,
+ "seed": 20261025,
+ "risk": "eigen: 1-exp(-k*Wh-eq) (params.K_PER_WHEQ)",
+ "ops": {
+  "containers_per_truck_day": 125,
+  "truck_days_per_week": 5,
+  "budget_oranje_per_truck_day": 2.5,
+  "budget_rood_per_truck_week": 1.0,
+  "eff_oranje": 0.3,
+  "eff_rood": 0.8,
+  "latent_gamma_shape": 2.0,
+  "b0_score_noise_sigma": 0.7,
+  "bags_per_emptying": 100
+ },
+ "sensors": {
+  "K1": {
+   "path": "experiments/r3_classificatie/placeholders/sensor_model_K1.json",
+   "placeholder": true
+  },
+  "K2": {
+   "path": "experiments/r3_classificatie/placeholders/sensor_model_K2.json",
+   "placeholder": true
+  },
+  "K3": {
+   "path": "experiments/r3_classificatie/placeholders/sensor_model_K3.json",
+   "placeholder": true
+  }
+ },
+ "events": {
+  "K4": "experiments/r3_classificatie/placeholders/event_model_K4.json",
+  "B1": "experiments/r3_classificatie/placeholders/event_model_B1.json"
+ },
+ "placeholder_any": true
+}
