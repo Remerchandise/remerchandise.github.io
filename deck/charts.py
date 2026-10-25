@@ -107,7 +107,8 @@ def c_inductie():
     if clutter:
         fa = (clutter[1] + clutter[2]) * 100
         ax.axvline(fa, color=INK, lw=1.2, ls="--")
-        ax.text(fa + 0.8, 0.2, f"vals alarm zak\nzonder Li: {fa:.0f}%", fontsize=10, color=INK)
+        ax.annotate(f"vals alarm bij zak\nzonder lithium: {fa:.0f}%", xy=(fa, 5.5), xytext=(22, 5.0),
+                    fontsize=10.5, color=INK, arrowprops=dict(arrowstyle="-", color=INK, lw=0.8))
     ax.set_xlabel("Kans op melding 'cel/pakket' als item in een gewone zak zit (K1, VLF)")
     from matplotlib.patches import Patch
     ax.legend(handles=[Patch(color=EMBER, label="lithium"), Patch(color=GRAY, label="geen lithium")], loc="lower right")
@@ -125,7 +126,8 @@ def c_rontgen():
     ax.set_xscale("log"); ax.set_xlim(1e-14, 2)
     ax.set_yticks(y, [o[0] for o in objs]); ax.grid(axis="y", visible=False)
     ax.axvline(1e-4, color=INK, lw=1, ls="--")
-    ax.text(1.3e-4, 8.3, "≈ zwart", fontsize=10, color=INK)
+    ax.text(1.5e-4, -0.9, "links hiervan: object ≈ zwart", fontsize=10, color=INK)
+    ax.set_ylim(-1.3, len(objs) - 0.4)
     ax.set_xlabel("Relatieve transmissie achter zak van 10 g/cm² bij 30 kV (log)")
     save(fig, "c04_rontgen_transmissie.png")
 
@@ -187,7 +189,8 @@ def c_recall():
             continue
         x, y = zip(*pts)
         ax.plot(x, y, ls, marker="o", color=col, lw=2.2, ms=7)
-        ax.text(51.5, y[-1], lab, va="center", fontsize=11, color=INK)
+        off = {"B0 geen sensor": 1.4, "K2 pakketwachter": 0.0, "K1 strandmetaaldetector": -1.4}.get(lab, 0)
+        ax.text(51.5, y[-1] + off, lab, va="center", fontsize=11, color=INK)
     ax.set_xlim(0, 75); ax.set_ylim(0, 35)
     ax.set_xticks([5, 20, 50])
     ax.set_xlabel("Meldingen per 1.000 ledigingen (drempelkeuze)")
@@ -214,6 +217,12 @@ def c_inworp():
     save(fig, "c08_inworp.png")
 
 
+SHORT = {"K1": "K1 strandmetaaldetector", "K2": "K2 pakketwachter", "K3a": "K3a röntgen vast",
+         "K3b": "K3b röntgen-ijkpaal", "K4": "K4 deksel-event", "K4add": "K4add add-on hotspots",
+         "K5": "K5 hybride", "B1": "B1 camera wagen (abo)", "B1oem": "B1oem camera wagen (OEM)",
+         "B0": "B0 accu-brievenbus"}
+
+
 # 7. Scorekaart ------------------------------------------------------------------
 def c_scores():
     rows = J("experiments/r4_scorekaart/scorekaart.json")["concepten"]
@@ -221,9 +230,10 @@ def c_scores():
     fig, ax = plt.subplots(figsize=(7.2, 4.6))
     cols = [TEAL if r["oordeel"].startswith("CONDITIONEEL") else GRAY for r in rows]
     ax.barh(range(len(rows)), [r["gewogen"] for r in rows], color=cols, height=0.62)
-    ax.set_yticks(range(len(rows)), [f"{r['id']}  {r['naam'][:34]}" for r in rows], fontsize=11)
+    ax.set_yticks(range(len(rows)), [SHORT.get(r["id"], r["id"]) for r in rows], fontsize=11.5)
     ax.axvline(3.5, color=INK, lw=1.2, ls="--")
-    ax.text(3.53, len(rows) - 0.6, "drempel\nAANBEVOLEN 3,5", fontsize=10, color=INK, va="top")
+    ax.text(3.55, -0.9, "drempel AANBEVOLEN = 3,5", fontsize=10, color=INK)
+    ax.set_ylim(-1.3, len(rows) - 0.4)
     for i, r in enumerate(rows):
         t = f"{r['gewogen']:.2f}".replace(".", ",") + ("  KO" if r["knockout"] else "")
         ax.text(r["gewogen"] + 0.05, i, t, va="center", fontsize=10.5, color=INK)
@@ -231,7 +241,7 @@ def c_scores():
     ax.set_xlabel("Gewogen score (1–5)")
     from matplotlib.patches import Patch
     ax.legend(handles=[Patch(color=TEAL, label="conditioneel"), Patch(color=GRAY, label="niet aanbevolen")],
-              loc="lower right")
+              loc="lower right", bbox_to_anchor=(1.0, 0.08))
     save(fig, "c09_scores.png")
 
 
@@ -247,13 +257,13 @@ def c_prijs_schade():
         ax.plot(pr["basis"], i, "o", color=EMBER, ms=9)
         ax.plot([max(av["laag"], 0.01), av["hoog"]], [i + 0.0, i + 0.0], color=GRAY, lw=1.5)
         ax.plot(max(av["basis"], 0.01), i, "D", color=INK, ms=7)
-    ax.set_yticks(range(len(order)), order); ax.grid(axis="y", visible=False)
+    ax.set_yticks(range(len(order)), [SHORT.get(k, k) for k in order]); ax.grid(axis="y", visible=False)
     ax.set_xscale("log"); ax.set_xlim(0.01, 300)
     ax.set_xlabel("EUR per container per maand (log), klant met 1.000 containers")
     from matplotlib.lines import Line2D
     ax.legend(handles=[Line2D([], [], marker="o", color=EMBER, ls="", ms=9, label="abonnementsprijs (basis, band)"),
                        Line2D([], [], marker="D", color=INK, ls="", ms=7, label="vermeden schade (basis; lijn = laag–hoog)")],
-              loc="lower right", fontsize=10.5)
+              loc="upper center", bbox_to_anchor=(0.4, -0.13), ncol=2, fontsize=10.5)
     save(fig, "c10_prijs_vs_schade.png")
 
 
