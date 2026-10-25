@@ -86,9 +86,9 @@
     "mediaan_detectietijd_brand_min": 15.0
    },
    "B": {
-    "brand_P_det_10min": 0.2570951585976628,
-    "brand_P_det_30min": 0.6928213689482471,
-    "brand_P_det_60min": 0.7813021702838063,
+    "brand_P_det_10min": 0.2646076794657763,
+    "brand_P_det_30min": 0.6936560934891486,
+    "brand_P_det_60min": 0.7821368948247078,
     "TR_zonder_brand_P_det_60min": 0.4057815845824411,
     "mediaan_detectietijd_brand_min": 17.0
    },
@@ -100,17 +100,17 @@
     "mediaan_detectietijd_brand_min": Infinity
    },
    "D": {
-    "brand_P_det_10min": 0.2913188647746244,
+    "brand_P_det_10min": 0.29716193656093487,
     "brand_P_det_30min": 0.672787979966611,
     "brand_P_det_60min": 0.7771285475792988,
     "TR_zonder_brand_P_det_60min": 0.4586009992862241,
     "mediaan_detectietijd_brand_min": 17.5
    },
    "E": {
-    "brand_P_det_10min": 0.20534223706176963,
-    "brand_P_det_30min": 0.41318864774624375,
-    "brand_P_det_60min": 0.4732888146911519,
-    "TR_zonder_brand_P_det_60min": 0.2883654532476802,
+    "brand_P_det_10min": 0.21619365609348914,
+    "brand_P_det_30min": 0.41819699499165275,
+    "brand_P_det_60min": 0.4782971619365609,
+    "TR_zonder_brand_P_det_60min": 0.2890792291220557,
     "mediaan_detectietijd_brand_min": Infinity
    }
   },
@@ -126,8 +126,8 @@
     "brand_P_det_10min": 1.0,
     "brand_P_det_30min": 1.0,
     "brand_P_det_60min": 1.0,
-    "TR_zonder_brand_P_det_60min": 0.935678391959799,
-    "mediaan_detectietijd_brand_min": 10.0
+    "TR_zonder_brand_P_det_60min": 1.0,
+    "mediaan_detectietijd_brand_min": 1.5
    },
    "C": {
     "brand_P_det_10min": 1.0,
@@ -140,15 +140,15 @@
     "brand_P_det_10min": 1.0,
     "brand_P_det_30min": 1.0,
     "brand_P_det_60min": 1.0,
-    "TR_zonder_brand_P_det_60min": 0.9577889447236181,
+    "TR_zonder_brand_P_det_60min": 1.0,
     "mediaan_detectietijd_brand_min": 1.5
    },
    "E": {
     "brand_P_det_10min": 1.0,
     "brand_P_det_30min": 1.0,
     "brand_P_det_60min": 1.0,
-    "TR_zonder_brand_P_det_60min": 0.9306532663316583,
-    "mediaan_detectietijd_brand_min": 10.0
+    "TR_zonder_brand_P_det_60min": 0.9994974874371859,
+    "mediaan_detectietijd_brand_min": 1.5
    }
   },
   "hoog": {
@@ -164,7 +164,7 @@
     "brand_P_det_30min": 1.0,
     "brand_P_det_60min": 1.0,
     "TR_zonder_brand_P_det_60min": 1.0,
-    "mediaan_detectietijd_brand_min": 10.0
+    "mediaan_detectietijd_brand_min": 0.5
    },
    "C": {
     "brand_P_det_10min": 1.0,
@@ -185,7 +185,7 @@
     "brand_P_det_30min": 1.0,
     "brand_P_det_60min": 1.0,
     "TR_zonder_brand_P_det_60min": 1.0,
-    "mediaan_detectietijd_brand_min": 10.0
+    "mediaan_detectietijd_brand_min": 0.5
    }
   }
  },
@@ -257,10 +257,10 @@
     "hindervlaggen_per_1000_containers_jaar": 35816.66666666667
    },
    "B": {
-    "PPV_accubrand": 8.45405480734783e-06,
-    "PPV_brand_alle_oorzaken": 4.2268844664221416e-05,
-    "PPV_brand_of_heet_object": 0.2511587955594938,
-    "vlaggen_per_1000_containers_jaar": 18484.114635503618,
+    "PPV_accubrand": 8.463086840745212e-06,
+    "PPV_brand_alle_oorzaken": 4.231400177543964e-05,
+    "PPV_brand_of_heet_object": 0.25115882937642875,
+    "vlaggen_per_1000_containers_jaar": 18484.115470228156,
     "hindervlaggen_per_1000_containers_jaar": 13841.666666666666
    },
    "C": {
@@ -278,10 +278,10 @@
     "hindervlaggen_per_1000_containers_jaar": 6441.666666666666
    },
    "E": {
-    "PPV_accubrand": 2.244797740621759e-05,
-    "PPV_brand_alle_oorzaken": 0.00011222980970215797,
-    "PPV_brand_of_heet_object": 0.9940718116389521,
-    "vlaggen_per_1000_containers_jaar": 4217.139955481358,
+    "PPV_accubrand": 2.268551675184987e-05,
+    "PPV_brand_alle_oorzaken": 0.00011341729203973528,
+    "PPV_brand_of_heet_object": 0.9940718186793612,
+    "vlaggen_per_1000_containers_jaar": 4217.144963828603,
     "hindervlaggen_per_1000_containers_jaar": 25.0
    }
   },
@@ -508,7 +508,7 @@
   "event_kanaal": {
    "rood_niet_legen": "regel E",
    "kans_detectie_brand_60min_l_b_h": [
-    0.4732888146911519,
+    0.4782971619365609,
     1.0,
     1.0
    ],

@@ -1,0 +1,221 @@
+{
+ "concept": "K1",
+ "classes": [
+  "geen",
+  "cel",
+  "pakket"
+ ],
+ "p_out_given_item": {
+  "blik": [
+   0.98,
+   0.018333333333333333,
+   0.0016666666666666668
+  ],
+  "folie": [
+   0.9966666666666667,
+   0.0033333333333333335,
+   0.0
+  ],
+  "sleutel_klein_metaal": [
+   0.9833333333333333,
+   0.016666666666666666,
+   0.0
+  ],
+  "pan_gereedschap": [
+   0.9966666666666667,
+   0.0,
+   0.0033333333333333335
+  ],
+  "alkaline": [
+   0.8983333333333333,
+   0.10166666666666667,
+   0.0
+  ],
+  "knoopcel": [
+   0.99,
+   0.01,
+   0.0
+  ],
+  "elektronica_zonder_accu": [
+   0.9783333333333334,
+   0.021666666666666667,
+   0.0
+  ],
+  "vape": [
+   0.99,
+   0.01,
+   0.0
+  ],
+  "li_klein_overig": [
+   1.0,
+   0.0,
+   0.0
+  ],
+  "cel_18650": [
+   0.6733333333333333,
+   0.31,
+   0.016666666666666666
+  ],
+  "telefoon": [
+   0.9083333333333333,
+   0.09166666666666666,
+   0.0
+  ],
+  "powerbank": [
+   0.47333333333333333,
+   0.31333333333333335,
+   0.21333333333333335
+  ],
+  "laptop_gereedschap": [
+   0.44,
+   0.2783333333333333,
+   0.2816666666666667
+  ],
+  "ebike_step": [
+   0.14166666666666666,
+   0.18833333333333332,
+   0.67
+  ]
+ },
+ "clutter": {
+  "model": "independent_or",
+  "note": "p_out_given_item = object all\u00e9\u00e9n in zak. Realistischer: gebruik clutter_bag.p_out (valse uitvoer per Li-loze zak met realistische metaalinhoud, superpositie gesimuleerd) en p_out_given_item_in_bag (Li-item + realistische clutter)."
+ },
+ "masking": {
+  "p_miss_li_given_n_metal": [
+   0.0,
+   0.1405985032070315,
+   0.2765375829842779,
+   0.5210636966185747
+  ],
+  "definitie": "P(detectie>=cel | Li + n metaalobjecten) = P(detectie | alleen) * (1 - p_miss[n]); energiegewogen over Li-items; index 3 = 3+ (realistische zakken met >=3 metaalobjecten)"
+ },
+ "clutter_bag": {
+  "p_out": [
+   0.979625,
+   0.018625,
+   0.00175
+  ],
+  "p_out_given_n_metal": {
+   "0": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "1": [
+    0.984375,
+    0.015625,
+    0.0
+   ],
+   "2": [
+    0.9795180722891567,
+    0.01927710843373494,
+    0.0012048192771084338
+   ],
+   "3": [
+    0.9781033649975849,
+    0.019803574303654807,
+    0.002093060698760264
+   ]
+  },
+  "frac_bags_n_metal": [
+   0.039875,
+   0.08,
+   0.10375,
+   0.776375
+  ]
+ },
+ "p_out_given_item_in_bag": {
+  "blik": [
+   0.9866666666666667,
+   0.011666666666666667,
+   0.0016666666666666668
+  ],
+  "folie": [
+   0.9766666666666667,
+   0.023333333333333334,
+   0.0
+  ],
+  "sleutel_klein_metaal": [
+   0.9816666666666667,
+   0.016666666666666666,
+   0.0016666666666666668
+  ],
+  "pan_gereedschap": [
+   0.9433333333333334,
+   0.041666666666666664,
+   0.015
+  ],
+  "alkaline": [
+   0.935,
+   0.06333333333333334,
+   0.0016666666666666668
+  ],
+  "knoopcel": [
+   0.975,
+   0.02,
+   0.005
+  ],
+  "elektronica_zonder_accu": [
+   0.9683333333333334,
+   0.028333333333333332,
+   0.0033333333333333335
+  ],
+  "vape": [
+   0.9783333333333334,
+   0.02,
+   0.0016666666666666668
+  ],
+  "li_klein_overig": [
+   0.9816666666666667,
+   0.016666666666666666,
+   0.0016666666666666668
+  ],
+  "cel_18650": [
+   0.865,
+   0.11833333333333333,
+   0.016666666666666666
+  ],
+  "telefoon": [
+   0.9616666666666667,
+   0.035,
+   0.0033333333333333335
+  ],
+  "powerbank": [
+   0.73,
+   0.15166666666666667,
+   0.11833333333333333
+  ],
+  "laptop_gereedschap": [
+   0.81,
+   0.12,
+   0.07
+  ],
+  "ebike_step": [
+   0.4066666666666667,
+   0.13166666666666665,
+   0.46166666666666667
+  ]
+ },
+ "operating_point": {
+  "vals_pakket_per_clutterzak": 0.002,
+  "vals_cel_of_pakket_per_clutterzak": 0.02,
+  "meettijd_s": 2.0,
+  "ruisniveau": "basis"
+ },
+ "gevoeligheid": {
+  "laag": {
+   "recall_pakket_items_in_bag": 0.23951257861635217,
+   "recall_any_li_energy_in_bag": 0.24049534196773462
+  },
+  "basis": {
+   "recall_pakket_items_in_bag": 0.2531446540880503,
+   "recall_any_li_energy_in_bag": 0.24479436491706433
+  },
+  "hoog": {
+   "recall_pakket_items_in_bag": 0.22226415094339622,
+   "recall_any_li_energy_in_bag": 0.2066251988184504
+  }
+ },
+ "basis": "A2 R3 simulatie experiments/r3_inductie/sim_inductie.py: dipool-polariseerbaarheid per object (multi-exponenti\u00eble eddy-modes + ferro-term), Biot-Savart 40x40 cm lus(sen), willekeurige positie/ori\u00ebntatie, superpositie clutter uit params.ITEMS, ruis+RVS-trommelrest [A], kNN-classifier. K1 = 1 lus, VLF 5/15/40 kHz I/Q. Pakket = powerbank, laptop/gereedschap, e-bike (PACK_WHEQ=20, Orchestrator)."
+}

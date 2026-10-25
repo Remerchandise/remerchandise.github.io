@@ -24,12 +24,12 @@ MECH = [
     ("Overladen (BESS, referentie)", "n.v.t.", (300, 900, 1800), (600, 1800, 7200), "Li-ion Tamer 9–25 min; ref. UN GTR 20 eist 5 min"),
 ]
 
-# latentie detectiekanaal na TR / brand (s) (l,b,h) – uit warmte_gas.py / b1_laadbak.py
+# latentie detectiekanaal na TR (s) (laag, basis, hoog) – uit valsalarm_mc.py (mediaan) en b1_laadbak.py (p90)
 CHANNELS = [
-    ("K4 CO-cel kopruimte (cel bovenin ≤0,3 m)", (90, 180, 600)),
-    ("K4 CO-cel (cel 1 m diep, smeulen)", (300, 1200, 7200)),
-    ("K4 IR 8×8 (cel bovenin)", (30, 120, 600)),
-    ("B1 thermische camera laadbak (TR in zicht)", (1, 3, 10)),
+    ("K4 CO-cel, basis (cel ≤ 0,3 m, Darcy-pluim)", (30, 90, 900)),
+    ("K4 CO-cel, pessimistisch (diep, lage permeabiliteit)", (300, 900, 7200)),
+    ("K4 IR 8×8 (alleen cel ≤ 0,3–0,6 m)", (30, 30, 7200)),
+    ("B1 thermische camera laadbak (TR in zicht)", (1, 1, 80)),
     ("Li-ion Tamer (vóór TR, BESS-rek)", (-1500, -400, -380)),
 ]
 
@@ -48,7 +48,7 @@ def main():
         ax.barh(y, -max(v[1], 1), left=0, color="#e07a1f", height=0.6, label="venster venting→TR (basis; licht = hoog)" if i == 0 else None)
         ax.barh(y, 1800, left=0, color="#b22222", height=0.6, label="TR → brand/smeulen" if i == 0 else None)
         ax.text(-3500, y, f"{n}\n[{s}]", va="center", ha="right", fontsize=8)
-        ax.text(1900, y, f"{v[1]/60:.1f} min (l {v[0]/60:.1f} – h {v[2]/60:.0f})", va="center", fontsize=8)
+        ax.text(1900, y, f"{v[1]/60:.1f} min (l {v[0]/60:.1f} – h {v[2]/60:.1f})", va="center", fontsize=8)
     ax.axvline(0, color="k", lw=1)
     ax.set_xlim(-3600, 5000)
     ax.set_yticks([])

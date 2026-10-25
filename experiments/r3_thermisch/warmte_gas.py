@@ -113,7 +113,7 @@ def main():
         p_pre = float(np.mean(M.t_diffusion(d, Dg) < win))
         v = M.darcy_velocity(M.PERM[lab])
         t_post = d / v
-        out_d[lab] = {
+        out_d[{"laag": "pessimistisch", "basis": "basis", "hoog": "optimistisch"}[lab]] = {
             "diepte_mediaan_m": float(np.median(d)), "P_diepte_lt_0.3m": float(np.mean(d < 0.3)),
             "P_ventgas_voor_TR": p_pre,
             "P_rookgas_kopruimte_10min": float(np.mean(t_post < 600)),

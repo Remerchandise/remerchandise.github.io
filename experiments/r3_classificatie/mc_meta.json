@@ -24,13 +24,13 @@
    "placeholder": true
   },
   "K3": {
-   "path": "experiments/r3_classificatie/placeholders/sensor_model_K3.json",
-   "placeholder": true
+   "path": "experiments/r3_rontgen/sensor_model_K3.json",
+   "placeholder": false
   }
  },
  "events": {
-  "K4": "experiments/r3_classificatie/placeholders/event_model_K4.json",
-  "B1": "experiments/r3_classificatie/placeholders/event_model_B1.json"
+  "K4": "experiments/r3_thermisch/event_model_K4.json",
+  "B1": "experiments/r3_thermisch/b1_resultaten.json"
  },
  "placeholder_any": true
 }

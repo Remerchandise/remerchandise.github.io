@@ -187,6 +187,7 @@ def fire_events(rng, sc, n, co_bg, sustain_p):
     Tmed = 15.0
     lag = int(600 / dt)
     dco = np.zeros_like(co); dco[:, lag:] = co[:, lag:] - co[:, :-lag]
+    dco[:, :lag] = co[:, :lag] - co_bg[:, None]   # historie vóór TR = achtergrond
     A = co > TH["co_abs"]; B = dco > TH["co_rise"]
     irn = ((Tmed + excess) > TH["ir_abs"]) & (excess > TH["ir_excess"])
     Cc = irn.copy(); Cc[:, 2:] = irn[:, 2:] & irn[:, 1:-1] & irn[:, :-2]
@@ -199,7 +200,6 @@ def fire_events(rng, sc, n, co_bg, sustain_p):
     for k, X in R.items():
         hit = X.any(axis=1)
         first = np.where(hit, t[np.argmax(X, axis=1)], np.inf)
-        tdet[k] = (first - np.minimum(t_arr, first)) / 60.0  # min na TR-onset (TR = t_arr - transport; gebruik t=0 als TR)
         tdet[k] = np.where(hit, t[np.argmax(X, axis=1)] / 60.0, np.inf)
     return tdet, sustain, d
 

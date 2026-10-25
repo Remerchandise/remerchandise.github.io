@@ -73,14 +73,42 @@ def load_sensor(concept):
 
 
 def load_event(name):
-    p = _first([os.path.join(ROOT, "experiments", "r3_thermisch", f"event_model_{name}.json"),
-                os.path.join(HERE, "placeholders", f"event_model_{name}.json")])
+    cands = [os.path.join(ROOT, "experiments", "r3_thermisch", f"event_model_{name}.json")]
+    if name == "B1":
+        cands.append(os.path.join(ROOT, "experiments", "r3_thermisch", "b1_resultaten.json"))
+    p = _first(cands + [os.path.join(HERE, "placeholders", f"event_model_{name}.json")])
     m = json.load(open(p))
     if name == "B1" and "B1" in m:
         m = m["B1"]
     m["_path"] = os.path.relpath(p, ROOT)
     m["_placeholder"] = "placeholders" in p
     return m
+
+
+def event_params(ev, kind, scen):
+    """Normaliseert A4-formaat (formaat_A6 / per-scenario) en placeholder-formaat naar één dict."""
+    si = SCEN_INDEX[scen]
+    if kind == "K4":
+        if "formaat_A6" in ev:
+            ek = ev["formaat_A6"]["event_kanaal"]
+            a = ev.get("aannames", {})
+            lam = a.get("lambda_fire_li_per_UGC_jaar", {}).get(scen, 5e-4)
+            rule = "E"  # A4-aanbevolen coincidentieregel
+            flag = ev.get("vlag_actief_bij_lediging_per_container_jaar", {}).get(scen, {}).get(rule)
+            return dict(p_detect=ek["kans_detectie_brand_60min_l_b_h"][si],
+                        # telt voor de chauffeur: vlag actief op moment van lediging (anders: alle valse alarmen)
+                        fa_per_cy=flag if flag is not None else ek["vals_alarm_per_container_jaar_l_b_h"][si],
+                        fa_all_per_cy=ek["vals_alarm_per_container_jaar_l_b_h"][si],
+                        cf_rate=lam, dmg_red=0.5)  # dmg_red [A] A6: brand in container vroeg gemeld -> halve schade
+        return dict(p_detect=ev["p_detect_container_fire"], fa_per_cy=ev["false_alarms_per_container_year"],
+                    cf_rate=ev["container_fire_rate_per_container_year"], dmg_red=ev["damage_reduction_if_detected"])
+    # B1
+    if scen in ev and isinstance(ev[scen], dict) and "P_det" in ev[scen]:
+        avoided = ev.get("vermeden_schade_per_wagenbrand_eur_l_b_h")
+        return dict(p_detect=ev[scen]["P_det"], avoided_eur_per_fire=(avoided[si] if avoided else None),
+                    dmg_red=0.6, fa_truck_week=float("nan"))
+    return dict(p_detect=ev["p_detect_truck_fire"], avoided_eur_per_fire=None,
+                dmg_red=ev["damage_reduction_if_detected"], fa_truck_week=ev.get("false_alarms_per_truck_week", float("nan")))
 
 
 def load_risk():
@@ -299,10 +327,13 @@ def run(n_cont, seed, scenarios, outdir):
         # K5 = K2-rangorde + K4-eventkanaal; B1 = camera wagen; K4 alleen
         base_k2 = [r for r in results if r["scenario"] == scen and r["concept"] == "K2 pakketwachter" and r["regel"] == "budget"][0]
         fires_truck = base_k2["branden_per_1000c_jr"]
-        cf = ev_k4["container_fire_rate_per_container_year"] * 1000
-        k4_cont_avoided = cf * ev_k4["p_detect_container_fire"] * ev_k4["damage_reduction_if_detected"]
-        k4_fa_week = ev_k4["false_alarms_per_container_year"] * cpd * tdw / 52
-        b1_eq = fires_truck * ev_b1["p_detect_truck_fire"] * ev_b1["damage_reduction_if_detected"]
+        e4, e1 = event_params(ev_k4, "K4", scen), event_params(ev_b1, "B1", scen)
+        k4_cont_avoided = e4["cf_rate"] * 1000 * e4["p_detect"] * e4["dmg_red"]
+        k4_fa_week = e4["fa_per_cy"] * cpd * tdw / 52   # vals alarm per wagen per week
+        if e1["avoided_eur_per_fire"] is not None:   # A4 levert vermeden EUR per wagenbrand direct
+            b1_eq = fires_truck * e1["avoided_eur_per_fire"] / P.ECON["fire_cost_truck_eur"][SCEN_INDEX[scen]]
+        else:
+            b1_eq = fires_truck * e1["p_detect"] * e1["dmg_red"]
         for cname, extra in (("K4 deksel-event", dict(src=None)), ("K5 hybride (K2+K4)", dict(src=base_k2)),
                              ("B1 camera wagen", dict(src=None))):
             r = {kk: (float("nan") if isinstance(vv, float) else vv) for kk, vv in base_k2.items()}
@@ -315,7 +346,7 @@ def run(n_cont, seed, scenarios, outdir):
                 r["meld_rood_per_wagen_week"] = base_k2["meld_rood_per_wagen_week"] + k4_fa_week
                 r["containerbranden_schade_eq_vermeden_per_1000c_jr"] = k4_cont_avoided
             else:
-                r.update({"meld_rood_per_wagen_week": ev_b1.get("false_alarms_per_truck_week", float("nan")),
+                r.update({"meld_rood_per_wagen_week": e1["fa_truck_week"],
                           "vermeden_per_1000c_jr": 0.0, "frac_branden_vermeden": 0.0,
                           "wagenbranden_schade_eq_vermeden_per_1000c_jr": b1_eq})
             r["concept"], r["scenario"] = cname, scen
