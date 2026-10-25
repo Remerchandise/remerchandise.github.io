@@ -1,0 +1,8 @@
+concept,post,categorie,laag,basis,hoog,bron_aanname
+B0,Stibat-inzamelbuis + RVS-houder + sticker/QR,hw,25,40,60,A6-C4 [A]
+B0,Installatie,installatie,20,40,60,[A]
+B0,Lediging buis (Stibat/inzamelaar),per_jaar,10,25,50,[A] 4-12x/j
+B0,Containers per unit,dekking,1,1,1,
+B0,TOTAAL_hw,totaal_hw,25.0,40.0,60.0,som
+B0,TOTAAL_installatie,totaal_installatie,20.0,40.0,60.0,som
+B0,TOTAAL_per_jaar,totaal_per_jaar,10.0,25.0,50.0,som

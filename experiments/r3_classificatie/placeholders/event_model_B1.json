@@ -1,0 +1,7 @@
+{
+ "concept": "B1",
+ "p_detect_truck_fire": 0.85,
+ "damage_reduction_if_detected": 0.6,
+ "false_alarms_per_truck_week": 0.2,
+ "basis": "PLACEHOLDER [A] (A6, FASE 1) - wordt vervangen door het echte model van A2/A3/A4. Waarden zijn ruwe schattingen op basis van R2-consensus (18650~AA, vapes~folie, metaal in ~85% zakken). Thermische camera boven laadbak; vermindert schade, voorkomt ontsteking niet."
+}

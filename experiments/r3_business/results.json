@@ -1,0 +1,1457 @@
+{
+ "bom_used": [],
+ "mc_used": [],
+ "concepts": {
+  "K1": {
+   "name": "Strandmetaaldetector (VLF) in trommel",
+   "cost_pm": {
+    "100": {
+     "laag": {
+      "hardware": 0.486111111111111,
+      "installatie": 0.34722222222222227,
+      "connectiviteit": 0.4000000000000001,
+      "cloud": 0.45,
+      "onderhoud": 0.25,
+      "support": 6.183333333333333,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 10.2
+     },
+     "basis": {
+      "hardware": 0.6944444444444445,
+      "installatie": 0.5555555555555557,
+      "connectiviteit": 0.9,
+      "cloud": 0.9,
+      "onderhoud": 0.6666666666666666,
+      "support": 8.833333333333334,
+      "CAC": 4.166666666666667,
+      "kostprijs": 16.71666666666667
+     },
+     "hoog": {
+      "hardware": 1.1111111111111114,
+      "installatie": 0.8333333333333334,
+      "connectiviteit": 1.5,
+      "cloud": 1.8,
+      "onderhoud": 1.5,
+      "support": 12.366666666666665,
+      "CAC": 6.9444444444444455,
+      "kostprijs": 26.055555555555557
+     }
+    },
+    "1000": {
+     "laag": {
+      "hardware": 0.3888888888888889,
+      "installatie": 0.2951388888888889,
+      "connectiviteit": 0.4000000000000001,
+      "cloud": 0.22499999999999998,
+      "onderhoud": 0.25,
+      "support": 2.1,
+      "CAC": 1.0416666666666667,
+      "kostprijs": 4.700694444444444
+     },
+     "basis": {
+      "hardware": 0.5555555555555556,
+      "installatie": 0.47222222222222227,
+      "connectiviteit": 0.9,
+      "cloud": 0.44999999999999996,
+      "onderhoud": 0.6666666666666666,
+      "support": 3.0,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 8.127777777777778
+     },
+     "hoog": {
+      "hardware": 0.8888888888888888,
+      "installatie": 0.7083333333333334,
+      "connectiviteit": 1.5,
+      "cloud": 0.8999999999999999,
+      "onderhoud": 1.5,
+      "support": 4.2,
+      "CAC": 3.472222222222222,
+      "kostprijs": 13.169444444444444
+     }
+    },
+    "10000": {
+     "laag": {
+      "hardware": 0.3159722222222222,
+      "installatie": 0.2951388888888889,
+      "connectiviteit": 0.4000000000000001,
+      "cloud": 0.15,
+      "onderhoud": 0.25,
+      "support": 0.9333333333333332,
+      "CAC": 0.625,
+      "kostprijs": 2.9694444444444446
+     },
+     "basis": {
+      "hardware": 0.4513888888888889,
+      "installatie": 0.47222222222222227,
+      "connectiviteit": 0.9,
+      "cloud": 0.3,
+      "onderhoud": 0.6666666666666666,
+      "support": 1.3333333333333333,
+      "CAC": 1.25,
+      "kostprijs": 5.373611111111111
+     },
+     "hoog": {
+      "hardware": 0.7222222222222222,
+      "installatie": 0.7083333333333334,
+      "connectiviteit": 1.5,
+      "cloud": 0.6,
+      "onderhoud": 1.5,
+      "support": 1.8666666666666665,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 8.980555555555556
+     }
+    }
+   },
+   "price_pm": {
+    "100": {
+     "laag": 17.0,
+     "basis": 27.861111111111114,
+     "hoog": 43.42592592592593
+    },
+    "1000": {
+     "laag": 7.8344907407407405,
+     "basis": 13.546296296296298,
+     "hoog": 21.949074074074076
+    },
+    "10000": {
+     "laag": 4.949074074074074,
+     "basis": 8.956018518518519,
+     "hoog": 14.967592592592593
+    }
+   },
+   "avoided_y": {
+    "laag": {
+     "container": 0.0,
+     "inzamelaar": 0.09,
+     "verwerker": 0.015
+    },
+    "basis": {
+     "container": 0.0,
+     "inzamelaar": 5.3125,
+     "verwerker": 2.125
+    },
+    "hoog": {
+     "container": 0.0,
+     "inzamelaar": 210.0,
+     "verwerker": 180.0
+    }
+   },
+   "alarm_cost_y": {
+    "laag": 41.6,
+    "basis": 83.2,
+    "hoog": 156.0
+   },
+   "tco6_per_1000": {
+    "laag": 813683.3333333333,
+    "basis": 1474533.3333333335,
+    "hoog": 2516333.3333333335
+   },
+   "gross_y": {
+    "container": 2.72,
+    "inzamelaar": 42.5,
+    "verwerker": 42.5
+   },
+   "max_price_pm_basis": 0.0,
+   "breakeven_fires_per_1000_cy": 56.172698412698416,
+   "business_case_1000": {
+    "pessimistisch": {
+     "cost_y": 419.3888888888889,
+     "avoided_y": 0.105,
+     "net_y": -419.2838888888889,
+     "ratio": 0.0002503642866604848
+    },
+    "basis": {
+     "cost_y": 245.7555555555556,
+     "avoided_y": 7.4375,
+     "net_y": -238.3180555555556,
+     "ratio": 0.030263812279591278
+    },
+    "optimistisch": {
+     "cost_y": 135.61388888888888,
+     "avoided_y": 390.0,
+     "net_y": 254.38611111111112,
+     "ratio": 2.8758116384342807
+    }
+   }
+  },
+  "K2": {
+   "name": "Pakketwachter (PI, OEM pas-zuil)",
+   "cost_pm": {
+    "100": {
+     "laag": {
+      "hardware": 0.20833333333333334,
+      "installatie": 0.27777777777777785,
+      "connectiviteit": 0.20000000000000004,
+      "cloud": 0.45,
+      "onderhoud": 0.09999999999999999,
+      "support": 4.328333333333332,
+      "CAC": 1.0416666666666667,
+      "kostprijs": 6.60611111111111
+     },
+     "basis": {
+      "hardware": 0.34722222222222227,
+      "installatie": 0.5555555555555557,
+      "connectiviteit": 0.5,
+      "cloud": 0.9,
+      "onderhoud": 0.25,
+      "support": 6.183333333333333,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 10.819444444444445
+     },
+     "hoog": {
+      "hardware": 0.5555555555555557,
+      "installatie": 0.8333333333333334,
+      "connectiviteit": 1.0,
+      "cloud": 1.8,
+      "onderhoud": 0.6666666666666666,
+      "support": 8.656666666666665,
+      "CAC": 3.4722222222222228,
+      "kostprijs": 16.984444444444442
+     }
+    },
+    "1000": {
+     "laag": {
+      "hardware": 0.16666666666666666,
+      "installatie": 0.23611111111111113,
+      "connectiviteit": 0.20000000000000004,
+      "cloud": 0.22499999999999998,
+      "onderhoud": 0.09999999999999999,
+      "support": 1.47,
+      "CAC": 0.5208333333333334,
+      "kostprijs": 2.9186111111111113
+     },
+     "basis": {
+      "hardware": 0.2777777777777778,
+      "installatie": 0.47222222222222227,
+      "connectiviteit": 0.5,
+      "cloud": 0.44999999999999996,
+      "onderhoud": 0.25,
+      "support": 2.1,
+      "CAC": 1.0416666666666667,
+      "kostprijs": 5.091666666666667
+     },
+     "hoog": {
+      "hardware": 0.4444444444444444,
+      "installatie": 0.7083333333333334,
+      "connectiviteit": 1.0,
+      "cloud": 0.8999999999999999,
+      "onderhoud": 0.6666666666666666,
+      "support": 2.94,
+      "CAC": 1.736111111111111,
+      "kostprijs": 8.395555555555555
+     }
+    },
+    "10000": {
+     "laag": {
+      "hardware": 0.13541666666666666,
+      "installatie": 0.23611111111111113,
+      "connectiviteit": 0.20000000000000004,
+      "cloud": 0.15,
+      "onderhoud": 0.09999999999999999,
+      "support": 0.6533333333333333,
+      "CAC": 0.3125,
+      "kostprijs": 1.7873611111111112
+     },
+     "basis": {
+      "hardware": 0.22569444444444445,
+      "installatie": 0.47222222222222227,
+      "connectiviteit": 0.5,
+      "cloud": 0.3,
+      "onderhoud": 0.25,
+      "support": 0.9333333333333332,
+      "CAC": 0.625,
+      "kostprijs": 3.30625
+     },
+     "hoog": {
+      "hardware": 0.3611111111111111,
+      "installatie": 0.7083333333333334,
+      "connectiviteit": 1.0,
+      "cloud": 0.6,
+      "onderhoud": 0.6666666666666666,
+      "support": 1.3066666666666666,
+      "CAC": 1.0416666666666667,
+      "kostprijs": 5.684444444444445
+     }
+    }
+   },
+   "price_pm": {
+    "100": {
+     "laag": 11.010185185185184,
+     "basis": 18.03240740740741,
+     "hoog": 28.307407407407403
+    },
+    "1000": {
+     "laag": 4.864351851851852,
+     "basis": 8.486111111111112,
+     "hoog": 13.992592592592592
+    },
+    "10000": {
+     "laag": 2.9789351851851853,
+     "basis": 5.510416666666667,
+     "hoog": 9.474074074074075
+    }
+   },
+   "avoided_y": {
+    "laag": {
+     "container": 0.0,
+     "inzamelaar": 0.22499999999999995,
+     "verwerker": 0.0375
+    },
+    "basis": {
+     "container": 0.0,
+     "inzamelaar": 9.5625,
+     "verwerker": 3.825
+    },
+    "hoog": {
+     "container": 0.0,
+     "inzamelaar": 341.25,
+     "verwerker": 292.5
+    }
+   },
+   "alarm_cost_y": {
+    "laag": 15.600000000000001,
+    "basis": 31.200000000000003,
+    "hoog": 62.400000000000006
+   },
+   "tco6_per_1000": {
+    "laag": 443833.3333333334,
+    "basis": 798200.0000000001,
+    "hoog": 1381866.6666666665
+   },
+   "gross_y": {
+    "container": 2.72,
+    "inzamelaar": 42.5,
+    "verwerker": 42.5
+   },
+   "max_price_pm_basis": 0.0,
+   "breakeven_fires_per_1000_cy": 16.8931216931217,
+   "business_case_1000": {
+    "pessimistisch": {
+     "cost_y": 230.3111111111111,
+     "avoided_y": 0.26249999999999996,
+     "net_y": -230.04861111111111,
+     "ratio": 0.0011397626399073716
+    },
+    "basis": {
+     "cost_y": 133.03333333333336,
+     "avoided_y": 13.3875,
+     "net_y": -119.64583333333336,
+     "ratio": 0.10063267351540965
+    },
+    "optimistisch": {
+     "cost_y": 73.97222222222223,
+     "avoided_y": 633.75,
+     "net_y": 559.7777777777778,
+     "ratio": 8.567405182125421
+    }
+   }
+  },
+  "K3a": {
+   "name": "R\u00f6ntgen schaduwdoos vast per zuil",
+   "cost_pm": {
+    "100": {
+     "laag": {
+      "hardware": 12.5,
+      "installatie": 2.777777777777778,
+      "connectiviteit": 0.4000000000000001,
+      "cloud": 0.45,
+      "onderhoud": 1.0,
+      "support": 6.183333333333333,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 25.394444444444446
+     },
+     "basis": {
+      "hardware": 27.77777777777777,
+      "installatie": 5.555555555555556,
+      "connectiviteit": 0.9,
+      "cloud": 0.9,
+      "onderhoud": 2.5,
+      "support": 8.833333333333334,
+      "CAC": 4.166666666666667,
+      "kostprijs": 50.633333333333326
+     },
+     "hoog": {
+      "hardware": 62.5,
+      "installatie": 11.111111111111112,
+      "connectiviteit": 1.5,
+      "cloud": 1.8,
+      "onderhoud": 6.666666666666667,
+      "support": 12.366666666666665,
+      "CAC": 6.9444444444444455,
+      "kostprijs": 102.88888888888889
+     }
+    },
+    "1000": {
+     "laag": {
+      "hardware": 10.0,
+      "installatie": 2.361111111111111,
+      "connectiviteit": 0.4000000000000001,
+      "cloud": 0.22499999999999998,
+      "onderhoud": 1.0,
+      "support": 2.1,
+      "CAC": 1.0416666666666667,
+      "kostprijs": 17.127777777777776
+     },
+     "basis": {
+      "hardware": 22.222222222222225,
+      "installatie": 4.722222222222222,
+      "connectiviteit": 0.9,
+      "cloud": 0.44999999999999996,
+      "onderhoud": 2.5,
+      "support": 3.0,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 35.87777777777778
+     },
+     "hoog": {
+      "hardware": 50.0,
+      "installatie": 9.444444444444445,
+      "connectiviteit": 1.5,
+      "cloud": 0.8999999999999999,
+      "onderhoud": 6.666666666666667,
+      "support": 4.2,
+      "CAC": 3.472222222222222,
+      "kostprijs": 76.18333333333334
+     }
+    },
+    "10000": {
+     "laag": {
+      "hardware": 8.125,
+      "installatie": 2.361111111111111,
+      "connectiviteit": 0.4000000000000001,
+      "cloud": 0.15,
+      "onderhoud": 1.0,
+      "support": 0.9333333333333332,
+      "CAC": 0.625,
+      "kostprijs": 13.594444444444445
+     },
+     "basis": {
+      "hardware": 18.055555555555554,
+      "installatie": 4.722222222222222,
+      "connectiviteit": 0.9,
+      "cloud": 0.3,
+      "onderhoud": 2.5,
+      "support": 1.3333333333333333,
+      "CAC": 1.25,
+      "kostprijs": 29.06111111111111
+     },
+     "hoog": {
+      "hardware": 40.625,
+      "installatie": 9.444444444444445,
+      "connectiviteit": 1.5,
+      "cloud": 0.6,
+      "onderhoud": 6.666666666666667,
+      "support": 1.8666666666666665,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 62.78611111111111
+     }
+    }
+   },
+   "price_pm": {
+    "100": {
+     "laag": 42.324074074074076,
+     "basis": 84.38888888888889,
+     "hoog": 171.4814814814815
+    },
+    "1000": {
+     "laag": 28.546296296296294,
+     "basis": 59.796296296296305,
+     "hoog": 126.97222222222223
+    },
+    "10000": {
+     "laag": 22.65740740740741,
+     "basis": 48.43518518518518,
+     "hoog": 104.64351851851852
+    }
+   },
+   "avoided_y": {
+    "laag": {
+     "container": 0.0,
+     "inzamelaar": 0.5399999999999998,
+     "verwerker": 0.08999999999999998
+    },
+    "basis": {
+     "container": 0.0,
+     "inzamelaar": 17.0,
+     "verwerker": 6.800000000000001
+    },
+    "hoog": {
+     "container": 0.0,
+     "inzamelaar": 472.49999999999994,
+     "verwerker": 405.0
+    }
+   },
+   "alarm_cost_y": {
+    "laag": 5.2,
+    "basis": 12.48,
+    "hoog": 31.200000000000003
+   },
+   "tco6_per_1000": {
+    "laag": 2086533.3333333333,
+    "basis": 4380213.333333334,
+    "hoog": 9329200.0
+   },
+   "gross_y": {
+    "container": 2.72,
+    "inzamelaar": 42.5,
+    "verwerker": 42.5
+   },
+   "max_price_pm_basis": 0.9433333333333334,
+   "breakeven_fires_per_1000_cy": 52.14539682539683,
+   "business_case_1000": {
+    "pessimistisch": {
+     "cost_y": 1554.8666666666668,
+     "avoided_y": 0.6299999999999998,
+     "net_y": -1554.2366666666667,
+     "ratio": 0.0004051794366076404
+    },
+    "basis": {
+     "cost_y": 730.0355555555557,
+     "avoided_y": 23.8,
+     "net_y": -706.2355555555557,
+     "ratio": 0.032601151846485404
+    },
+    "optimistisch": {
+     "cost_y": 347.75555555555553,
+     "avoided_y": 877.5,
+     "net_y": 529.7444444444445,
+     "ratio": 2.5233241740686307
+    }
+   }
+  },
+  "K3b": {
+   "name": "R\u00f6ntgen ijkpaal rouleert (1 per 35)",
+   "cost_pm": {
+    "100": {
+     "laag": {
+      "hardware": 0.7936507936507936,
+      "installatie": 0.05952380952380953,
+      "connectiviteit": 0.025714285714285717,
+      "cloud": 0.012857142857142857,
+      "onderhoud": 1.4571428571428573,
+      "support": 6.083333333333333,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 10.515555555555556
+     },
+     "basis": {
+      "hardware": 1.388888888888889,
+      "installatie": 0.0992063492063492,
+      "connectiviteit": 0.025714285714285717,
+      "cloud": 0.025714285714285714,
+      "onderhoud": 3.642857142857143,
+      "support": 8.690476190476192,
+      "CAC": 4.166666666666667,
+      "kostprijs": 18.03952380952381
+     },
+     "hoog": {
+      "hardware": 2.777777777777778,
+      "installatie": 0.15873015873015875,
+      "connectiviteit": 0.042857142857142864,
+      "cloud": 0.05142857142857143,
+      "onderhoud": 11.61904761904762,
+      "support": 12.166666666666666,
+      "CAC": 6.9444444444444455,
+      "kostprijs": 33.76095238095238
+     }
+    },
+    "1000": {
+     "laag": {
+      "hardware": 0.634920634920635,
+      "installatie": 0.0505952380952381,
+      "connectiviteit": 0.025714285714285717,
+      "cloud": 0.0064285714285714285,
+      "onderhoud": 1.4571428571428573,
+      "support": 2.0,
+      "CAC": 1.0416666666666667,
+      "kostprijs": 5.216468253968254
+     },
+     "basis": {
+      "hardware": 1.1111111111111112,
+      "installatie": 0.08432539682539682,
+      "connectiviteit": 0.025714285714285717,
+      "cloud": 0.012857142857142857,
+      "onderhoud": 3.642857142857143,
+      "support": 2.8571428571428577,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 9.81734126984127
+     },
+     "hoog": {
+      "hardware": 2.2222222222222223,
+      "installatie": 0.1349206349206349,
+      "connectiviteit": 0.042857142857142864,
+      "cloud": 0.025714285714285714,
+      "onderhoud": 11.61904761904762,
+      "support": 4.0,
+      "CAC": 3.472222222222222,
+      "kostprijs": 21.516984126984127
+     }
+    },
+    "10000": {
+     "laag": {
+      "hardware": 0.5158730158730158,
+      "installatie": 0.0505952380952381,
+      "connectiviteit": 0.025714285714285714,
+      "cloud": 0.004285714285714285,
+      "onderhoud": 1.4571428571428573,
+      "support": 0.8333333333333331,
+      "CAC": 0.625,
+      "kostprijs": 3.5119444444444445
+     },
+     "basis": {
+      "hardware": 0.9027777777777778,
+      "installatie": 0.08432539682539682,
+      "connectiviteit": 0.025714285714285714,
+      "cloud": 0.00857142857142857,
+      "onderhoud": 3.642857142857143,
+      "support": 1.1904761904761905,
+      "CAC": 1.25,
+      "kostprijs": 7.104722222222222
+     },
+     "hoog": {
+      "hardware": 1.8055555555555556,
+      "installatie": 0.1349206349206349,
+      "connectiviteit": 0.042857142857142864,
+      "cloud": 0.01714285714285714,
+      "onderhoud": 11.61904761904762,
+      "support": 1.6666666666666663,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 17.36952380952381
+     }
+    }
+   },
+   "price_pm": {
+    "100": {
+     "laag": 17.52592592592593,
+     "basis": 30.06587301587302,
+     "hoog": 56.26825396825397
+    },
+    "1000": {
+     "laag": 8.694113756613758,
+     "basis": 16.36223544973545,
+     "hoog": 35.861640211640214
+    },
+    "10000": {
+     "laag": 5.853240740740741,
+     "basis": 11.841203703703703,
+     "hoog": 28.94920634920635
+    }
+   },
+   "avoided_y": {
+    "laag": {
+     "container": 0.0,
+     "inzamelaar": 0.015428571428571425,
+     "verwerker": 0.0025714285714285713
+    },
+    "basis": {
+     "container": 0.0,
+     "inzamelaar": 0.4857142857142857,
+     "verwerker": 0.19428571428571428
+    },
+    "hoog": {
+     "container": 0.0,
+     "inzamelaar": 13.499999999999998,
+     "verwerker": 11.571428571428571
+    }
+   },
+   "alarm_cost_y": {
+    "laag": 5.2,
+    "basis": 12.48,
+    "hoog": 31.200000000000003
+   },
+   "tco6_per_1000": {
+    "laag": 657176.1904761905,
+    "basis": 1252960.9523809524,
+    "hoog": 2769238.0952380956
+   },
+   "gross_y": {
+    "container": 2.72,
+    "inzamelaar": 42.5,
+    "verwerker": 42.5
+   },
+   "max_price_pm_basis": 0.0,
+   "breakeven_fires_per_1000_cy": 522.0670634920635,
+   "price_per_unit_pm_1000": {
+    "laag": 304.2939814814815,
+    "basis": 572.6782407407408,
+    "hoog": 1255.1574074074074
+   },
+   "business_case_1000": {
+    "pessimistisch": {
+     "cost_y": 461.5396825396826,
+     "avoided_y": 0.017999999999999995,
+     "net_y": -461.5216825396826,
+     "ratio": 3.899989682566976e-05
+    },
+    "basis": {
+     "cost_y": 208.8268253968254,
+     "avoided_y": 0.6799999999999999,
+     "net_y": -208.1468253968254,
+     "ratio": 0.0032562866322744825
+    },
+    "optimistisch": {
+     "cost_y": 109.52936507936509,
+     "avoided_y": 25.07142857142857,
+     "net_y": -84.45793650793652,
+     "ratio": 0.22890143253603074
+    }
+   }
+  },
+  "K4": {
+   "name": "Deksel-eventmodule (IR 8x8 + CO)",
+   "cost_pm": {
+    "100": {
+     "laag": {
+      "hardware": 0.625,
+      "installatie": 0.27777777777777785,
+      "connectiviteit": 0.4000000000000001,
+      "cloud": 0.45,
+      "onderhoud": 0.25,
+      "support": 6.183333333333333,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 10.269444444444444
+     },
+     "basis": {
+      "hardware": 0.972222222222222,
+      "installatie": 0.486111111111111,
+      "connectiviteit": 0.9,
+      "cloud": 0.9,
+      "onderhoud": 0.6666666666666666,
+      "support": 8.833333333333334,
+      "CAC": 4.166666666666667,
+      "kostprijs": 16.925
+     },
+     "hoog": {
+      "hardware": 1.5277777777777777,
+      "installatie": 0.8333333333333334,
+      "connectiviteit": 1.5,
+      "cloud": 1.8,
+      "onderhoud": 1.5,
+      "support": 12.366666666666665,
+      "CAC": 6.9444444444444455,
+      "kostprijs": 26.47222222222222
+     }
+    },
+    "1000": {
+     "laag": {
+      "hardware": 0.5,
+      "installatie": 0.23611111111111113,
+      "connectiviteit": 0.4000000000000001,
+      "cloud": 0.22499999999999998,
+      "onderhoud": 0.25,
+      "support": 2.1,
+      "CAC": 1.0416666666666667,
+      "kostprijs": 4.752777777777778
+     },
+     "basis": {
+      "hardware": 0.7777777777777778,
+      "installatie": 0.4131944444444444,
+      "connectiviteit": 0.9,
+      "cloud": 0.44999999999999996,
+      "onderhoud": 0.6666666666666666,
+      "support": 3.0,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 8.290972222222223
+     },
+     "hoog": {
+      "hardware": 1.222222222222222,
+      "installatie": 0.7083333333333334,
+      "connectiviteit": 1.5,
+      "cloud": 0.8999999999999999,
+      "onderhoud": 1.5,
+      "support": 4.2,
+      "CAC": 3.472222222222222,
+      "kostprijs": 13.502777777777778
+     }
+    },
+    "10000": {
+     "laag": {
+      "hardware": 0.40625,
+      "installatie": 0.23611111111111113,
+      "connectiviteit": 0.4000000000000001,
+      "cloud": 0.15,
+      "onderhoud": 0.25,
+      "support": 0.9333333333333332,
+      "CAC": 0.625,
+      "kostprijs": 3.0006944444444446
+     },
+     "basis": {
+      "hardware": 0.6319444444444444,
+      "installatie": 0.4131944444444444,
+      "connectiviteit": 0.9,
+      "cloud": 0.3,
+      "onderhoud": 0.6666666666666666,
+      "support": 1.3333333333333333,
+      "CAC": 1.25,
+      "kostprijs": 5.495138888888889
+     },
+     "hoog": {
+      "hardware": 0.9930555555555555,
+      "installatie": 0.7083333333333334,
+      "connectiviteit": 1.5,
+      "cloud": 0.6,
+      "onderhoud": 1.5,
+      "support": 1.8666666666666665,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 9.251388888888888
+     }
+    }
+   },
+   "price_pm": {
+    "100": {
+     "laag": 17.11574074074074,
+     "basis": 28.208333333333336,
+     "hoog": 44.120370370370374
+    },
+    "1000": {
+     "laag": 7.921296296296298,
+     "basis": 13.818287037037038,
+     "hoog": 22.50462962962963
+    },
+    "10000": {
+     "laag": 5.001157407407407,
+     "basis": 9.158564814814815,
+     "hoog": 15.418981481481481
+    }
+   },
+   "avoided_y": {
+    "laag": {
+     "container": 0.0108,
+     "inzamelaar": 0.09,
+     "verwerker": 0.045
+    },
+    "basis": {
+     "container": 0.8704000000000001,
+     "inzamelaar": 4.76,
+     "verwerker": 4.76
+    },
+    "hoog": {
+     "container": 36.449999999999996,
+     "inzamelaar": 182.25,
+     "verwerker": 273.375
+    }
+   },
+   "alarm_cost_y": {
+    "laag": 1.56,
+    "basis": 2.08,
+    "hoog": 3.9000000000000004
+   },
+   "tco6_per_1000": {
+    "laag": 579693.3333333334,
+    "basis": 1007396.6666666667,
+    "hoog": 1643733.333333333
+   },
+   "gross_y": {
+    "container": 2.72,
+    "inzamelaar": 42.5,
+    "verwerker": 42.5
+   },
+   "max_price_pm_basis": 0.6925333333333333,
+   "breakeven_fires_per_1000_cy": 27.470458842350205,
+   "business_case_1000": {
+    "pessimistisch": {
+     "cost_y": 273.9555555555555,
+     "avoided_y": 0.14579999999999999,
+     "net_y": -273.8097555555555,
+     "ratio": 0.0005322031148604803
+    },
+    "basis": {
+     "cost_y": 167.89944444444447,
+     "avoided_y": 10.3904,
+     "net_y": -157.50904444444447,
+     "ratio": 0.06188465979968168
+    },
+    "optimistisch": {
+     "cost_y": 96.61555555555557,
+     "avoided_y": 492.075,
+     "net_y": 395.45944444444444,
+     "ratio": 5.093123950594566
+    }
+   }
+  },
+  "K5": {
+   "name": "Hybride K2+K4 + actieprotocol",
+   "cost_pm": {
+    "100": {
+     "laag": {
+      "hardware": 0.7638888888888888,
+      "installatie": 0.486111111111111,
+      "connectiviteit": 0.3,
+      "cloud": 0.45,
+      "onderhoud": 0.25,
+      "support": 8.038333333333332,
+      "CAC": 1.25,
+      "kostprijs": 11.538333333333332
+     },
+     "basis": {
+      "hardware": 1.25,
+      "installatie": 0.8333333333333334,
+      "connectiviteit": 0.6999999999999998,
+      "cloud": 0.9,
+      "onderhoud": 0.6666666666666666,
+      "support": 11.483333333333334,
+      "CAC": 2.5,
+      "kostprijs": 18.333333333333336
+     },
+     "hoog": {
+      "hardware": 1.944444444444444,
+      "installatie": 1.388888888888889,
+      "connectiviteit": 1.2,
+      "cloud": 1.8,
+      "onderhoud": 1.5,
+      "support": 16.076666666666664,
+      "CAC": 4.166666666666667,
+      "kostprijs": 28.076666666666664
+     }
+    },
+    "1000": {
+     "laag": {
+      "hardware": 0.611111111111111,
+      "installatie": 0.4131944444444444,
+      "connectiviteit": 0.3,
+      "cloud": 0.22499999999999998,
+      "onderhoud": 0.25,
+      "support": 2.7300000000000004,
+      "CAC": 0.625,
+      "kostprijs": 5.154305555555556
+     },
+     "basis": {
+      "hardware": 1.0,
+      "installatie": 0.7083333333333334,
+      "connectiviteit": 0.6999999999999998,
+      "cloud": 0.44999999999999996,
+      "onderhoud": 0.6666666666666666,
+      "support": 3.9000000000000004,
+      "CAC": 1.25,
+      "kostprijs": 8.675
+     },
+     "hoog": {
+      "hardware": 1.5555555555555556,
+      "installatie": 1.1805555555555556,
+      "connectiviteit": 1.2,
+      "cloud": 0.8999999999999999,
+      "onderhoud": 1.5,
+      "support": 5.460000000000001,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 13.879444444444445
+     }
+    },
+    "10000": {
+     "laag": {
+      "hardware": 0.49652777777777773,
+      "installatie": 0.4131944444444444,
+      "connectiviteit": 0.3,
+      "cloud": 0.15,
+      "onderhoud": 0.25,
+      "support": 1.2133333333333332,
+      "CAC": 0.375,
+      "kostprijs": 3.1980555555555554
+     },
+     "basis": {
+      "hardware": 0.8125,
+      "installatie": 0.7083333333333334,
+      "connectiviteit": 0.6999999999999998,
+      "cloud": 0.3,
+      "onderhoud": 0.6666666666666666,
+      "support": 1.7333333333333334,
+      "CAC": 0.75,
+      "kostprijs": 5.670833333333333
+     },
+     "hoog": {
+      "hardware": 1.2638888888888888,
+      "installatie": 1.1805555555555556,
+      "connectiviteit": 1.2,
+      "cloud": 0.6,
+      "onderhoud": 1.5,
+      "support": 2.4266666666666663,
+      "CAC": 1.25,
+      "kostprijs": 9.421111111111111
+     }
+    }
+   },
+   "price_pm": {
+    "100": {
+     "laag": 19.230555555555554,
+     "basis": 30.55555555555556,
+     "hoog": 46.794444444444444
+    },
+    "1000": {
+     "laag": 8.59050925925926,
+     "basis": 14.458333333333336,
+     "hoog": 23.13240740740741
+    },
+    "10000": {
+     "laag": 5.330092592592592,
+     "basis": 9.45138888888889,
+     "hoog": 15.701851851851853
+    }
+   },
+   "avoided_y": {
+    "laag": {
+     "container": 0.0081,
+     "inzamelaar": 0.2925,
+     "verwerker": 0.07125000000000001
+    },
+    "basis": {
+     "container": 0.4787200000000001,
+     "inzamelaar": 12.1805,
+     "verwerker": 6.443
+    },
+    "hoog": {
+     "container": 12.757499999999999,
+     "inzamelaar": 405.0375,
+     "verwerker": 388.18125
+    }
+   },
+   "alarm_cost_y": {
+    "laag": 15.600000000000001,
+    "basis": 31.200000000000003,
+    "hoog": 62.400000000000006
+   },
+   "tco6_per_1000": {
+    "laag": 712116.6666666667,
+    "basis": 1228200.0000000002,
+    "hoog": 2039933.3333333337
+   },
+   "gross_y": {
+    "container": 2.72,
+    "inzamelaar": 42.5,
+    "verwerker": 42.5
+   },
+   "max_price_pm_basis": 0.0,
+   "breakeven_fires_per_1000_cy": 18.217254329601484,
+   "business_case_1000": {
+    "pessimistisch": {
+     "cost_y": 339.98888888888894,
+     "avoided_y": 0.37185,
+     "net_y": -339.61703888888894,
+     "ratio": 0.0010937122128174123
+    },
+    "basis": {
+     "cost_y": 204.70000000000005,
+     "avoided_y": 19.10222,
+     "net_y": -185.59778000000006,
+     "ratio": 0.09331812408402537
+    },
+    "optimistisch": {
+     "cost_y": 118.68611111111113,
+     "avoided_y": 805.97625,
+     "net_y": 687.2901388888889,
+     "ratio": 6.790821962693379
+    }
+   }
+  },
+  "B1": {
+   "name": "Thermische camera laadbak (per wagen)",
+   "cost_pm": {
+    "100": {
+     "laag": {
+      "hardware": 0.4166666666666667,
+      "installatie": 0.06944444444444443,
+      "connectiviteit": 0.049999999999999996,
+      "cloud": 0.0045,
+      "onderhoud": 0.012499999999999999,
+      "support": 6.008333333333333,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 8.644777777777778
+     },
+     "basis": {
+      "hardware": 0.6944444444444445,
+      "installatie": 0.13888888888888887,
+      "connectiviteit": 0.09999999999999999,
+      "cloud": 0.009,
+      "onderhoud": 0.041666666666666664,
+      "support": 8.583333333333334,
+      "CAC": 4.166666666666667,
+      "kostprijs": 13.734000000000002
+     },
+     "hoog": {
+      "hardware": 1.111111111111111,
+      "installatie": 0.27777777777777773,
+      "connectiviteit": 0.19999999999999998,
+      "cloud": 0.018,
+      "onderhoud": 0.09999999999999999,
+      "support": 12.016666666666666,
+      "CAC": 6.9444444444444455,
+      "kostprijs": 20.668
+     }
+    },
+    "1000": {
+     "laag": {
+      "hardware": 0.08333333333333333,
+      "installatie": 0.014756944444444442,
+      "connectiviteit": 0.012499999999999999,
+      "cloud": 0.0005625,
+      "onderhoud": 0.0031249999999999997,
+      "support": 1.79375,
+      "CAC": 1.0416666666666667,
+      "kostprijs": 2.9496944444444444
+     },
+     "basis": {
+      "hardware": 0.13888888888888887,
+      "installatie": 0.029513888888888885,
+      "connectiviteit": 0.024999999999999998,
+      "cloud": 0.001125,
+      "onderhoud": 0.010416666666666666,
+      "support": 2.5625,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 4.850777777777778
+     },
+     "hoog": {
+      "hardware": 0.22222222222222224,
+      "installatie": 0.05902777777777777,
+      "connectiviteit": 0.049999999999999996,
+      "cloud": 0.00225,
+      "onderhoud": 0.024999999999999998,
+      "support": 3.5875,
+      "CAC": 3.472222222222222,
+      "kostprijs": 7.418222222222222
+     }
+    },
+    "10000": {
+     "laag": {
+      "hardware": 0.06770833333333333,
+      "installatie": 0.014756944444444442,
+      "connectiviteit": 0.012499999999999999,
+      "cloud": 0.00037499999999999995,
+      "onderhoud": 0.0031249999999999997,
+      "support": 0.6270833333333333,
+      "CAC": 0.625,
+      "kostprijs": 1.3505486111111111
+     },
+     "basis": {
+      "hardware": 0.11284722222222221,
+      "installatie": 0.029513888888888885,
+      "connectiviteit": 0.024999999999999998,
+      "cloud": 0.0007499999999999999,
+      "onderhoud": 0.010416666666666666,
+      "support": 0.8958333333333334,
+      "CAC": 1.25,
+      "kostprijs": 2.324361111111111
+     },
+     "hoog": {
+      "hardware": 0.18055555555555555,
+      "installatie": 0.05902777777777777,
+      "connectiviteit": 0.049999999999999996,
+      "cloud": 0.0014999999999999998,
+      "onderhoud": 0.024999999999999998,
+      "support": 1.2541666666666667,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 3.6535833333333336
+     }
+    }
+   },
+   "price_pm": {
+    "100": {
+     "laag": 14.407962962962964,
+     "basis": 22.890000000000004,
+     "hoog": 34.446666666666665
+    },
+    "1000": {
+     "laag": 4.9161574074074075,
+     "basis": 8.08462962962963,
+     "hoog": 12.363703703703704
+    },
+    "10000": {
+     "laag": 2.250914351851852,
+     "basis": 3.8739351851851853,
+     "hoog": 6.089305555555557
+    }
+   },
+   "avoided_y": {
+    "laag": {
+     "container": 0.0,
+     "inzamelaar": 0.96,
+     "verwerker": 0.12
+    },
+    "basis": {
+     "container": 0.0,
+     "inzamelaar": 22.95,
+     "verwerker": 7.65
+    },
+    "hoog": {
+     "container": 0.0,
+     "inzamelaar": 570.0,
+     "verwerker": 427.5
+    }
+   },
+   "alarm_cost_y": {
+    "laag": 0.26,
+    "basis": 0.624,
+    "hoog": 1.5600000000000003
+   },
+   "tco6_per_1000": {
+    "laag": 355523.3333333333,
+    "basis": 585837.3333333333,
+    "hoog": 899546.6666666666
+   },
+   "gross_y": {
+    "container": 2.72,
+    "inzamelaar": 42.5,
+    "verwerker": 42.5
+   },
+   "max_price_pm_basis": 2.498,
+   "breakeven_fires_per_1000_cy": 5.424419753086419,
+   "price_per_unit_pm_1000": {
+    "laag": 1966.462962962963,
+    "basis": 3233.8518518518517,
+    "hoog": 4945.481481481482
+   },
+   "business_case_1000": {
+    "pessimistisch": {
+     "cost_y": 149.92444444444445,
+     "avoided_y": 1.08,
+     "net_y": -148.84444444444443,
+     "ratio": 0.007203628494352712
+    },
+    "basis": {
+     "cost_y": 97.63955555555555,
+     "avoided_y": 30.6,
+     "net_y": -67.03955555555555,
+     "ratio": 0.3133975756637793
+    },
+    "optimistisch": {
+     "cost_y": 59.25388888888889,
+     "avoided_y": 997.5,
+     "net_y": 938.2461111111111,
+     "ratio": 16.83433811189139
+    }
+   }
+  },
+  "B0": {
+   "name": "Accu-brievenbus + steekproefsortering",
+   "cost_pm": {
+    "100": {
+     "laag": {
+      "hardware": 0.6944444444444445,
+      "installatie": 0.27777777777777785,
+      "connectiviteit": 0.0,
+      "cloud": 0.45,
+      "onderhoud": 1.7916666666666667,
+      "support": 11.424999999999999,
+      "CAC": 1.0416666666666667,
+      "kostprijs": 15.680555555555555
+     },
+     "basis": {
+      "hardware": 1.388888888888889,
+      "installatie": 0.5555555555555557,
+      "connectiviteit": 0.0,
+      "cloud": 0.9,
+      "onderhoud": 3.75,
+      "support": 21.083333333333332,
+      "CAC": 2.0833333333333335,
+      "kostprijs": 29.76111111111111
+     },
+     "hoog": {
+      "hardware": 2.777777777777778,
+      "installatie": 1.1111111111111114,
+      "connectiviteit": 0.0,
+      "cloud": 1.8,
+      "onderhoud": 7.666666666666667,
+      "support": 47.85,
+      "CAC": 3.4722222222222228,
+      "kostprijs": 64.67777777777778
+     }
+    },
+    "1000": {
+     "laag": {
+      "hardware": 0.5555555555555556,
+      "installatie": 0.23611111111111113,
+      "connectiviteit": 0.0,
+      "cloud": 0.22499999999999998,
+      "onderhoud": 1.7916666666666667,
+      "support": 5.216666666666667,
+      "CAC": 0.5208333333333334,
+      "kostprijs": 8.545833333333334
+     },
+     "basis": {
+      "hardware": 1.1111111111111112,
+      "installatie": 0.47222222222222227,
+      "connectiviteit": 0.0,
+      "cloud": 0.44999999999999996,
+      "onderhoud": 3.75,
+      "support": 9.833333333333334,
+      "CAC": 1.0416666666666667,
+      "kostprijs": 16.658333333333335
+     },
+     "hoog": {
+      "hardware": 2.2222222222222223,
+      "installatie": 0.9444444444444445,
+      "connectiviteit": 0.0,
+      "cloud": 0.8999999999999999,
+      "onderhoud": 7.666666666666667,
+      "support": 22.933333333333334,
+      "CAC": 1.736111111111111,
+      "kostprijs": 36.40277777777778
+     }
+    },
+    "10000": {
+     "laag": {
+      "hardware": 0.4513888888888889,
+      "installatie": 0.23611111111111113,
+      "connectiviteit": 0.0,
+      "cloud": 0.15,
+      "onderhoud": 1.7916666666666667,
+      "support": 2.966666666666667,
+      "CAC": 0.3125,
+      "kostprijs": 5.908333333333333
+     },
+     "basis": {
+      "hardware": 0.9027777777777778,
+      "installatie": 0.47222222222222227,
+      "connectiviteit": 0.0,
+      "cloud": 0.3,
+      "onderhoud": 3.75,
+      "support": 5.666666666666667,
+      "CAC": 0.625,
+      "kostprijs": 11.716666666666667
+     },
+     "hoog": {
+      "hardware": 1.8055555555555556,
+      "installatie": 0.9444444444444445,
+      "connectiviteit": 0.0,
+      "cloud": 0.6,
+      "onderhoud": 7.666666666666667,
+      "support": 13.433333333333332,
+      "CAC": 1.0416666666666667,
+      "kostprijs": 25.491666666666667
+     }
+    }
+   },
+   "price_pm": {
+    "100": {
+     "laag": 26.13425925925926,
+     "basis": 49.60185185185185,
+     "hoog": 107.7962962962963
+    },
+    "1000": {
+     "laag": 14.243055555555557,
+     "basis": 27.763888888888893,
+     "hoog": 60.6712962962963
+    },
+    "10000": {
+     "laag": 9.847222222222223,
+     "basis": 19.52777777777778,
+     "hoog": 42.486111111111114
+    }
+   },
+   "avoided_y": {
+    "laag": {
+     "container": 0.0026999999999999997,
+     "inzamelaar": 0.08999999999999998,
+     "verwerker": 0.04499999999999999
+    },
+    "basis": {
+     "container": 0.21760000000000002,
+     "inzamelaar": 3.4,
+     "verwerker": 3.4
+    },
+    "hoog": {
+     "container": 10.125,
+     "inzamelaar": 112.5,
+     "verwerker": 168.75
+    }
+   },
+   "alarm_cost_y": {
+    "laag": 0.0,
+    "basis": 0.0,
+    "hoog": 0.0
+   },
+   "tco6_per_1000": {
+    "laag": 1025500.0,
+    "basis": 1999000.0000000005,
+    "hoog": 4368333.333333333
+   },
+   "gross_y": {
+    "container": 2.72,
+    "inzamelaar": 42.5,
+    "verwerker": 42.5
+   },
+   "max_price_pm_basis": 0.5848,
+   "breakeven_fires_per_1000_cy": 80.7089793281654,
+   "business_case_1000": {
+    "pessimistisch": {
+     "cost_y": 728.0555555555555,
+     "avoided_y": 0.13769999999999996,
+     "net_y": -727.9178555555555,
+     "ratio": 0.0001891339183517741
+    },
+    "basis": {
+     "cost_y": 333.16666666666674,
+     "avoided_y": 7.0176,
+     "net_y": -326.1490666666667,
+     "ratio": 0.02106333166583291
+    },
+    "optimistisch": {
+     "cost_y": 170.91666666666669,
+     "avoided_y": 291.375,
+     "net_y": 120.45833333333331,
+     "ratio": 1.7047781569965867
+    }
+   }
+  }
+ },
+ "global": {
+  "life_y": 6,
+  "gross_margin": 0.4,
+  "emptyings_per_year": 52,
+  "fires_per_1000_cy": [
+   0.3,
+   1.7,
+   15.0
+  ],
+  "dmg_truck": [
+   10000,
+   25000,
+   50000
+  ],
+  "dmg_container": [
+   3000,
+   8000,
+   15000
+  ],
+  "p_container_start": [
+   0.1,
+   0.2,
+   0.3
+  ],
+  "dmg_processor": [
+   5000,
+   25000,
+   75000
+  ],
+  "support_fixed_y": {
+   "100": 10000,
+   "1000": 30000,
+   "10000": 100000
+  },
+  "support_per_unit_y": {
+   "container": 6,
+   "pool": 150,
+   "wagen": 300
+  },
+  "customers": {
+   "100": 1,
+   "1000": 5,
+   "10000": 30
+  },
+  "cac_per_customer": [
+   15000,
+   30000,
+   50000
+  ],
+  "hw_scale": {
+   "100": 1.0,
+   "1000": 0.8,
+   "10000": 0.65
+  },
+  "cloud_pm": [
+   0.15,
+   0.3,
+   0.6
+  ],
+  "cost_per_alarm": [
+   10,
+   40,
+   150
+  ]
+ }
+}

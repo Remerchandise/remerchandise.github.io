@@ -1,0 +1,21 @@
+concept,post,categorie,laag,basis,hoog,bron_aanname
+K4,Thermopile-array 8x8 (AMG8833-klasse),hw,15,22,30,[A]
+K4,Elektrochemische CO-cel (TGS5042-klasse) + bias,hw,10,15,22,[A]
+K4,2x NTC (binnen/buiten) + RH-sensor,hw,2,3,5,[A]
+K4,Radio+MCU: STM32WL LoRaWAN (basis) / nRF9151 (hoog),hw,6,8,16,[A]
+K4,Antenne in dekselnaad,hw,2,3,6,[A]
+K4,Li-SOCl2 LS33600 + buffer,hw,14,18,26,TME 2026
+K4,PCB + passieven + assemblage,hw,5,8,12,[A]
+K4,Behuizing IP68/IK10 met IR-venster (HDPE/Ge) + vent,hw,10,16,25,[A]
+K4,"RVS-beugel onder deksel, schokdempers",hw,3,5,8,[A]
+K4,"Test, kalibratie, verpakking",hw,3,5,8,[A]
+K4,"Installatie (bij lediging, 20-30 min)",installatie,20,30,50,[A]
+K4,Certificering RED/CE/EMC,eenmalig,15000,25000,40000,[A]
+K4,Connectiviteit (KPN LoRaWAN of 1NCE) + cloud,per_maand,0.3,0.8,1.5,[A]
+K4,"Onderhoud: CO-cel + batterij /6 j, uitval 2 %/j",per_jaar,4,7,12,[A] CO-cel 5-7 j
+K4,Containers per unit,dekking,1,1,1,
+K4,TOTAAL_hw,totaal_hw,70.0,103.0,158.0,som
+K4,TOTAAL_installatie,totaal_installatie,20.0,30.0,50.0,som
+K4,TOTAAL_eenmalig,totaal_eenmalig,15000.0,25000.0,40000.0,som
+K4,TOTAAL_per_maand,totaal_per_maand,0.3,0.8,1.5,som
+K4,TOTAAL_per_jaar,totaal_per_jaar,4.0,7.0,12.0,som

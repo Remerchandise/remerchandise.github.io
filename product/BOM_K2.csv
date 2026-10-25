@@ -1,0 +1,21 @@
+concept,post,categorie,laag,basis,hoog,bron_aanname
+K2,2 PI-lussen in liner (boven/onder),hw,8,12,20,[A]
+K2,Kunststof (PE-UHMW) trommelliner + bevestiging,hw,15,30,60,[A] maatwerk per trommeltype; spoel erachter (R2 A3#6)
+K2,PI front-end multi-gate + ferro-kanaal,hw,6,9,14,"[A] MOSFET, snelle opamp, 1 MS/s ADC"
+K2,STM32U5 MCU (DSP + classifier),hw,3,4,6,[A]
+K2,"OEM-interface (RS485/UART, galv. scheiding) + DC-DC 12 V",hw,3,5,8,"[A]; fail-open, geen slotsturing"
+K2,PCB + passieven + assemblage,hw,5,8,12,[A]
+K2,Behuizing in zuilkop IP67 + potting,hw,5,8,14,[A] zuilkop beschermt al (IK)
+K2,Robot-flexkabel lussen-zuilkop + connector,hw,6,10,18,[A]
+K2,"Test, kalibratie, verpakking",hw,3,5,8,[A]
+K2,Installatie (meeliften op service toegangscontrole),installatie,30,45,75,[A]
+K2,Certificering EMC (geen radio) + OEM-integratie NRE,eenmalig,60000,100000,160000,[A] EMC 10-20k + NRE 50-150k/OEM (A7)
+K2,Connectiviteit (meeliften op OEM-modem) + cloud,per_maand,0.05,0.2,0.5,[A]
+K2,"Onderhoud: uitval 2 %/j, geen eigen batterij",per_jaar,1,2,4,[A]
+K2,Containers per unit,dekking,1,1,1,
+K2,OPTIE standalone: nRF9151 + SIM + antenne + LS33600 + buffer,optie_hw,39,47,65,zie K1-regels
+K2,TOTAAL_hw,totaal_hw,54.0,91.0,160.0,som
+K2,TOTAAL_installatie,totaal_installatie,30.0,45.0,75.0,som
+K2,TOTAAL_eenmalig,totaal_eenmalig,60000.0,100000.0,160000.0,som
+K2,TOTAAL_per_maand,totaal_per_maand,0.05,0.2,0.5,som
+K2,TOTAAL_per_jaar,totaal_per_jaar,1.0,2.0,4.0,som

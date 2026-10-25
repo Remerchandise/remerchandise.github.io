@@ -1,0 +1,21 @@
+concept,post,categorie,laag,basis,hoog,bron_aanname
+K3a,Mini-röntgenbuis <=30 kV + HV-voeding,hw,300,700,1500,A3 R1 [A]
+K3a,GOS-scherm 35x43 cm,hw,80,150,300,[A]
+K3a,Camera 12 MP + optiek/spiegel,hw,40,80,150,[A]
+K3a,Compute (STM32N6 of CM5) i.p.v. RPi,hw,15,40,80,[A]
+K3a,Afscherming + interlock (veiligheids-PLC-relais),hw,100,250,600,[A]
+K3a,PE/CFRP-vensters in dubbele RVS-trommel,hw,40,80,150,[A] R2a A5
+K3a,Energie: LiFePO4 200 Wh verwarmd + 30-50 Wp + laadregelaar,hw,120,185,305,[A]
+K3a,LTE-M modem + antenne + SIM,hw,25,30,40,[A]
+K3a,Behuizing/mechaniek IP67,hw,80,150,300,[A]
+K3a,Assemblage + test,hw,60,120,250,[A]
+K3a,Installatie + stralingsmeting oplevering,installatie,400,650,1100,[A]
+K3a,"Certificering (RED/EMC, LVD, Bbs-dossier/typekeur)",eenmalig,40000,80000,150000,[A]
+K3a,Connectiviteit + cloud (beelden),per_maand,1,2,4,[A]
+K3a,"Onderhoud: jaarlijkse dosiscontrole, accu /5 j, buis /8 j",per_jaar,120,220,400,[A]
+K3a,Containers per unit,dekking,1,1,1,
+K3a,TOTAAL_hw,totaal_hw,860.0,1785.0,3675.0,som
+K3a,TOTAAL_installatie,totaal_installatie,400.0,650.0,1100.0,som
+K3a,TOTAAL_eenmalig,totaal_eenmalig,40000.0,80000.0,150000.0,som
+K3a,TOTAAL_per_maand,totaal_per_maand,1.0,2.0,4.0,som
+K3a,TOTAAL_per_jaar,totaal_per_jaar,120.0,220.0,400.0,som

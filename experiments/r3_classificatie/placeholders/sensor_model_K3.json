@@ -1,0 +1,93 @@
+{
+ "concept": "K3",
+ "classes": [
+  "geen",
+  "cel",
+  "pakket"
+ ],
+ "p_out_given_item": {
+  "blik": [
+   0.97,
+   0.03,
+   0.0
+  ],
+  "folie": [
+   0.99,
+   0.01,
+   0.0
+  ],
+  "sleutel_klein_metaal": [
+   0.95,
+   0.05,
+   0.0
+  ],
+  "pan_gereedschap": [
+   0.9,
+   0.08,
+   0.02
+  ],
+  "alkaline": [
+   0.3,
+   0.68,
+   0.02
+  ],
+  "knoopcel": [
+   0.5,
+   0.5,
+   0.0
+  ],
+  "elektronica_zonder_accu": [
+   0.8,
+   0.18,
+   0.02
+  ],
+  "vape": [
+   0.15,
+   0.83,
+   0.02
+  ],
+  "li_klein_overig": [
+   0.5,
+   0.5,
+   0.0
+  ],
+  "cel_18650": [
+   0.05,
+   0.9,
+   0.05
+  ],
+  "telefoon": [
+   0.05,
+   0.8,
+   0.15
+  ],
+  "powerbank": [
+   0.02,
+   0.18,
+   0.8
+  ],
+  "laptop_gereedschap": [
+   0.02,
+   0.13,
+   0.85
+  ],
+  "ebike_step": [
+   0.01,
+   0.04,
+   0.95
+  ]
+ },
+ "clutter": {
+  "model": "independent_or",
+  "note": "elk object triggert zelfstandig; zak-output = hoogste klasse"
+ },
+ "masking": {
+  "p_miss_li_given_n_metal": [
+   0,
+   0.02,
+   0.04,
+   0.08
+  ]
+ },
+ "basis": "PLACEHOLDER [A] (A6, FASE 1) - wordt vervangen door het echte model van A2/A3/A4. Waarden zijn ruwe schattingen op basis van R2-consensus (18650~AA, vapes~folie, metaal in ~85% zakken)."
+}

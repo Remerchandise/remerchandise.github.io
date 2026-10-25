@@ -1,0 +1,9 @@
+{
+ "concept": "K4",
+ "p_detect_li_presence": 0.0,
+ "container_fire_rate_per_container_year": 0.002,
+ "p_detect_container_fire": 0.8,
+ "damage_reduction_if_detected": 0.5,
+ "false_alarms_per_container_year": 0.2,
+ "basis": "PLACEHOLDER [A] (A6, FASE 1) - wordt vervangen door het echte model van A2/A3/A4. Waarden zijn ruwe schattingen op basis van R2-consensus (18650~AA, vapes~folie, metaal in ~85% zakken). Event-kanaal: ziet begraven cel niet (A4 R2), wel brand/smeulen in container."
+}

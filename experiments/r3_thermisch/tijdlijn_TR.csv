@@ -1,0 +1,6 @@
+mechanisme,stap,venster_l_s,venster_b_s,venster_h_s,latentie_b_s,bron
+Extern oververhitten (zon/compost >> 60 °C),3 container,300,600,1800,21600,"Li-ion Tamer: 6,4 min (DNV-GL), 9–25 min (Honeywell); onwaarschijnlijk in container (compost < 50 °C) [A]"
+Latente interne short na valschade,2→3 container,0,60,900,21600,NG; soft short kan minuten–uren zelf verwarmen [A]; venster na venting ≈ crush-achtig
+Crush/penetratie persplaat,5 wagen,0,5,30,2,nail/crush: TR binnen seconden (algemene lit.) – geen venster
+Doorboring shredder/grijper,6–7 verwerking,0,5,30,5,idem crush
+"Overladen (BESS, referentie)",n.v.t.,300,900,1800,1800,Li-ion Tamer 9–25 min; ref. UN GTR 20 eist 5 min

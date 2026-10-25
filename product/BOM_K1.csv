@@ -1,0 +1,22 @@
+concept,post,categorie,laag,basis,hoog,bron_aanname
+K1,DD-spoel gewikkeld + gegoten,hw,8,12,20,"[A] 2 spoelen Cu 0,5 mm, epoxy"
+K1,Kunststof (PE-UHMW) trommelliner + bevestiging,hw,15,30,60,[A] maatwerk per trommeltype; spoel erachter (R2 A3#6)
+K1,"VLF front-end 2-3 freq (DDS, eindtrap, lock-in ADC 24 bit)",hw,6,10,16,[A] AD9833/ADS1220-klasse
+K1,nRF9151 SiP (MCU + LTE-M/NB-IoT),hw,12,14,16,"Farnell 2026: 15,57 @250"
+K1,Antenne LTE + kabel naar kunststof kap,hw,2,3,6,[A]
+K1,SIM 10 jaar (1NCE),hw,10,10,15,1NCE FAQ: EUR 10/10 j
+K1,Li-SOCl2 LS33600 + HLC/supercap-buffer,hw,15,20,28,"TME 2026: 11-18,6/cel; buffer [A]"
+K1,PCB + passieven + assemblage,hw,6,9,14,[A]
+K1,Behuizing IP67/IK10 + potting + RVS-bevestiging,hw,8,14,22,[A]
+K1,Robot-flexkabel spoel-zuilkop + connector,hw,6,10,18,[A] >=300k buigcycli
+K1,"Test, kalibratie, verpakking",hw,3,5,8,[A]
+K1,"Installatie (liner + spoel + kop), 45-90 min + reis",installatie,40,60,90,[A]
+K1,Certificering RED/CE/EMC + veldvalidatie,eenmalig,20000,30000,45000,[A]
+K1,Connectiviteit + cloud,per_maand,0.1,0.5,1.5,1NCE in HW; hosting [A]
+K1,Onderhoud: celwissel /6 j + uitval 2 %/j,per_jaar,3,6,12,[A]
+K1,Containers per unit,dekking,1,1,1,
+K1,TOTAAL_hw,totaal_hw,91.0,137.0,223.0,som
+K1,TOTAAL_installatie,totaal_installatie,40.0,60.0,90.0,som
+K1,TOTAAL_eenmalig,totaal_eenmalig,20000.0,30000.0,45000.0,som
+K1,TOTAAL_per_maand,totaal_per_maand,0.1,0.5,1.5,som
+K1,TOTAAL_per_jaar,totaal_per_jaar,3.0,6.0,12.0,som

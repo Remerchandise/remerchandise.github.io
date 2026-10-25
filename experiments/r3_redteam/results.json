@@ -1,0 +1,205 @@
+{
+ "prevalentie_per_zak": {
+  "laag": {
+   "p_li": 0.01464175162472292,
+   "p_ge10": 0.0014988755622891148,
+   "p_pakket": 4.999875002087428e-05
+  },
+  "basis": {
+   "p_li": 0.029069122358805766,
+   "p_ge10": 0.0029955044966269995,
+   "p_pakket": 9.999500016666385e-05
+  },
+  "hoog": {
+   "p_li": 0.0710961092118435,
+   "p_ge10": 0.007471945180861583,
+   "p_pakket": 0.00024996875260396845
+  }
+ },
+ "veldtest_natuurlijk": {
+  "Li-item (alle)": {
+   "laag": {
+    "recall0.5": {
+     "n_pos": 97,
+     "n_zakken": 6625,
+     "ton": 33.1
+    },
+    "recall0.8": {
+     "n_pos": 62,
+     "n_zakken": 4235,
+     "ton": 21.2
+    }
+   },
+   "basis": {
+    "recall0.5": {
+     "n_pos": 97,
+     "n_zakken": 3337,
+     "ton": 16.7
+    },
+    "recall0.8": {
+     "n_pos": 62,
+     "n_zakken": 2133,
+     "ton": 10.7
+    }
+   },
+   "hoog": {
+    "recall0.5": {
+     "n_pos": 97,
+     "n_zakken": 1365,
+     "ton": 6.8
+    },
+    "recall0.8": {
+     "n_pos": 62,
+     "n_zakken": 873,
+     "ton": 4.4
+    }
+   }
+  },
+  "Li >= 10 Wh-eq": {
+   "laag": {
+    "recall0.5": {
+     "n_pos": 97,
+     "n_zakken": 64716,
+     "ton": 323.6
+    },
+    "recall0.8": {
+     "n_pos": 62,
+     "n_zakken": 41365,
+     "ton": 206.8
+    }
+   },
+   "basis": {
+    "recall0.5": {
+     "n_pos": 97,
+     "n_zakken": 32382,
+     "ton": 161.9
+    },
+    "recall0.8": {
+     "n_pos": 62,
+     "n_zakken": 20698,
+     "ton": 103.5
+    }
+   },
+   "hoog": {
+    "recall0.5": {
+     "n_pos": 97,
+     "n_zakken": 12982,
+     "ton": 64.9
+    },
+    "recall0.8": {
+     "n_pos": 62,
+     "n_zakken": 8298,
+     "ton": 41.5
+    }
+   }
+  },
+  "pakket >= 50 Wh-eq": {
+   "laag": {
+    "recall0.5": {
+     "n_pos": 97,
+     "n_zakken": 1940049,
+     "ton": 9700.2
+    },
+    "recall0.8": {
+     "n_pos": 62,
+     "n_zakken": 1240032,
+     "ton": 6200.2
+    }
+   },
+   "basis": {
+    "recall0.5": {
+     "n_pos": 97,
+     "n_zakken": 970049,
+     "ton": 4850.2
+    },
+    "recall0.8": {
+     "n_pos": 62,
+     "n_zakken": 620032,
+     "ton": 3100.2
+    }
+   },
+   "hoog": {
+    "recall0.5": {
+     "n_pos": 97,
+     "n_zakken": 388049,
+     "ton": 1940.2
+    },
+    "recall0.8": {
+     "n_pos": 62,
+     "n_zakken": 248032,
+     "ton": 1240.2
+    }
+   }
+  }
+ },
+ "ppv_meting_alarmen_nodig": {
+  "ppv0.1": 35,
+  "ppv0.27": 76,
+  "ppv0.5": 97
+ },
+ "spiking_per_klasse": {
+  "recall0.5": {
+   "hw10": 97,
+   "hw05": 385
+  },
+  "recall0.8": {
+   "hw10": 62,
+   "hw05": 246
+  },
+  "recall0.95": {
+   "hw10": 19,
+   "hw05": 73
+  }
+ },
+ "sim_check_halfbreedte_95_n62": 0.103,
+ "lab_inductie_auc_halfbreedte": {
+  "AUC0.7_n20per_klasse": 0.163,
+  "AUC0.7_n50per_klasse": 0.102,
+  "AUC0.7_n100per_klasse": 0.072,
+  "AUC0.7_n200per_klasse": 0.051,
+  "AUC0.8_n20per_klasse": 0.139,
+  "AUC0.8_n50per_klasse": 0.087,
+  "AUC0.8_n100per_klasse": 0.061,
+  "AUC0.8_n200per_klasse": 0.043,
+  "AUC0.9_n20per_klasse": 0.101,
+  "AUC0.9_n50per_klasse": 0.063,
+  "AUC0.9_n100per_klasse": 0.044,
+  "AUC0.9_n200per_klasse": 0.031
+ },
+ "cluster_steekproef": {
+  "laag": {
+   "li_per_ton": 2.95,
+   "ton_per_cluster_power80": 8.0,
+   "steekproeven_100kg": 80
+  },
+  "basis": {
+   "li_per_ton": 5.9,
+   "ton_per_cluster_power80": 4.0,
+   "steekproeven_100kg": 40
+  },
+  "hoog": {
+   "li_per_ton": 14.75,
+   "ton_per_cluster_power80": 1.5,
+   "steekproeven_100kg": 15
+  },
+  "proxy_alle_batterijen": {
+   "per_ton": 36.0,
+   "ton_per_cluster_power80": 1.0,
+   "steekproeven_100kg": 10
+  }
+ },
+ "brand_uitkomst_containerjaren_per_arm": {
+  "laag": {
+   "daling30%": 411634,
+   "daling50%": 134640
+  },
+  "basis": {
+   "daling30%": 96048,
+   "daling50%": 31416
+  },
+  "hoog": {
+   "daling30%": 41163,
+   "daling50%": 13464
+  }
+ }
+}

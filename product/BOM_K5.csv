@@ -1,0 +1,34 @@
+concept,post,categorie,laag,basis,hoog,bron_aanname
+K5,K2: 2 PI-lussen in liner (boven/onder),hw,8,12,20,[A]
+K5,K2: Kunststof (PE-UHMW) trommelliner + bevestiging,hw,15,30,60,[A] maatwerk per trommeltype; spoel erachter (R2 A3#6)
+K5,K2: PI front-end multi-gate + ferro-kanaal,hw,6,9,14,"[A] MOSFET, snelle opamp, 1 MS/s ADC"
+K5,K2: STM32U5 MCU (DSP + classifier),hw,3,4,6,[A]
+K5,"K2: OEM-interface (RS485/UART, galv. scheiding) + DC-DC 12 V",hw,3,5,8,"[A]; fail-open, geen slotsturing"
+K5,K2: PCB + passieven + assemblage,hw,5,8,12,[A]
+K5,K2: Behuizing in zuilkop IP67 + potting,hw,5,8,14,[A] zuilkop beschermt al (IK)
+K5,K2: Robot-flexkabel lussen-zuilkop + connector,hw,6,10,18,[A]
+K5,"K2: Test, kalibratie, verpakking",hw,3,5,8,[A]
+K5,K2: Installatie (meeliften op service toegangscontrole),installatie,30,45,75,[A]
+K5,K2: Certificering EMC (geen radio) + OEM-integratie NRE,eenmalig,60000,100000,160000,[A] EMC 10-20k + NRE 50-150k/OEM (A7)
+K5,K2: Connectiviteit (meeliften op OEM-modem) + cloud,per_maand,0.05,0.2,0.5,[A]
+K5,"K2: Onderhoud: uitval 2 %/j, geen eigen batterij",per_jaar,1,2,4,[A]
+K5,K4-lite: Thermopile-array 8x8 (AMG8833-klasse),hw,15,22,30,[A]
+K5,K4-lite: Elektrochemische CO-cel (TGS5042-klasse) + bias,hw,10,15,22,[A]
+K5,K4-lite: 2x NTC (binnen/buiten) + RH-sensor,hw,2,3,5,[A]
+K5,K4-lite: Radio+MCU: nRF52 BLE naar zuilmodule (geen eigen WAN),hw,3,4,6,[A]
+K5,K4-lite: Antenne BLE (PCB),hw,0.5,1,2,[A]
+K5,K4-lite: Li-SOCl2 LS33600 + buffer,hw,14,18,26,TME 2026
+K5,K4-lite: PCB + passieven + assemblage,hw,5,8,12,[A]
+K5,K4-lite: Behuizing IP68/IK10 met IR-venster (HDPE/Ge) + vent,hw,10,16,25,[A]
+K5,"K4-lite: RVS-beugel onder deksel, schokdempers",hw,3,5,8,[A]
+K5,"K4-lite: Test, kalibratie, verpakking",hw,3,5,8,[A]
+K5,"K4-lite: Installatie (bij lediging, 20-30 min)",installatie,20,30,50,[A]
+K5,"K4-lite: Certificering RED (BLE, pre-gecert. module)",eenmalig,5000,10000,20000,[A]
+K5,"K4-lite: Onderhoud: CO-cel + batterij /6 j, uitval 2 %/j",per_jaar,4,7,12,[A] CO-cel 5-7 j
+K5,Software-integratie actieprotocol (boordcomputer/AMCS),eenmalig,20000,40000,80000,[A] A6
+K5,Containers per unit,dekking,1,1,1,
+K5,TOTAAL_hw,totaal_hw,119.5,188.0,304.0,som
+K5,TOTAAL_installatie,totaal_installatie,50.0,75.0,125.0,som
+K5,TOTAAL_eenmalig,totaal_eenmalig,85000.0,150000.0,260000.0,som
+K5,TOTAAL_per_maand,totaal_per_maand,0.05,0.2,0.5,som
+K5,TOTAAL_per_jaar,totaal_per_jaar,5.0,9.0,16.0,som
