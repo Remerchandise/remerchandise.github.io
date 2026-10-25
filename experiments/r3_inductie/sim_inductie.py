@@ -47,16 +47,25 @@ def loop_field(P, z0, n=60):
 B0 = np.linalg.norm(loop_field(np.zeros((1, 3)), 0.0))
 
 
+from scipy.interpolate import RegularGridInterpolator
+_G = [np.linspace(BOX[a][0], BOX[a][1], 29) for a in "xyz"]
+_GP = np.stack(np.meshgrid(*_G, indexing="ij"), -1).reshape(-1, 3)
+_FT = (loop_field(_GP, 0.0) / B0).reshape(29, 29, 29, 3)
+_FB = (loop_field(_GP, -L) / B0).reshape(29, 29, 29, 3)
+_IT = RegularGridInterpolator(_G, _FT); _IB = RegularGridInterpolator(_G, _FB)
+
+
 def fields(P):
-    return loop_field(P, 0.0) / B0, loop_field(P, -L) / B0
+    """Veld per A van lus T (opening) en B (bodem), genormaliseerd op lusmidden T; grid-interpolatie."""
+    return _IT(P), _IB(P)
 
 
 # ---------------------------------------------------------------- ruis/achtergrond [A]
 # eenheden: cm^3-equivalent polariseerbaarheid in het centrum van lus T
-NOISE = {  # laag / basis / hoog
-    "sig_w_1ms": (0.6, 2.0, 6.0),   # witte ruis per 1 ms meting
-    "sig_drift": (0.1, 0.3, 1.0),   # 1/f + temperatuurdrift-vloer na vóór/na-verschil
-    "sig_bg": (0.5, 2.0, 20.0),     # restsignaal RVS-trommel/stalen zuil (meedraaiende spoel); niet meedraaiend: ~200+
+NOISE = {  # laag / basis / hoog / ideaal (index 3: vrijwel ruisloos -> alleen clutter beperkt)
+    "sig_w_1ms": (0.6, 2.0, 6.0, 0.01),   # witte ruis per 1 ms meting
+    "sig_drift": (0.1, 0.3, 1.0, 0.01),   # 1/f + temperatuurdrift-vloer na vóór/na-verschil
+    "sig_bg": (0.5, 2.0, 20.0, 0.0),     # restsignaal RVS-trommel/stalen zuil (meedraaiende spoel); niet meedraaiend: ~200+
 }
 T_MEAS = 2.0  # s stilstand (opdrachtgever: 1-10 s)
 
@@ -96,8 +105,10 @@ def tri(rng, lo, mid, hi):
     return lo if hi <= lo else rng.triangular(lo, mid, hi)
 
 
-def draw_obj(item, rng):
-    wh = tri(rng, *ITEMS[item]["wh"])
+def draw_obj(item, rng, wh=None):
+    if isinstance(item, tuple):
+        item, wh = item
+    wh = tri(rng, *ITEMS[item]["wh"]) if wh is None else wh
     kind, D, tau = pad(make(item, rng, wh))
     return kind, D, tau, wh
 
@@ -186,7 +197,7 @@ class KNN:
         return P / P.sum(1, keepdims=True)
 
 
-def run_concept(name, lvl=1, T=T_MEAS, n_train=1400, n_eval=600, verbose=True):
+def run_concept(name, lvl=1, T=T_MEAS, n_train=2500, n_eval=600, verbose=True):
     rng = np.random.default_rng(1000 + lvl * 10 + (name == "K2"))
     col = 0 if name == "K1" else 1
     # training: 70 % realistische zak-clutter, 30 % alleen
@@ -328,8 +339,10 @@ if __name__ == "__main__":
     # ---------- concepten basis + gevoeligheid
     R = {}
     for name in ["K1", "K2"]:
-        R[name] = {lvl: run_concept(name, lvl) for lvl in (1, 0, 2)}
-    out["K1_T0.2_basis"] = {k: v for k, v in run_concept("K1", 1, T=0.2).items() if not k.startswith("_")}
+        R[name] = {lvl: run_concept(name, lvl, n_train=(2500 if lvl == 1 else 1200), n_eval=(600 if lvl == 1 else 300)) for lvl in (1, 0, 2)}
+    for name in ["K1", "K2"]:
+        rr = run_concept(name, 3, n_train=1200, n_eval=300)
+        out[name + "_ideaal_ruisloos"] = {k: v for k, v in rr.items() if not k.startswith("_")}
     for name in ["K1", "K2"]:
         out[name] = {nm: {k: v for k, v in R[name][l].items() if not k.startswith("_")} for l, nm in [(0, "laag"), (1, "basis"), (2, "hoog")]}
 
@@ -388,13 +401,13 @@ if __name__ == "__main__":
             for _ in range(800):
                 rr = np.random.default_rng(rng.integers(1 << 31))
                 wh = tri(rr, *ITEMS[it]["wh"]); whs.append(wh)
-                bags.append([it] + (draw_clutter_counts(rng) if mode == "zak" else []))
+                bags.append([(it, wh)] + (draw_clutter_counts(rng) if mode == "zak" else []))
         # meet met dezelfde wh: hertrek via vaste seed is complex -> benadering: gebruik item-mediane Wh-spreiding
         X = feat(measure(bags, 1, T_MEAS, rng)[1]); y = np.log(np.array(whs))
         Xa = np.c_[X, np.ones(len(X))]; n2 = len(X) // 2; perm = rng.permutation(len(X))
         tr, te = perm[:n2], perm[n2:]
         coef, *_ = np.linalg.lstsq(Xa[tr], y[tr], rcond=None)
-        out.setdefault("Wh_schatting_K2", {})[mode] = {"sigma_ln": float(np.std(Xa[te] @ coef - y[te])), "note": "ln-fout; Wh in meting niet gekoppeld aan getrokken Wh (alleen via n cellen niet) -> ondergrens is item-spreiding"}
+        out.setdefault("Wh_schatting_K2", {})[mode] = {"sigma_ln": float(np.std(Xa[te] @ coef - y[te])), "sigma_log10": float(np.std(Xa[te] @ coef - y[te]) / np.log(10)), "note": "lineaire regressie ln(Wh) op K2-features; 18650/telefoon/powerbank/laptop-gereedschap"}
 
     # ---------- JSON voor A6
     for name in ["K1", "K2"]:
