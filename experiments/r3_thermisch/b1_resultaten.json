@@ -1,0 +1,36 @@
+{
+ "bronnen": [
+  "Goodyear AZ / Seek Thermal pilot, alarm 93 °C (goodyearaz.gov, hoodline 2025-09)",
+  "A8 checklist D3: EUR 3–8k per wagen"
+ ],
+ "laag": {
+  "P_det": 0.19352,
+  "reactietijd_mediaan_s": 1.0,
+  "reactietijd_p90_s": 1.0
+ },
+ "basis": {
+  "P_det": 0.48744,
+  "reactietijd_mediaan_s": 1.0,
+  "reactietijd_p90_s": 80.75972013175958
+ },
+ "hoog": {
+  "P_det": 0.75548,
+  "reactietijd_mediaan_s": 1.0,
+  "reactietijd_p90_s": 46.64323229509357
+ },
+ "kosten_eur_per_container_maand_l_b_h": [
+  0.07291666666666667,
+  0.20555555555555555,
+  0.5555555555555555
+ ],
+ "vermeden_schade_per_wagenbrand_eur_l_b_h": [
+  967.6,
+  8530.199999999999,
+  32107.899999999998
+ ],
+ "K4_waarde_eur_per_container_maand_l_b_h": [
+  0.023499999999999997,
+  0.6666666666666666,
+  3.75
+ ]
+}

@@ -1,0 +1,161 @@
+{
+ "concept": "K3",
+ "variant": "K3a (vast per zuil) en K3b (ijkpaal) gebruiken dezelfde sensor; K3b meet alleen tijdens campagne",
+ "classes": [
+  "geen",
+  "cel",
+  "pakket"
+ ],
+ "p_out_given_item": {
+  "blik": [
+   0.99,
+   0.0097,
+   0.0003
+  ],
+  "folie": [
+   0.998,
+   0.002,
+   0.0
+  ],
+  "sleutel_klein_metaal": [
+   0.96,
+   0.0399,
+   0.0001
+  ],
+  "pan_gereedschap": [
+   0.9,
+   0.0499,
+   0.0501
+  ],
+  "alkaline": [
+   0.15,
+   0.85,
+   0.0
+  ],
+  "knoopcel": [
+   0.6605,
+   0.3395,
+   0.0
+  ],
+  "elektronica_zonder_accu": [
+   0.92,
+   0.0749,
+   0.0051
+  ],
+  "vape": [
+   0.224,
+   0.776,
+   0.0
+  ],
+  "li_klein_overig": [
+   0.5635,
+   0.4365,
+   0.0
+  ],
+  "cel_18650": [
+   0.0979,
+   0.8936,
+   0.0085
+  ],
+  "telefoon": [
+   0.0785,
+   0.8452,
+   0.0763
+  ],
+  "powerbank": [
+   0.0785,
+   0.1232,
+   0.7983
+  ],
+  "laptop_gereedschap": [
+   0.0785,
+   0.0069,
+   0.9146
+  ],
+  "ebike_step": [
+   0.0591,
+   0.0,
+   0.9409
+  ]
+ },
+ "wh_est_given_item": {
+  "note": "[mediaan geschatte Wh, sigma lognormaal] per gedetecteerd object; A6: tel Wh_est*0,8 van alle 'cel'-objecten in één inworp op -> >= PACK_WHEQ = pakket (vangt bundels alkaline/losse cellen)",
+  "blik": [
+   7.99,
+   0.6
+  ],
+  "folie": [
+   5.0,
+   0.6
+  ],
+  "sleutel_klein_metaal": [
+   4.99,
+   0.6
+  ],
+  "pan_gereedschap": [
+   25.03,
+   0.6
+  ],
+  "alkaline": [
+   5.41,
+   0.35
+  ],
+  "knoopcel": [
+   0.67,
+   0.35
+  ],
+  "elektronica_zonder_accu": [
+   10.0,
+   0.6
+  ],
+  "vape": [
+   2.17,
+   0.35
+  ],
+  "li_klein_overig": [
+   0.67,
+   0.35
+  ],
+  "cel_18650": [
+   10.86,
+   0.35
+  ],
+  "telefoon": [
+   15.1,
+   0.35
+  ],
+  "powerbank": [
+   41.66,
+   0.35
+  ],
+  "laptop_gereedschap": [
+   65.63,
+   0.35
+  ],
+  "ebike_step": [
+   464.95,
+   0.35
+  ]
+ },
+ "clutter": {
+  "model": "independent_or",
+  "note": "elk niet-Li object triggert zelfstandig met p_out_given_item; Al-blik/folie/glas zijn (half)transparant (T1) en triggeren vrijwel nooit"
+ },
+ "masking": {
+  "p_miss_li_given_n_metal": [
+   0.0,
+   0.006,
+   0.012,
+   0.03
+  ],
+  "note": "2D-overlap met opaak metaal: ~3 %/opaak object x 50 % mis bij overlap; ~40 % van metaalobjecten opaak [A]"
+ },
+ "chemie": "Li-ion vs alkaline NIET te onderscheiden (T1: R 18650=1,19 vs AA=1,20 zelfs bij 80 kV; bij 30 kV beide opaak)",
+ "meettijd_s": {
+  "laag": 0.2,
+  "basis": 5,
+  "hoog": 15,
+  "note": "4/3-camera+GOS, 30 kV 4 W; t2_resultaten.txt"
+ },
+ "basis": "experiments/r3_rontgen: t1 (Beer-Lambert/contrast), t2 (fotonstatistiek), p_det [A] expertschatting vorm-herkenning; PACK_WHEQ=20, sigma Wh 0.35, P_heavy_fail 0.03"
+}

@@ -1,0 +1,21 @@
+p_out_given_item [geen, cel, pakket]  (PACK_WHEQ=20)
+  blik                     [0.99, 0.0097, 0.0003]
+  folie                    [0.998, 0.002, 0.0]
+  sleutel_klein_metaal     [0.96, 0.0399, 0.0001]
+  pan_gereedschap          [0.9, 0.0499, 0.0501]
+  alkaline                 [0.15, 0.85, 0.0]
+  knoopcel                 [0.6605, 0.3395, 0.0]
+  elektronica_zonder_accu  [0.92, 0.0749, 0.0051]
+  vape                     [0.224, 0.776, 0.0]
+  li_klein_overig          [0.5635, 0.4365, 0.0]
+  cel_18650                [0.0979, 0.8936, 0.0085]
+  telefoon                 [0.0785, 0.8452, 0.0763]
+  powerbank                [0.0785, 0.1232, 0.7983]
+  laptop_gereedschap       [0.0785, 0.0069, 0.9146]
+  ebike_step               [0.0591, 0.0, 0.9409]
+
+HW per zuil (laag/basis/hoog): [1460, 3320, 7150] EUR
+K3a vast per zuil, TCO 6 jr: [32.8, 71.1, 149.3] EUR/container/maand
+K3b ijkpaal: kosten per unit-jaar [4377.0, 8387.0, 14425.0] EUR; per campagne [1000, 1900, 3200] EUR; (i) netwerk 1 per [50, 35, 20] containers: [7.3, 20.0, 60.1] EUR/container/maand
+K3b (ii) ijkcampagne 5 units x 1 jaar voor gemeente met 1 000 containers: [21883.0, 41933.0, 72125.0] EUR/jaar = [1.82, 3.49, 6.01] EUR/container/maand
+Vermeden schade (A7): ~3 EUR/container/maand (basis)

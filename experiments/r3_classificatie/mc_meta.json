@@ -2,7 +2,7 @@
  "n_containers": 30000,
  "bags": 100,
  "seed": 20261025,
- "risk": "eigen: 1-exp(-k*Wh-eq) (params.K_PER_WHEQ)",
+ "risk": "A1 risk.p_fire_from_wheq (experiments/r3_risico/risk.py)",
  "ops": {
   "containers_per_truck_day": 125,
   "truck_days_per_week": 5,

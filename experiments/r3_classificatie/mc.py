@@ -43,6 +43,8 @@ OPS = {
     "bags_per_emptying": P.CONTAINER["bags_per_emptying"][1],
 }
 SCEN_INDEX = {"laag": 0, "basis": 1, "hoog": 2}
+# A1-drempels R3 (Orchestrator-bericht 2026-10-25; params.THRESH_* nog op R1-waarden)
+A1_R3 = {"throw_oranje": 50, "throw_rood": 75, "cont_oranje": 75, "cont_rood": 150}
 
 
 # ---- modellen laden -------------------------------------------------------------------
@@ -87,8 +89,10 @@ def load_risk():
         sys.path.insert(0, os.path.dirname(rp))
         try:
             import risk  # noqa
-            if hasattr(risk, "p_fire_wheq"):
-                return (lambda wheq, k: np.asarray(risk.p_fire_wheq(wheq, k), float)), "A1 risk.p_fire_wheq"
+            for fn in ("p_fire_from_wheq", "p_fire_wheq"):
+                if hasattr(risk, fn):
+                    f = getattr(risk, fn)
+                    return (lambda wheq, k, f=f: np.asarray(f(wheq, k), float)), f"A1 risk.{fn} (experiments/r3_risico/risk.py)"
         except Exception as e:  # pragma: no cover
             print("risk.py niet bruikbaar:", e)
     return (lambda wheq, k: -np.expm1(-k * wheq)), "eigen: 1-exp(-k*Wh-eq) (params.K_PER_WHEQ)"
@@ -106,13 +110,13 @@ def sample_bags(rng, n_cont, n_bags, scen):
     si = SCEN_INDEX[scen]
     for i, n in enumerate(ITEM_NAMES):
         it = P.ITEMS[n]
-        mu = it["mean"] * (s * lat_b if it["li"] else 1.0)
+        mu = it["mean"] * (s * lat_b if it["li"] else np.ones(nb))
         if it["dist"][0] == "nb":
             r = it["dist"][1]
-            lam = rng.gamma(r, mu / r)  # NB als gamma-Poisson-mengsel
+            lam = rng.gamma(r, mu / r, nb)  # NB als gamma-Poisson-mengsel
             c = rng.poisson(lam)
         else:
-            c = rng.poisson(mu)
+            c = rng.poisson(mu, nb)
         counts[:, i] = c
         if WHEQ_FACTOR[i] > 0:
             idx = np.nonzero(c)[0]
@@ -171,7 +175,7 @@ def bag_metrics(out, counts, wheq):
         "ppv_li_bij_flag": sd(flag & li, flag),
         "frac_flag_met_alkaline_zonder_li": sd(flag & alk & ~li, flag),
         "frac_pakket": float(pk.mean()),
-        "recall_pakket(>=50Wh-eq)": sd(pk & pos_pack, pos_pack),
+        "recall_pakket(>=PACK_WHEQ)": sd(pk & pos_pack, pos_pack),
         "ppv_pakket": sd(pk & pos_pack, pk),
         "energierecall_flag": float(wheq[flag].sum() / wheq.sum()),
     }
@@ -182,7 +186,7 @@ def calibrate_posterior(out, wheq):
     return np.array([wheq[out == k].mean() if (out == k).any() else 0.0 for k in range(3)])
 
 
-def container_eval(score, cont_wheq, pfire, rule_q=None, thr=None):
+def container_eval(score, cont_wheq, pfire, rule_q=None, thr=None, bagmax=None, pakket_any=None):
     """Beslisregel: rangorde (quantiles) of absolute drempels. Geeft alarm-niveau per container."""
     lvl = np.zeros(score.size, np.int8)
     if rule_q is not None:
@@ -195,15 +199,22 @@ def container_eval(score, cont_wheq, pfire, rule_q=None, thr=None):
         tr = np.quantile(jitter, 1 - qr) if qr > 0 else np.inf
         lvl[jitter >= to] = 1
         lvl[jitter >= tr] = 2
-    else:
-        lvl[score >= thr[0]] = 1
-        lvl[score >= thr[1]] = 2
+    else:  # A1-R3: container-score of hoogste inworp-score; optioneel elke 'pakket'-output = oranje
+        o = score >= thr["cont_oranje"]
+        r = score >= thr["cont_rood"]
+        if bagmax is not None:
+            o |= bagmax >= thr["throw_oranje"]
+            r |= bagmax >= thr["throw_rood"]
+        if pakket_any is not None:
+            o |= pakket_any
+        lvl[o] = 1
+        lvl[r] = 2
     return lvl
 
 
 def summarize(lvl, cont_wheq, pfire, eff):
-    pos_o = cont_wheq >= P.THRESH_CONTAINER["oranje"]
-    pos_r = cont_wheq >= P.THRESH_CONTAINER["rood"]
+    pos_o = cont_wheq >= A1_R3["cont_oranje"]
+    pos_r = cont_wheq >= A1_R3["cont_rood"]
     alarm = lvl >= 1
     red = lvl == 2
     e = np.where(lvl == 2, eff[1], np.where(lvl == 1, eff[0], 0.0))
@@ -213,8 +224,9 @@ def summarize(lvl, cont_wheq, pfire, eff):
         "frac_oranje+": float(alarm.mean()), "frac_rood": float(red.mean()),
         "meld_oranje+_per_wagen_dag": float(alarm.mean() * cpd),
         "meld_rood_per_wagen_week": float(red.mean() * cpd * OPS["truck_days_per_week"]),
-        "recall_cont>=50": sd(alarm & pos_o, pos_o), "ppv_cont>=50": sd(alarm & pos_o, alarm),
-        "far_cont<50": sd(alarm & ~pos_o, ~pos_o),
+        "meld_per_1000_ledigingen": float(alarm.mean() * 1000),
+        "recall_cont>=75": sd(alarm & pos_o, pos_o), "ppv_cont>=75": sd(alarm & pos_o, alarm),
+        "far_cont<75": sd(alarm & ~pos_o, ~pos_o),
         "recall_rood_cont>=150": sd(red & pos_r, pos_r), "ppv_rood_cont>=150": sd(red & pos_r, red),
         "energierecall": float(cont_wheq[alarm].sum() / cont_wheq.sum()),
         "risicorecall": float(pfire[alarm].sum() / pfire.sum()),
@@ -250,13 +262,15 @@ def run(n_cont, seed, scenarios, outdir):
         pfire = p_fire_fn(cont_wheq, k)
         outs = {name: sensor_output(rng, counts, nmet, sm) for name, sm in sensors.items()}
         outs["perfect"] = perfect_output(wheq)
-        scores = {}
+        scores, bagmax, pakany = {}, {}, {}
         for name, o in outs.items():
             bagres[(scen, name)] = bag_metrics(o, counts, wheq)
             oc = o.reshape(n_cont, nbag)
             scores[name + "_bayes"] = post[name][oc].sum(1)
             scores[name + "_teller"] = (oc >= 1).sum(1).astype(float)
             scores[name + "_pakket"] = (oc == 2).sum(1) + 1e-3 * scores[name + "_bayes"]
+            bagmax[name + "_bayes"] = (wheq.reshape(n_cont, nbag).max(1) if name == "perfect" else post[name][oc].max(1))
+            pakany[name + "_bayes"] = (oc == 2).any(1)
         scores["B0_risicokaart"] = latent * np.exp(OPS["b0_score_noise_sigma"] * rng.standard_normal(n_cont))
         scores["random"] = rng.random(n_cont)
         concepts = {  # concept -> scorefunctie (zie RESULTATEN.md)
@@ -266,10 +280,11 @@ def run(n_cont, seed, scenarios, outdir):
         }
         for cname, skey in concepts.items():
             sc = scores[skey]
-            for rule, kw in (("budget", dict(rule_q=(q_o, q_r))),
-                             ("A1-drempel", dict(thr=(P.THRESH_CONTAINER["oranje"], P.THRESH_CONTAINER["rood"])))):
-                if rule == "A1-drempel" and not skey.endswith("bayes"):
-                    continue  # absolute Wh-eq-drempel alleen zinvol voor gekalibreerde Bayes-score
+            rules = [("budget", dict(rule_q=(q_o, q_r)))]
+            if skey.endswith("bayes"):  # absolute Wh-eq-drempel alleen zinvol voor gekalibreerde Bayes-score
+                rules += [("A1-R3", dict(thr=A1_R3, bagmax=bagmax[skey])),
+                          ("A1-R3+pakket", dict(thr=A1_R3, bagmax=bagmax[skey], pakket_any=pakany[skey]))]
+            for rule, kw in rules:
                 lvl = container_eval(sc, cont_wheq, pfire, **kw)
                 r = summarize(lvl, cont_wheq, pfire, eff)
                 r.update(scenario=scen, concept=cname, regel=rule)
@@ -350,7 +365,7 @@ def plot(outdir, results, bagres, curves, meta):
     plt.rcParams.update({"font.size": 9, "axes.edgecolor": grid, "axes.labelcolor": ink2,
                          "xtick.color": ink2, "ytick.color": ink2, "axes.spines.top": False, "axes.spines.right": False})
     # Fig 1: risicorecall vs meldingen per wagen per week (basis)
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4), sharey=True)
     for ax, which, lab in ((axes[0], 1, "risicorecall (aandeel brandkans in gemelde containers)"),
                            (axes[1], 2, "energierecall (aandeel Wh-eq)")):
         for (s, c), v in curves.items():
@@ -362,14 +377,14 @@ def plot(outdir, results, bagres, curves, meta):
         b_r = OPS["budget_rood_per_truck_week"]
         for b, t in ((b_r, "budget rood\n1/wagen/wk"), (b_o, "budget oranje\n2,5/wagen/dag")):
             ax.axvline(b, color=ink2, lw=0.8, ls=":")
-            ax.text(b * 1.08, 0.02, t, color=ink2, fontsize=7)
+            ax.text(b * 1.08, 0.86, t, color=ink2, fontsize=7)
         ax.set_xscale("log")
         ax.set_xlabel("gemelde containers per wagen per week (rangorde)")
         ax.set_title(lab, fontsize=9, color=ink, loc="left")
         ax.grid(True, color=grid, lw=0.6)
         ax.set_ylim(0, 1)
     axes[0].set_ylabel("recall")
-    axes[1].legend(frameon=False, fontsize=7, loc="upper left")
+    axes[1].legend(frameon=False, fontsize=7, loc="upper left", bbox_to_anchor=(1.01, 1))
     fig.suptitle("Container-rangorde: recall vs alarmlast (scenario basis)" + tag, fontsize=10, color=ink, x=0.01, ha="left")
     fig.tight_layout()
     fig.savefig(os.path.join(outdir, "fig_recall_vs_meldingen.png"), dpi=150)
@@ -377,7 +392,7 @@ def plot(outdir, results, bagres, curves, meta):
     # Fig 2: per-inworp PPV en recall (basis)
     sens = ["K1", "K2", "K3", "perfect"]
     mets = [("ppv_li_bij_flag", "PPV Li | flag"), ("recall_li_zak", "recall Li-zak"),
-            ("ppv_pakket", "PPV pakket"), ("recall_pakket(>=50Wh-eq)", "recall pakket"), ("frac_flag(cel|pakket)", "aandeel zakken geflagd")]
+            ("ppv_pakket", "PPV pakket"), ("recall_pakket(>=PACK_WHEQ)", "recall pakket"), ("frac_flag(cel|pakket)", "aandeel zakken geflagd")]
     fig, ax = plt.subplots(figsize=(10, 3.6))
     x = np.arange(len(mets))
     wbar = 0.2
@@ -427,7 +442,7 @@ if __name__ == "__main__":
     res, bag, cur, meta = run(n, a.seed, ["laag", "basis", "hoog"], a.out)
     print("risico:", meta["risk"], "| placeholders:", meta["placeholder_any"])
     for r in res:
-        if r["regel"].startswith("budget") or r["regel"] == "A1-drempel":
+        if True:
             print(f'{r["scenario"]:5s} {r["concept"]:22s} {r["regel"]:12s} '
                   f'or/dag={r.get("meld_oranje+_per_wagen_dag", float("nan")):6.2f} rood/wk={r["meld_rood_per_wagen_week"]:6.2f} '
                   f'risrec={r.get("risicorecall", float("nan")):.2f} verm={r.get("frac_branden_vermeden", float("nan")):.3f} '

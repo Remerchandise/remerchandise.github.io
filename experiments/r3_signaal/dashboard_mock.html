@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accurisico containers</title>
+<style>
+:root{
+  --bg:#f6f5f2; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#8a8984; --line:#e4e3df;
+  --ok:#1f8a4c; --warn:#c98500; --bad:#d23b3b; --crit:#1b1b1b; --accent:#2a78d6;
+  --ok-bg:#e6f4ec; --warn-bg:#fdf3dc; --bad-bg:#fbe6e6; --crit-bg:#e4e3df;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121211; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#8f8e86; --line:#2e2e2c;
+    --ok:#3fb36d; --warn:#e0a02a; --bad:#e66767; --crit:#f0efec; --accent:#3987e5;
+    --ok-bg:#16301f; --warn-bg:#33290f; --bad-bg:#3a1a1a; --crit-bg:#2e2e2c;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121211; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#8f8e86; --line:#2e2e2c;
+  --ok:#3fb36d; --warn:#e0a02a; --bad:#e66767; --crit:#f0efec; --accent:#3987e5;
+  --ok-bg:#16301f; --warn-bg:#33290f; --bad-bg:#3a1a1a; --crit-bg:#2e2e2c;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{padding:16px;border-bottom:1px solid var(--line);background:var(--surface)}
+header h1{font-size:18px;margin:0}
+header p{margin:4px 0 0;color:var(--ink2);font-size:13px}
+.mock{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;background:var(--warn-bg);color:var(--ink);font-size:11px;font-weight:600;vertical-align:middle}
+main{max-width:1200px;margin:0 auto;padding:16px;display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:900px){main{grid-template-columns:2fr 1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.card h2{font-size:14px;margin:0 0 12px;color:var(--ink2);font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;grid-column:1/-1}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.tile .v{font-size:26px;font-weight:650}
+.tile .l{color:var(--ink2);font-size:12px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.badge::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.b-groen{background:var(--ok-bg);color:var(--ok)} .b-oranje{background:var(--warn-bg);color:var(--warn)}
+.b-rood{background:var(--bad-bg);color:var(--bad)} .b-zwart{background:var(--crit-bg);color:var(--crit)}
+.b-groen span,.b-oranje span,.b-rood span,.b-zwart span{color:var(--ink)}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{color:var(--ink2);font-weight:600;font-size:12px;cursor:pointer;user-select:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filters button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer}
+.filters button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+svg text{fill:var(--ink2);font-size:10px}
+.map{width:100%;height:auto;display:block;border-radius:8px;background:var(--bg)}
+.msg{border-left:3px solid var(--line);padding:8px 10px;margin-bottom:10px;background:var(--bg);border-radius:0 6px 6px 0}
+.msg.rood{border-color:var(--bad)} .msg.oranje{border-color:var(--warn)} .msg.zwart{border-color:var(--crit)}
+.msg b{display:block}
+.msg small{color:var(--ink2)}
+.act{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+.act button{font:inherit;font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--ink2)}
+.note{color:var(--muted);font-size:12px;margin-top:8px}
+footer{max-width:1200px;margin:0 auto;padding:0 16px 24px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Accurisico per container <span class="mock">MOCK – fictieve data</span></h1>
+  <p>Gemeente Voorbeeld · fractie restafval · stand sinds laatste lediging · twee kanalen: <b>rangorde</b> (inworpsensor, K2) en <b>event</b> (deksel, K4)</p>
+</header>
+<main>
+  <section class="tiles" aria-label="Kerncijfers">
+    <div class="tile"><div class="v" id="t-n">–</div><div class="l">containers</div></div>
+    <div class="tile"><div class="v" id="t-or">–</div><div class="l">oranje (laatst in route)</div></div>
+    <div class="tile"><div class="v" id="t-rd">–</div><div class="l">rood (apart, niet persen)</div></div>
+    <div class="tile"><div class="v" id="t-ev">–</div><div class="l">zwart (event, niet legen)</div></div>
+    <div class="tile"><div class="v" id="t-load">–</div><div class="l">meldingen per wagen vandaag (norm ≤ 2,5)</div></div>
+  </section>
+
+  <section class="card">
+    <h2>Kaart (schematisch)</h2>
+    <svg class="map" id="map" viewBox="0 0 600 300" role="img" aria-label="Schematische kaart met containers gekleurd naar niveau"></svg>
+    <div class="legend">
+      <span class="badge b-groen"><span>groen</span></span>
+      <span class="badge b-oranje"><span>oranje</span></span>
+      <span class="badge b-rood"><span>rood</span></span>
+      <span class="badge b-zwart"><span>zwart</span></span>
+    </div>
+    <h2 style="margin-top:16px">Containers</h2>
+    <div class="filters" role="group" aria-label="Filter op niveau">
+      <button data-f="alle" aria-pressed="true">Alle</button>
+      <button data-f="oranje+" aria-pressed="false">Oranje en hoger</button>
+      <button data-f="rood+" aria-pressed="false">Rood en zwart</button>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th data-k="id">Container</th><th data-k="buurt">Buurt</th><th data-k="lvl">Niveau</th>
+          <th class="num" data-k="score">Score Wh-eq</th><th class="num" data-k="rank">Rang</th>
+          <th class="num" data-k="throws">Inworpen</th><th class="num" data-k="pak">Pakket</th>
+          <th class="num" data-k="temp">°C</th><th data-k="route">Route</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p class="note">Score = som van E[Wh-eq | sensoruitkomst] per inworp sinds lediging (mc.py). Een melding per container zegt "relatief hoog", niet "accu aanwezig": in 60–100 % van de ledigingen zit er al een Li-item in. Geen persoonsgegevens; geen koppeling aan de afvalpas.</p>
+  </section>
+
+  <aside class="card">
+    <h2>Meldingen chauffeur (boordcomputer)</h2>
+    <div id="msgs"></div>
+    <p class="note">Draaiboek: oranje = als laatste van de route legen, niet extra persen · rood = apart legen, niet persen · zwart = niet legen, beheerder/brandweer. Terugkoppeling "gezien/bevinding" voedt het model (labels).</p>
+  </aside>
+</main>
+<footer>Mock voor Ronde 3 (A6). Data willekeurig gegenereerd (seed 7). Payload v1, zie experiments/r3_signaal/firmware_skeleton.py.</footer>
+
+<script>
+(function(){
+  // deterministische pseudo-random (mulberry32)
+  function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var r=rng(7), buurten=["Centrum","Oost","Noord","Haven","Park","West"];
+  var C=[];
+  for(var i=0;i<60;i++){
+    var throws=Math.round(20+r()*90), pak=r()<0.06?1:0;
+    var score=+(throws*(0.15+r()*0.35)+pak*30).toFixed(1);
+    var temp=Math.round(8+r()*10);
+    C.push({id:"UGC-"+String(1001+i),buurt:buurten[i%6],x:30+r()*540,y:25+r()*250,throws:throws,pak:pak,score:score,temp:temp,route:"Route "+(1+(i%3)),ev:false});
+  }
+  C[17].ev=true; C[17].temp=61;
+  // rangorde-budget: top 2 % oranje per dag-equivalent; hier: top 3 oranje, top 1 rood (mock)
+  var sorted=C.slice().sort(function(a,b){return b.score-a.score});
+  sorted.forEach(function(c,i){c.rank=i+1});
+  C.forEach(function(c){c.lvl=c.ev?"zwart":(c.rank===1?"rood":(c.rank<=3?"oranje":"groen"))});
+  var order={groen:0,oranje:1,rood:2,zwart:3};
+
+  function q(s){return document.querySelector(s)}
+  var cnt=function(l){return C.filter(function(c){return c.lvl===l}).length};
+  q("#t-n").textContent=C.length; q("#t-or").textContent=cnt("oranje"); q("#t-rd").textContent=cnt("rood"); q("#t-ev").textContent=cnt("zwart");
+  q("#t-load").textContent=((cnt("oranje")+cnt("rood")+cnt("zwart"))/3).toFixed(1);
+
+  // kaart
+  var ns="http://www.w3.org/2000/svg", svg=q("#map");
+  var col={groen:"var(--ok)",oranje:"var(--warn)",rood:"var(--bad)",zwart:"var(--crit)"};
+  C.forEach(function(c){
+    var g=document.createElementNS(ns,"circle");
+    g.setAttribute("cx",c.x);g.setAttribute("cy",c.y);g.setAttribute("r",c.lvl==="groen"?5:8);
+    g.setAttribute("fill",col[c.lvl]);g.setAttribute("stroke","var(--surface)");g.setAttribute("stroke-width","2");
+    var t=document.createElementNS(ns,"title");t.textContent=c.id+" · "+c.lvl+" · "+c.score+" Wh-eq";g.appendChild(t);
+    svg.appendChild(g);
+    if(c.lvl!=="groen"){var tx=document.createElementNS(ns,"text");tx.setAttribute("x",c.x+11);tx.setAttribute("y",c.y+4);tx.textContent=c.id;svg.appendChild(tx)}
+  });
+
+  // tabel
+  var filt="alle", sk="score", sd=-1;
+  function render(){
+    var rows=C.filter(function(c){return filt==="alle"||(filt==="oranje+"&&order[c.lvl]>=1)||(filt==="rood+"&&order[c.lvl]>=2)})
+      .sort(function(a,b){var va=sk==="lvl"?order[a.lvl]:a[sk],vb=sk==="lvl"?order[b.lvl]:b[sk];return (va>vb?1:va<vb?-1:0)*sd});
+    q("#rows").innerHTML=rows.map(function(c){
+      return "<tr><td>"+c.id+"</td><td>"+c.buurt+"</td><td><span class='badge b-"+c.lvl+"'><span>"+c.lvl+"</span></span></td><td class='num'>"+c.score.toFixed(1)+"</td><td class='num'>"+c.rank+"</td><td class='num'>"+c.throws+"</td><td class='num'>"+c.pak+"</td><td class='num'>"+c.temp+"</td><td>"+c.route+"</td></tr>"}).join("");
+  }
+  document.querySelectorAll(".filters button").forEach(function(b){b.addEventListener("click",function(){
+    filt=b.dataset.f;document.querySelectorAll(".filters button").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});render()})});
+  document.querySelectorAll("th").forEach(function(th){th.addEventListener("click",function(){var k=th.dataset.k;sd=(sk===k)?-sd:-1;sk=k;render()})});
+  render();
+
+  // meldingen
+  var txt={zwart:"NIET LEGEN – temperatuur-/gasevent in container. Beheerder gewaarschuwd.",rood:"Apart legen, NIET persen. Hoogste score in de route.",oranje:"Als laatste van de route legen; niet extra persen."};
+  q("#msgs").innerHTML=C.filter(function(c){return c.lvl!=="groen"}).sort(function(a,b){return order[b.lvl]-order[a.lvl]}).map(function(c){
+    return "<div class='msg "+c.lvl+"'><span class='badge b-"+c.lvl+"'><span>"+c.lvl+"</span></span><b>"+c.id+" · "+c.buurt+" · "+c.route+"</b>"+txt[c.lvl]+
+    "<br><small>score "+c.score.toFixed(1)+" Wh-eq · rang "+c.rank+" · "+c.temp+" °C</small><div class='act'><button>Gezien</button><button>Bevinding: accu</button><button>Niets gevonden</button></div></div>"}).join("");
+  document.querySelectorAll(".act button").forEach(function(b){b.addEventListener("click",function(){b.parentNode.innerHTML="<small>Vastgelegd: "+b.textContent+"</small>"})});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,522 @@
+{
+ "concept": "K4",
+ "regels": {
+  "A": "CO > 50 ppm",
+  "B": "dCO > 30 ppm / 10 min",
+  "C": "IR max > 45 °C én > 20 K boven mediaan, 2 frames",
+  "D": "2-van-3 (A,B,C)",
+  "E": "coïncidentie: B (±30 min) ∧ C, of B ∧ CO > 150 ppm (aanbevolen)"
+ },
+ "vals_alarm_per_container_jaar": {
+  "laag": {
+   "A": 3.075,
+   "B": 0.55,
+   "C": 0.5666666666666667,
+   "D": 0.5416666666666666,
+   "E": 0.5083333333333333
+  },
+  "basis": {
+   "A": 11.666666666666666,
+   "B": 2.0416666666666665,
+   "C": 2.15,
+   "D": 1.9583333333333333,
+   "E": 1.85
+  },
+  "hoog": {
+   "A": 39.7,
+   "B": 18.483333333333334,
+   "C": 4.916666666666667,
+   "D": 11.275,
+   "E": 4.216666666666667
+  }
+ },
+ "vals_alarm_hinder_per_container_jaar": {
+  "laag": {
+   "A": 2.0833333333333335,
+   "B": 0.0,
+   "C": 0.0,
+   "D": 0.0,
+   "E": 0.0
+  },
+  "basis": {
+   "A": 9.891666666666667,
+   "B": 0.10833333333333334,
+   "C": 0.0,
+   "D": 0.0,
+   "E": 0.0
+  },
+  "hoog": {
+   "A": 35.81666666666667,
+   "B": 13.841666666666667,
+   "C": 0.0,
+   "D": 6.441666666666666,
+   "E": 0.025
+  }
+ },
+ "hete_object_alarmen_per_container_jaar": {
+  "laag": {
+   "A": 0.9916666666666667,
+   "B": 0.55,
+   "C": 0.5666666666666667,
+   "D": 0.5416666666666666,
+   "E": 0.5083333333333333
+  },
+  "basis": {
+   "A": 1.7749999999999986,
+   "B": 1.9333333333333331,
+   "C": 2.15,
+   "D": 1.9583333333333333,
+   "E": 1.85
+  },
+  "hoog": {
+   "A": 3.883333333333333,
+   "B": 4.6416666666666675,
+   "C": 4.916666666666667,
+   "D": 4.833333333333334,
+   "E": 4.191666666666666
+  }
+ },
+ "detectie_na_TR": {
+  "laag": {
+   "A": {
+    "brand_P_det_10min": 0.3831385642737897,
+    "brand_P_det_30min": 0.7470784641068448,
+    "brand_P_det_60min": 0.8889816360601002,
+    "TR_zonder_brand_P_det_60min": 0.5588865096359743,
+    "mediaan_detectietijd_brand_min": 15.0
+   },
+   "B": {
+    "brand_P_det_10min": 0.2570951585976628,
+    "brand_P_det_30min": 0.6928213689482471,
+    "brand_P_det_60min": 0.7813021702838063,
+    "TR_zonder_brand_P_det_60min": 0.4057815845824411,
+    "mediaan_detectietijd_brand_min": 17.0
+   },
+   "C": {
+    "brand_P_det_10min": 0.3046744574290484,
+    "brand_P_det_30min": 0.34056761268781305,
+    "brand_P_det_60min": 0.34223706176961605,
+    "TR_zonder_brand_P_det_60min": 0.37366167023554603,
+    "mediaan_detectietijd_brand_min": Infinity
+   },
+   "D": {
+    "brand_P_det_10min": 0.2913188647746244,
+    "brand_P_det_30min": 0.672787979966611,
+    "brand_P_det_60min": 0.7771285475792988,
+    "TR_zonder_brand_P_det_60min": 0.4586009992862241,
+    "mediaan_detectietijd_brand_min": 17.5
+   },
+   "E": {
+    "brand_P_det_10min": 0.20534223706176963,
+    "brand_P_det_30min": 0.41318864774624375,
+    "brand_P_det_60min": 0.4732888146911519,
+    "TR_zonder_brand_P_det_60min": 0.2883654532476802,
+    "mediaan_detectietijd_brand_min": Infinity
+   }
+  },
+  "basis": {
+   "A": {
+    "brand_P_det_10min": 0.9995024875621891,
+    "brand_P_det_30min": 1.0,
+    "brand_P_det_60min": 1.0,
+    "TR_zonder_brand_P_det_60min": 0.8959798994974875,
+    "mediaan_detectietijd_brand_min": 1.0
+   },
+   "B": {
+    "brand_P_det_10min": 1.0,
+    "brand_P_det_30min": 1.0,
+    "brand_P_det_60min": 1.0,
+    "TR_zonder_brand_P_det_60min": 0.935678391959799,
+    "mediaan_detectietijd_brand_min": 10.0
+   },
+   "C": {
+    "brand_P_det_10min": 1.0,
+    "brand_P_det_30min": 1.0,
+    "brand_P_det_60min": 1.0,
+    "TR_zonder_brand_P_det_60min": 0.9989949748743718,
+    "mediaan_detectietijd_brand_min": 0.5
+   },
+   "D": {
+    "brand_P_det_10min": 1.0,
+    "brand_P_det_30min": 1.0,
+    "brand_P_det_60min": 1.0,
+    "TR_zonder_brand_P_det_60min": 0.9577889447236181,
+    "mediaan_detectietijd_brand_min": 1.5
+   },
+   "E": {
+    "brand_P_det_10min": 1.0,
+    "brand_P_det_30min": 1.0,
+    "brand_P_det_60min": 1.0,
+    "TR_zonder_brand_P_det_60min": 0.9306532663316583,
+    "mediaan_detectietijd_brand_min": 10.0
+   }
+  },
+  "hoog": {
+   "A": {
+    "brand_P_det_10min": 1.0,
+    "brand_P_det_30min": 1.0,
+    "brand_P_det_60min": 1.0,
+    "TR_zonder_brand_P_det_60min": 1.0,
+    "mediaan_detectietijd_brand_min": 0.5
+   },
+   "B": {
+    "brand_P_det_10min": 1.0,
+    "brand_P_det_30min": 1.0,
+    "brand_P_det_60min": 1.0,
+    "TR_zonder_brand_P_det_60min": 1.0,
+    "mediaan_detectietijd_brand_min": 10.0
+   },
+   "C": {
+    "brand_P_det_10min": 1.0,
+    "brand_P_det_30min": 1.0,
+    "brand_P_det_60min": 1.0,
+    "TR_zonder_brand_P_det_60min": 1.0,
+    "mediaan_detectietijd_brand_min": 0.5
+   },
+   "D": {
+    "brand_P_det_10min": 1.0,
+    "brand_P_det_30min": 1.0,
+    "brand_P_det_60min": 1.0,
+    "TR_zonder_brand_P_det_60min": 1.0,
+    "mediaan_detectietijd_brand_min": 0.5
+   },
+   "E": {
+    "brand_P_det_10min": 1.0,
+    "brand_P_det_30min": 1.0,
+    "brand_P_det_60min": 1.0,
+    "TR_zonder_brand_P_det_60min": 1.0,
+    "mediaan_detectietijd_brand_min": 10.0
+   }
+  }
+ },
+ "detectie_gevoeligheid_basis_diep72h": {
+  "A": {
+   "P10": 0.9970074812967581,
+   "P60": 1.0,
+   "diepte_mediaan_m": 0.6514666302907755
+  },
+  "B": {
+   "P10": 0.9985037406483791,
+   "P60": 1.0,
+   "diepte_mediaan_m": 0.6514666302907755
+  },
+  "C": {
+   "P10": 0.626932668329177,
+   "P60": 0.628428927680798,
+   "diepte_mediaan_m": 0.6514666302907755
+  },
+  "D": {
+   "P10": 0.9985037406483791,
+   "P60": 1.0,
+   "diepte_mediaan_m": 0.6514666302907755
+  },
+  "E": {
+   "P10": 0.9211970074812967,
+   "P60": 0.9995012468827931,
+   "diepte_mediaan_m": 0.6514666302907755
+  }
+ },
+ "vlag_actief_bij_lediging_per_container_jaar": {
+  "laag": {
+   "A": 0.14642857142857144,
+   "B": 0.02619047619047619,
+   "C": 0.026984126984126982,
+   "D": 0.025793650793650792,
+   "E": 0.024206349206349204
+  },
+  "basis": {
+   "A": 0.5555555555555556,
+   "B": 0.09722222222222221,
+   "C": 0.10238095238095238,
+   "D": 0.09325396825396826,
+   "E": 0.0880952380952381
+  },
+  "hoog": {
+   "A": 1.8904761904761906,
+   "B": 0.8801587301587303,
+   "C": 0.23412698412698413,
+   "D": 0.5369047619047619,
+   "E": 0.2007936507936508
+  }
+ },
+ "detectie_voor_TR": {
+  "P": [
+   0.0,
+   0.0,
+   0.05
+  ],
+  "toelichting": "K4 heeft geen VOC-kanaal; ventgas vóór TR bevat weinig CO. Zelfs een VOC-sensor: P(ventgas in kopruimte vóór TR) 0,3 % / 4 % / 24 % (warmte_gas.py)."
+ },
+ "P_vlag_niet_legen_terecht": {
+  "laag": {
+   "A": {
+    "PPV_accubrand": 4.478476850258943e-06,
+    "PPV_brand_alle_oorzaken": 2.239198312338252e-05,
+    "PPV_brand_of_heet_object": 0.09783716220475493,
+    "vlaggen_per_1000_containers_jaar": 39700.88898163606,
+    "hindervlaggen_per_1000_containers_jaar": 35816.66666666667
+   },
+   "B": {
+    "PPV_accubrand": 8.45405480734783e-06,
+    "PPV_brand_alle_oorzaken": 4.2268844664221416e-05,
+    "PPV_brand_of_heet_object": 0.2511587955594938,
+    "vlaggen_per_1000_containers_jaar": 18484.114635503618,
+    "hindervlaggen_per_1000_containers_jaar": 13841.666666666666
+   },
+   "C": {
+    "PPV_accubrand": 1.392131379172956e-05,
+    "PPV_brand_alle_oorzaken": 6.960269311492139e-05,
+    "PPV_brand_of_heet_object": 0.9999999999997966,
+    "vlaggen_per_1000_containers_jaar": 4917.008903728437,
+    "hindervlaggen_per_1000_containers_jaar": 0.0
+   },
+   "D": {
+    "PPV_accubrand": 1.3784795299712283e-05,
+    "PPV_brand_alle_oorzaken": 6.892017629647235e-05,
+    "PPV_brand_of_heet_object": 0.4287163897237441,
+    "vlaggen_per_1000_containers_jaar": 11275.77712854758,
+    "hindervlaggen_per_1000_containers_jaar": 6441.666666666666
+   },
+   "E": {
+    "PPV_accubrand": 2.244797740621759e-05,
+    "PPV_brand_alle_oorzaken": 0.00011222980970215797,
+    "PPV_brand_of_heet_object": 0.9940718116389521,
+    "vlaggen_per_1000_containers_jaar": 4217.139955481358,
+    "hindervlaggen_per_1000_containers_jaar": 25.0
+   }
+  },
+  "basis": {
+   "A": {
+    "PPV_accubrand": 4.2855306201159137e-05,
+    "PPV_brand_alle_oorzaken": 0.00021423980575589112,
+    "PPV_brand_of_heet_object": 0.15232450189243846,
+    "vlaggen_per_1000_containers_jaar": 11669.166666666666,
+    "hindervlaggen_per_1000_containers_jaar": 9891.666666666668
+   },
+   "B": {
+    "PPV_accubrand": 0.0002448379988573028,
+    "PPV_brand_alle_oorzaken": 0.0012229922543817908,
+    "PPV_brand_of_heet_object": 0.9470036689762998,
+    "vlaggen_per_1000_containers_jaar": 2044.1666666666665,
+    "hindervlaggen_per_1000_containers_jaar": 108.33333333333334
+   },
+   "C": {
+    "PPV_accubrand": 0.00023250406882109625,
+    "PPV_brand_alle_oorzaken": 0.0011614401858298902,
+    "PPV_brand_of_heet_object": 0.9999999999995354,
+    "vlaggen_per_1000_containers_jaar": 2152.5,
+    "hindervlaggen_per_1000_containers_jaar": 0.0
+   },
+   "D": {
+    "PPV_accubrand": 0.000255253977707689,
+    "PPV_brand_alle_oorzaken": 0.0012749681257962049,
+    "PPV_brand_of_heet_object": 0.99999999999949,
+    "vlaggen_per_1000_containers_jaar": 1960.8333333333333,
+    "hindervlaggen_per_1000_containers_jaar": 0.0
+   },
+   "E": {
+    "PPV_accubrand": 0.0002701972439879653,
+    "PPV_brand_alle_oorzaken": 0.0013495276653164104,
+    "PPV_brand_of_heet_object": 0.9999999999994601,
+    "vlaggen_per_1000_containers_jaar": 1852.5,
+    "hindervlaggen_per_1000_containers_jaar": 0.0
+   }
+  },
+  "hoog": {
+   "A": {
+    "PPV_accubrand": 0.00032509752925867193,
+    "PPV_brand_alle_oorzaken": 0.0016233766233760963,
+    "PPV_brand_of_heet_object": 0.3235930735929685,
+    "vlaggen_per_1000_containers_jaar": 3080.0,
+    "hindervlaggen_per_1000_containers_jaar": 2083.3333333333335
+   },
+   "B": {
+    "PPV_accubrand": 0.0018148820326645827,
+    "PPV_brand_alle_oorzaken": 0.009009009008992777,
+    "PPV_brand_of_heet_object": 0.9999999999981982,
+    "vlaggen_per_1000_containers_jaar": 555.0,
+    "hindervlaggen_per_1000_containers_jaar": 0.0
+   },
+   "C": {
+    "PPV_accubrand": 0.0017615971814414066,
+    "PPV_brand_alle_oorzaken": 0.008746355685115897,
+    "PPV_brand_of_heet_object": 0.9999999999982507,
+    "vlaggen_per_1000_containers_jaar": 571.6666666666666,
+    "hindervlaggen_per_1000_containers_jaar": 0.0
+   },
+   "D": {
+    "PPV_accubrand": 0.0018427518427484473,
+    "PPV_brand_alle_oorzaken": 0.009146341463397904,
+    "PPV_brand_of_heet_object": 0.9999999999981708,
+    "vlaggen_per_1000_containers_jaar": 546.6666666666666,
+    "hindervlaggen_per_1000_containers_jaar": 0.0
+   },
+   "E": {
+    "PPV_accubrand": 0.0019633507853364595,
+    "PPV_brand_alle_oorzaken": 0.009740259740240767,
+    "PPV_brand_of_heet_object": 0.999999999998052,
+    "vlaggen_per_1000_containers_jaar": 513.3333333333333,
+    "hindervlaggen_per_1000_containers_jaar": 0.0
+   }
+  }
+ },
+ "aannames": {
+  "BG": {
+   "laag": {
+    "type": "ondergronds",
+    "ferm_p_week": 0.15,
+    "ferm_med_ppm": 20,
+    "ash_per_yr": 0.5,
+    "firework_p": 0.15,
+    "exhaust_max": 10
+   },
+   "basis": {
+    "type": "ondergronds",
+    "ferm_p_week": 0.3,
+    "ferm_med_ppm": 30,
+    "ash_per_yr": 2.0,
+    "firework_p": 0.3,
+    "exhaust_max": 25
+   },
+   "hoog": {
+    "type": "bovengronds",
+    "ferm_p_week": 0.6,
+    "ferm_med_ppm": 50,
+    "ash_per_yr": 5.0,
+    "firework_p": 0.5,
+    "exhaust_max": 40
+   }
+  },
+  "FIRE": {
+   "laag": {
+    "perm": 1e-08,
+    "delay_h": 72.0,
+    "smolder_W": [
+     30,
+     150
+    ],
+    "f_reach": [
+     0.2,
+     0.5
+    ],
+    "V": 3.5,
+    "ach": 5.0,
+    "lam": [
+     0.1,
+     0.4
+    ],
+    "vfront_cm_min": [
+     0.05,
+     0.3
+    ]
+   },
+   "basis": {
+    "perm": 1e-07,
+    "delay_h": 6.0,
+    "smolder_W": [
+     50,
+     500
+    ],
+    "f_reach": [
+     0.3,
+     0.8
+    ],
+    "V": 2.0,
+    "ach": 2.0,
+    "lam": [
+     0.2,
+     0.8
+    ],
+    "vfront_cm_min": [
+     0.1,
+     1.0
+    ]
+   },
+   "hoog": {
+    "perm": 1e-06,
+    "delay_h": 0.5,
+    "smolder_W": [
+     100,
+     1000
+    ],
+    "f_reach": [
+     0.5,
+     1.0
+    ],
+    "V": 0.5,
+    "ach": 0.5,
+    "lam": [
+     0.4,
+     1.2
+    ],
+    "vfront_cm_min": [
+     0.3,
+     2.0
+    ]
+   },
+   "basis_diep": {
+    "perm": 1e-07,
+    "delay_h": 72.0,
+    "smolder_W": [
+     50,
+     500
+    ],
+    "f_reach": [
+     0.3,
+     0.8
+    ],
+    "V": 2.0,
+    "ach": 2.0,
+    "lam": [
+     0.2,
+     0.8
+    ],
+    "vfront_cm_min": [
+     0.1,
+     1.0
+    ]
+   }
+  },
+  "P_sustain": {
+   "laag": 0.3,
+   "basis": 0.5,
+   "hoog": 0.7
+  },
+  "lambda_fire_li_per_UGC_jaar": {
+   "laag": 0.0002,
+   "basis": 0.0005,
+   "hoog": 0.001
+  },
+  "allcause_factor": 5.0,
+  "drempels": {
+   "co_abs": 50.0,
+   "co_rise": 30.0,
+   "ir_abs": 45.0,
+   "ir_excess": 20.0,
+   "co_big": 150.0
+  },
+  "container_jaren_per_scenario": 120,
+  "events_per_scenario": 4000
+ },
+ "formaat_A6": {
+  "classes": [
+   "geen",
+   "cel",
+   "pakket"
+  ],
+  "p_out_given_item": "n.v.t. – K4 detecteert geen items, alleen events; gebruik als apart event-kanaal",
+  "event_kanaal": {
+   "rood_niet_legen": "regel E",
+   "kans_detectie_brand_60min_l_b_h": [
+    0.4732888146911519,
+    1.0,
+    1.0
+   ],
+   "vals_alarm_per_container_jaar_l_b_h": [
+    0.5083333333333333,
+    1.85,
+    4.216666666666667
+   ]
+  }
+ }
+}

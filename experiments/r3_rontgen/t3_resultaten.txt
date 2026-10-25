@@ -1,0 +1,10 @@
+30 kV 1 W: H*(10) primair onafgeschermd op 0.75 m = 4.3e+03 uSv/h; staal nodig voor 1 uSv/h: 0.75 mm; 3 mm staal -> 3.4e-08 uSv/h
+           strooi naar klep onafgeschermd op 0.4 m = 89 uSv/h; RVS nodig: 0.35 mm; 2 mm RVS -> 1.6e-06 uSv/h; interlock-falen 10 s open klep -> 0.247 uSv
+30 kV 4 W: H*(10) primair onafgeschermd op 0.75 m = 1.72e+04 uSv/h; staal nodig voor 1 uSv/h: 0.90 mm; 3 mm staal -> 1.4e-07 uSv/h
+           strooi naar klep onafgeschermd op 0.4 m = 356 uSv/h; RVS nodig: 0.50 mm; 2 mm RVS -> 6.6e-06 uSv/h; interlock-falen 10 s open klep -> 0.989 uSv
+50 kV 4 W: H*(10) primair onafgeschermd op 0.75 m = 3.74e+04 uSv/h; staal nodig voor 1 uSv/h: 3.50 mm; 3 mm staal -> 2.6 uSv/h
+           strooi naar klep onafgeschermd op 0.4 m = 948 uSv/h; RVS nodig: 1.95 mm; 2 mm RVS -> 0.85 uSv/h; interlock-falen 10 s open klep -> 2.63 uSv
+80 kV 4 W: H*(10) primair onafgeschermd op 0.75 m = 5.56e+04 uSv/h; staal nodig voor 1 uSv/h: >4 mm; 3 mm staal -> 3.5e+02 uSv/h
+           strooi naar klep onafgeschermd op 0.4 m = 1.55e+03 uSv/h; RVS nodig: >4 mm; 2 mm RVS -> 34 uSv/h; interlock-falen 10 s open klep -> 4.31 uSv
+Buisbehuizing 1 mm Pb, 30 kV 4 W, 0,1 m: 8.6e-13 uSv/h
+Dosis op zakinhoud per scan (5 s, 4 W, 0,3 m): 401 uGy luchtkerma
