@@ -1,88 +1,87 @@
-# R3 – A6 Classificatie-Monte-Carlo en signaalketen (FASE 1)
+# R3 – A6 Classificatie-Monte-Carlo en signaalketen (FASE 2)
 
 A6 · 2026-10-25 · EUR 2026 excl. btw · aannames **[A]**
 Draaien vanuit repo-root: `python3 experiments/r3_classificatie/mc.py` (~15 s, seed 20261025, 30 000 ledigingen × 100 zakken per scenario). Gebruik `--fast` voor een snelle controle.
-Uitvoer: `mc_container.csv`, `mc_inworp.csv`, `mc_meta.json` (welke modellen zijn gebruikt), `fig_recall_vs_meldingen.png`, `fig_inworp.png`, `fig_vermeden_schade.png`.
+Uitvoer: `mc_results.json` (voor A7), `mc_container.csv`, `mc_inworp.csv`, `mc_meta.json`, `fig_concepten_recall_valsalarm.png` (deck), `fig_recall_vs_meldingen.png`, `fig_inworp.png`, `fig_vermeden_schade.png`.
 
-> **Status van de modellen.** K3 (A3) en K4/B1 (A4) zijn al de echte modellen. Voor K1 en K2 zijn het nog **placeholders [A]** (`placeholders/sensor_model_K1/K2.json`), omdat A2 nog geen JSON heeft geleverd. Figuren met placeholders dragen een label in de titel.
-
-**FASE 2:** zodra `experiments/r3_inductie/sensor_model_K1.json` en `sensor_model_K2.json` bestaan, gebruikt mc.py die automatisch. Opnieuw draaien is dan genoeg. Dit wordt automatisch opgepikt:
-- K3 uit `r3_rontgen/`;
-- K4 (A4-formaat `formaat_A6`, regel E; meldingen = "vlag actief bij lediging");
-- B1 (`b1_resultaten.json`);
-- brandkans via A1 `risk.p_fire_from_wheq`.
+> **Status: FASE 2. Alle modellen zijn echt.** K1/K2: A2 `r3_inductie/sensor_model_K1/K2.json` in de **in_bag**-modus, door A2 aanbevolen:
+> - een Li-loze zak geeft `clutter_bag.p_out_given_n_metal`;
+> - een zak met Li geeft het maximum over de Li-items van `p_out_given_item_in_bag`, met superpositie gesimuleerd door A2.
+>
+> K3: A3 (independent_or met masking). K4 en B1: A4. Brandkans: A1 `risk.p_fire_from_wheq`. Geen placeholders meer (zie `mc_meta.json`).
+>
+> **Voor A7:** `mc_results.json` bevat per concept K1–K5, B0, B1, perfect en random de reeksen [laag, basis, hoog] voor `recall_energy`, `recall_risk`, `alarms_per_1000_emptyings`, `avoided_fire_fraction`, `fires_per_1000_containers_year`, `ppv_container_ge75` en `eur_avoided_per_container_month`.
 
 ## Methode
-1. **Zakken.** Per zak worden de items getrokken uit `params.ITEMS`:
-   - NB- of Poisson-verdeling;
-   - Wh per item uit een driehoeksverdeling (laag/basis/hoog);
-   - Li-items geschaald met het scenario en met een latente containerfactor Gamma(k = 2) **[A]**. Die factor staat voor verschillen tussen buurten; zonder zo'n factor valt er geen rangorde te maken.
-2. **Sensor per zak.** Elk object geeft een uitkomst {geen, cel, pakket} volgens `p_out_given_item` (independent-or). De zak krijgt de hoogste uitkomst. Li-objecten hebben een extra kans gemist te worden als er ander metaal in de zak zit (`masking`). Pakket = ≥ 20 Wh-eq (`params.PACK_WHEQ`).
-3. **Bayes-score.** Per uitkomst wordt E[Wh-eq van de zak | uitkomst] gekalibreerd op een aparte trekking. De containerscore is de som daarvan sinds de laatste lediging. Daarnaast tellen we twee varianten: de "teller" (aantal geflagde zakken, de oorspronkelijke K1) en de "pakket-teller".
-4. **Beslisregels.** Er zijn drie regels:
-   - **budget**: rangorde, met oranje = top 2 % (2,5 per wagen per dag bij 125 containers per wagen per dag **[A]**) en rood = top 0,16 % (1 per wagen per week);
-   - **A1-R3**: oranje bij een container ≥ 75 of een inworp ≥ 50 Wh-eq, rood bij ≥ 150 of een inworp ≥ 75;
+1. **Zakken.** Items uit `params.ITEMS` (NB/Poisson), Wh per item uit een driehoeksverdeling. Li-items worden geschaald met het scenario en met een latente containerfactor Gamma(k = 2) **[A]**. Die factor staat voor verschillen tussen buurten.
+2. **Sensor per zak.** Uitkomst {geen, cel, pakket}, waarbij pakket = ≥ 20 Wh-eq (`PACK_WHEQ`). Voor K1/K2 geldt de in_bag-modus van A2. Voor K3 geldt independent-or: elk object triggert zelfstandig, de zak krijgt de hoogste uitkomst, en Li krijgt een extra miskans bij ander metaal.
+3. **Bayes-score.** Per uitkomst wordt E[Wh-eq van de zak | uitkomst] gekalibreerd op een aparte trekking. De containerscore is de som sinds de laatste lediging. Daarnaast de varianten "teller" (de oorspronkelijke K1) en "pakket-teller".
+4. **Beslisregels.**
+   - **budget**: rangorde, met oranje = top 20 per 1 000 ledigingen (2,5 per wagen per dag bij 125 containers per dag **[A]**) en rood = 1 per wagen per week.
+   - **budget5 / budget50**: varianten met 5 en 50 meldingen per 1 000 ledigingen.
+   - **A1-R3**: oranje bij een container ≥ 75 of een inworp ≥ 50 Wh-eq, rood bij ≥ 150 of een inworp ≥ 75.
    - **A1-R3+pakket**: daarbovenop maakt elke pakket-uitkomst de container oranje.
-5. **Effect.** Brandkans per lediging = `risk.p_fire_from_wheq(som Wh-eq, k)`. De actie verlaagt die kans: oranje (laatste in de route, niet extra persen) met 30 % **[A]**, rood (apart legen, niet persen) met 80 % **[A]**. Vermeden schade = vermeden wagenbranden × `ECON.fire_cost_truck_eur`.
+5. **Effect.** P(brand) per lediging komt uit A1. De actie verlaagt die: oranje (laatste in de route, niet extra persen) met 30 % **[A]**, rood (apart legen, niet persen) met 80 % **[A]**. Wagenbranden zijn omgerekend naar EUR met `ECON`.
 6. **Event-kanalen.**
-   - K4: containerbranden per jaar (A4: λ = 2/5/10 e-4) × P(detectie binnen 60 min) × 50 % minder schade **[A]** × `fire_cost_container`.
+   - K4: λ containerbrand (A4: 2/5/10 e-4 per container per jaar) × P(detectie binnen 60 min, regel E) × 50 % minder schade **[A]**. Meldingen = A4 "vlag actief bij lediging".
    - B1: wagenbranden × vermeden EUR per wagenbrand (A4).
-   - K5 = K2-rangorde + K4-event.
+   - K5 = K2-rangorde + K4.
 
 ## Resultaten
 
 ### Basisgetal
-Wagenbranden per 1 000 containers per jaar: **0,07 / 1,26 / 48** (laag / basis / hoog). Het hoge scenario combineert 2,5× zoveel Li met een 15× hogere k (A1) en is een extreme bovengrens.
+Wagenbranden per 1 000 containers per jaar: **0,07 / 1,27 / 48** (laag / basis / hoog). Het hoge scenario combineert 2,5× zoveel Li met een 15× hogere k (A1) en is een extreme bovengrens.
 
 ### Per inworp (scenario basis) – `fig_inworp.png`
 
-| Sensor | Zakken geflagd | PPV Li bij flag | Recall Li-zak | PPV pakket | Recall pakket |
+| Sensor | Zakken geflagd | PPV Li bij flag (laag–hoog) | Recall Li-zak | Energierecall per zak | PPV pakket | Recall pakket |
+|---|---|---|---|---|---|---|
+| K1 VLF (A2) | 2,0 % | 0,07 (0,04–0,17) | 0,05 | 0,26 | 0,08 | 0,12 |
+| K2 PI pakketwachter (A2) | 2,4 % | 0,05 (0,02–0,11) | 0,04 | 0,27 | 0,04 | 0,08 |
+| K3 röntgen (A3) | 15 % | 0,12 (0,06–0,26) | 0,65 | 0,88 | 0,34 (0,20–0,53) | 0,82 |
+| Perfect | 2,9 % | 1 | 1 | 1 | 1 | 1 |
+
+Bij A2's werkpunt (2 % vals per zak) zijn K1 en K2 vooral **blind**: ze vinden 4–5 % van de Li-zakken en 8–12 % van de pakketten. Per zak haalt geen enkel concept een PPV ≥ 50 % (checklist B1). Bij röntgen is 62 % van de flags een zak met alkaline en zonder Li.
+
+### Per container bij de werkbare drempel: ≤ 20 meldingen per 1 000 ledigingen en 1 rood per wagen per week
+Figuren: `fig_concepten_recall_valsalarm.png` (deckfiguur, ook met 5 en 50 per 1 000) en `fig_recall_vs_meldingen.png`.
+
+| Concept | Energierecall (laag / basis / hoog) | PPV cont ≥ 75 (basis) | Vals-alarmratio (basis) | Vermeden wagenbranden (basis) | EUR/c/m (laag / basis / hoog) |
 |---|---|---|---|---|---|
-| K1 VLF *(placeholder)* | 77 % | 0,03 | 0,85 | 0,004 | 0,50 |
-| K2 PI *(placeholder)* | 53 % | 0,04 | 0,67 | 0,009 | 0,60 |
-| K3 röntgen (A3) | 21 % | 0,10 (laag 0,05 / hoog 0,22) | 0,72 | 0,17 (0,10 / 0,31) | 0,77 |
-| Perfect | 2,9 % | 1 | 1 | 1 | 1 |
+| Willekeurig | 0,021 / 0,015 / 0,019 | 0,01 | 0,020 | 0,5 % | 0,0004 / 0,014 / 1,3 |
+| K1 VLF-teller | 0,027 / 0,036 / 0,036 | 0,05 | 0,019 | 1,4 % | 0,0006 / 0,036 / 2,6 |
+| K2 pakketwachter | 0,046 / 0,044 / 0,052 | 0,07 | 0,019 | 1,5 % | 0,0009 / 0,041 / 3,9 |
+| B0 risicokaart (geen sensor) | 0,050 / 0,044 / 0,048 | 0,09 | 0,019 | 1,5 % | 0,0010 / 0,041 / 3,4 |
+| K3 röntgen | 0,104 / 0,093 / 0,092 | 0,28 | 0,015 | 3,5 % | 0,0023 / 0,092 / 6,7 |
+| **Perfecte sensor** | **0,21 / 0,15 / 0,11** | 0,67 | 0,007 | **5,8 %** | 0,005 / **0,15** / 8,2 |
+| K4 deksel-event | n.v.t. (0,5 / 1,7 / 3,9 vlaggen per 1 000 ledigingen) | – | – | 0 (containerbrand) | 0,012 / 0,17 / 0,63 |
+| K5 = K2 + K4 | 0,046 / 0,044 / 0,052 (21,7 meldingen per 1 000) | 0,07 | 0,019 | 1,5 % | 0,013 / 0,21 / 4,5 |
+| **B1 camera in de wagen** | n.v.t. | – | – | 10 / 34 / 64 % (schade-eq.) | 0,006 / **0,90** / 129 |
 
-Ook röntgen haalt per inworp geen PPV ≥ 50 % (checklist B1). De oorzaak is alkaline: 39 % van de K3-flags is een zak met alkaline en zonder Li. Alarmeren per zak valt daarmee af voor alle concepten.
+Varianten (basis, energierecall bij 5 / 20 / 50 meldingen per 1 000):
+- K2: 0,015 / 0,044 / 0,092
+- K3: 0,031 / 0,093 / 0,19
+- perfect: 0,050 / 0,15 / 0,30
+- willekeurig: 0,004 / 0,015 / 0,046
 
-### Per container, regel "budget" (≤ 20 meldingen per 1 000 ledigingen, 1 rood per wagen per week) – `fig_recall_vs_meldingen.png`
+Bij 50 per 1 000 is de vals-alarmratio voor alle concepten ~4–5 %.
 
-| Concept | Risicorecall basis (laag–hoog) | Vermeden branden | EUR/container/maand basis (laag–hoog) |
-|---|---|---|---|
-| Willekeurig (referentie) | 0,018 | 0,6 % | 0,016 |
-| K1 VLF-teller *(ph)* | 0,024 | 0,9 % | 0,023 (0,0004–1,8) |
-| K2 pakketwachter *(ph)* | 0,029 | 1,0 % | 0,027 (0,0006–2,1) |
-| B0 risicokaart (geen sensor, ruis σ = 0,7 **[A]**) | 0,041 | 1,4 % | 0,037 (0,0008–3,4) |
-| K3 röntgen | 0,093 (0,11–0,087) | 3,3 % | 0,086 (0,002–6,2) |
-| **Perfecte sensor (bovengrens)** | **0,16 (0,21–0,11)** | **5,8 %** | **0,15 (0,005–7,7)** |
+### A1-R3-drempels (los van het budget, basis)
 
-**Kernresultaat.** Ook een perfecte zuilsensor vangt binnen de werkbaarheidsgrens hooguit ~16 % van het brandrisico. Dat komt doordat het risico verspreid zit over veel containers met elk een paar kleine items. De top 2 % containers bevat dus maar een klein deel ervan. Vermeden schade is dan **≤ EUR 0,15 per container per maand** (basis). Dat ligt een orde onder de kostprijs van EUR 8–23 (A7).
-
-### Per container, A1-R3-drempels (los van het budget)
-
-| Concept | Meldingen per 1 000 ledigingen | Rood per wagen per week | Risicorecall | EUR/c/m basis |
+| Concept | Meldingen per 1 000 | Rood per wagen per week | Energierecall | EUR/c/m |
 |---|---|---|---|---|
-| Perfect | 77 (laag 22 / hoog 246) | 7,6 | 0,52 | 0,76 |
-| Perfect + pakket | 134 | 7,6 | 0,67 | 0,88 |
-| K3 röntgen | 4,4 | 0 | 0,03 | 0,02 |
-| K3 + pakket | 304 | 0 | 0,69 | 0,54 |
-| K2 *(ph)* + pakket | ~1 000 (elke container) | 0 | 1 | 0,79 |
-
-De A1-drempels liggen bij een perfecte sensor al **3–4× boven de werkbaarheidsgrens** (77 tegenover 20 per 1 000). Elke pakket-uitkomst als oranje tellen is met echte sensoren onwerkbaar, omdat pakket-flags door ander metaal in vrijwel elke lediging voorkomen. Een Bayes-score van een sensor met veel vals-positieven blijft onder de 75 Wh-eq. Hij komt daar alleen overheen bij 2,5× zoveel Li (scenario hoog).
-
-### Event-kanalen en benchmark (EUR per container per maand)
-
-| Concept | Meldingen | EUR/c/m (laag / basis / hoog) |
-|---|---|---|
-| K4 deksel-event (regel E) | 0,29 / 1,06 / 2,41 vlaggen per wagen per week | 0,012 / 0,17 / 0,63 |
-| K5 = K2 + K4 | budget + 1,06 per week | 0,013 / 0,19 / 2,7 |
-| **B1 thermische camera in de wagen** | n.v.t. (A4) | 0,006 / **0,90** / 129 |
+| Perfect | 77 (laag 22 / hoog 246) | 7,7 | 0,52 | 0,76 |
+| K3 röntgen | 1,4 | 0 | 0,01 | 0,01 |
+| K3 + pakket | 304 | 0 | 0,69 | 0,55 |
+| K2 + pakket | 253 | 0 | 0,39 | 0,31 |
+| K1 + pakket | 203 | 0 | 0,34 | 0,27 |
 
 ## Conclusies
-1. **Uitgangspunt 2 (risicodrempel) klopt wel, maar de drempel moet in meldingen per wagen worden uitgedrukt, niet in Wh-eq.** Bij een vaste Wh-eq-drempel bepaalt de base rate de alarmlast.
-2. **Uitgangspunt 3 (metaaldetector):** de K1/K2-placeholders presteren nauwelijks beter dan willekeurig (0,024–0,029 tegenover 0,018). Wachten op A2 voor de echte cijfers. Om er iets aan te hebben moet K2 de PPV voor pakket per inworp naar ≥ 0,1–0,2 brengen (röntgenniveau).
-3. Een **zuilsensor kan het meeste risico niet bereiken.** De bovengrens is ~6 % vermeden branden bij een werkbaar aantal meldingen. **B1 (wagen) levert in het basisscenario ~6× meer op dan een perfecte zuilsensor.** K4 voegt een eigen waarde toe via containerbranden.
-4. Het nut van een sensor in de zuil zit dus vooral in **data en preventie** (B0, rangorde voor campagnes, de Li-prevalentie omlaag brengen), niet in het voorkomen van branden.
+1. **K1 en K2 (inductie) zijn nauwelijks beter dan willekeurig.** Hun energierecall is 0,036–0,044, tegenover 0,015 willekeurig en 0,044 voor B0 zonder sensor. **K2 voegt dus niets toe ten opzichte van een sensorloze risicokaart (B0).** Uitgangspunt 3 (de metaaldetector als Li-detector) vervalt.
+2. **Röntgen (K3) haalt ~60 % van de perfecte bovengrens**, maar is per zuil te duur (A7: EUR 36 per container per maand).
+3. Een **zuilsensor kan het meeste risico niet bereiken.** Zelfs perfect vermijdt hij binnen de werkbaarheidsgrens ~6 % van de wagenbranden, wat neerkomt op ≤ EUR 0,15 per container per maand (basis). **B1 (wagen) levert ~6× meer op dan een perfecte zuilsensor** en ~20× meer dan K2. K4 levert een eigen bijdrage via containerbranden (EUR 0,17).
+4. **Uitgangspunt 2 (risicodrempel) is nodig, maar moet in meldingen per wagen worden uitgedrukt.** Met de A1-Wh-drempels geeft zelfs een perfecte sensor 3–4× te veel meldingen. Met echte sensoren plus de pakketregel worden het er 200–300 per 1 000.
+5. Waar een zuilsensor wel waarde heeft: **data en preventie** (rangorde voor campagnes, B0, gedrag), en K4 als vangnet voor containerbranden.
 
 ## Alleen met een prototype te bevestigen
 - **Sensor per object en bij opeenstapeling** (K1/K2): zie het labtestontwerp van A8. A6 heeft daaruit nodig: `p_out_given_item` per itemklasse en `p_miss_li_given_n_metal`, gemeten op ≥ 300 synthetische zakken met een realistische metaalmix (2,5 blikjes + 3 folie gemiddeld).

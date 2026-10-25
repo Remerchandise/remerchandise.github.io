@@ -1,0 +1,369 @@
+{
+ "_meta": {
+  "bron": "experiments/r3_classificatie/mc.py",
+  "werkpunt": "rangorde-budget: oranje <= 20 per 1 000 ledigingen, rood <= 1 per wagen per week",
+  "volgorde": [
+   "laag",
+   "basis",
+   "hoog"
+  ],
+  "sensoren": {
+   "K1": {
+    "path": "experiments/r3_inductie/sensor_model_K1.json",
+    "placeholder": false,
+    "mode": "in_bag"
+   },
+   "K2": {
+    "path": "experiments/r3_inductie/sensor_model_K2.json",
+    "placeholder": false,
+    "mode": "in_bag"
+   },
+   "K3": {
+    "path": "experiments/r3_rontgen/sensor_model_K3.json",
+    "placeholder": false,
+    "mode": "independent_or"
+   }
+  },
+  "risico": "A1 risk.p_fire_from_wheq (experiments/r3_risico/risk.py)",
+  "toelichting": {
+   "recall_energy": "aandeel Wh-eq in gemelde containers",
+   "recall_risk": "aandeel brandkans in gemelde containers",
+   "avoided_fire_fraction": "aandeel wagenbranden vermeden (oranje 30 %, rood 80 % effect [A]); B1: schade-equivalent; K4: 0 wagen (alleen containerbranden)",
+   "alarms_per_1000_emptyings": "oranje+rood; K4: vlag actief bij lediging; B1: n.v.t. (null)",
+   "eur_avoided_per_container_month": "A6-schatting (ECON), ter vergelijking"
+  }
+ },
+ "K1": {
+  "recall_energy": [
+   0.026961,
+   0.036425,
+   0.036175
+  ],
+  "recall_risk": [
+   0.026961,
+   0.036423,
+   0.036127
+  ],
+  "alarms_per_1000_emptyings": [
+   20.0,
+   20.0,
+   20.0
+  ],
+  "avoided_fire_fraction": [
+   0.009566,
+   0.013614,
+   0.013135
+  ],
+  "fires_per_1000_containers_year": [
+   0.071469,
+   1.270573,
+   48.081312
+  ],
+  "ppv_container_ge75": [
+   0.016667,
+   0.051667,
+   0.241667
+  ],
+  "eur_avoided_per_container_month": [
+   0.00057,
+   0.036036,
+   2.631423
+  ]
+ },
+ "K2": {
+  "recall_energy": [
+   0.046289,
+   0.044058,
+   0.052003
+  ],
+  "recall_risk": [
+   0.046288,
+   0.044053,
+   0.051872
+  ],
+  "alarms_per_1000_emptyings": [
+   20.0,
+   20.0,
+   20.0
+  ],
+  "avoided_fire_fraction": [
+   0.01497,
+   0.015481,
+   0.019532
+  ],
+  "fires_per_1000_containers_year": [
+   0.071469,
+   1.270573,
+   48.081312
+  ],
+  "ppv_container_ge75": [
+   0.035,
+   0.071667,
+   0.275
+  ],
+  "eur_avoided_per_container_month": [
+   0.000892,
+   0.040978,
+   3.912994
+  ]
+ },
+ "K3": {
+  "recall_energy": [
+   0.10408,
+   0.093036,
+   0.092161
+  ],
+  "recall_risk": [
+   0.10408,
+   0.09303,
+   0.091998
+  ],
+  "alarms_per_1000_emptyings": [
+   20.0,
+   20.0,
+   20.0
+  ],
+  "avoided_fire_fraction": [
+   0.037892,
+   0.034666,
+   0.033219
+  ],
+  "fires_per_1000_containers_year": [
+   0.071469,
+   1.270573,
+   48.081312
+  ],
+  "ppv_container_ge75": [
+   0.105,
+   0.281667,
+   0.816667
+  ],
+  "eur_avoided_per_container_month": [
+   0.002257,
+   0.091761,
+   6.655106
+  ]
+ },
+ "K4": {
+  "recall_energy": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "recall_risk": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "alarms_per_1000_emptyings": [
+   0.4655,
+   1.6941,
+   3.8614
+  ],
+  "avoided_fire_fraction": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "fires_per_1000_containers_year": [
+   0.071469,
+   1.270573,
+   48.081312
+  ],
+  "ppv_container_ge75": [
+   null,
+   null,
+   null
+  ],
+  "eur_avoided_per_container_month": [
+   0.011957,
+   0.166667,
+   0.625
+  ]
+ },
+ "K5": {
+  "recall_energy": [
+   0.046289,
+   0.044058,
+   0.052003
+  ],
+  "recall_risk": [
+   0.046288,
+   0.044053,
+   0.051872
+  ],
+  "alarms_per_1000_emptyings": [
+   20.4655,
+   21.6941,
+   23.8614
+  ],
+  "avoided_fire_fraction": [
+   0.01497,
+   0.015481,
+   0.019532
+  ],
+  "fires_per_1000_containers_year": [
+   0.071469,
+   1.270573,
+   48.081312
+  ],
+  "ppv_container_ge75": [
+   0.035,
+   0.071667,
+   0.275
+  ],
+  "eur_avoided_per_container_month": [
+   0.012849,
+   0.207645,
+   4.537994
+  ]
+ },
+ "B0": {
+  "recall_energy": [
+   0.049867,
+   0.044331,
+   0.048044
+  ],
+  "recall_risk": [
+   0.049867,
+   0.044332,
+   0.048004
+  ],
+  "alarms_per_1000_emptyings": [
+   20.0,
+   20.0,
+   20.0
+  ],
+  "avoided_fire_fraction": [
+   0.016983,
+   0.015364,
+   0.017151
+  ],
+  "fires_per_1000_containers_year": [
+   0.071469,
+   1.270573,
+   48.081312
+  ],
+  "ppv_container_ge75": [
+   0.038333,
+   0.091667,
+   0.406667
+  ],
+  "eur_avoided_per_container_month": [
+   0.001011,
+   0.040668,
+   3.43606
+  ]
+ },
+ "B1": {
+  "recall_energy": [
+   null,
+   null,
+   null
+  ],
+  "recall_risk": [
+   null,
+   null,
+   null
+  ],
+  "alarms_per_1000_emptyings": [
+   null,
+   null,
+   null
+  ],
+  "avoided_fire_fraction": [
+   0.0968,
+   0.3412,
+   0.6422
+  ],
+  "fires_per_1000_containers_year": [
+   0.071469,
+   1.270573,
+   48.081312
+  ],
+  "ppv_container_ge75": [
+   null,
+   null,
+   null
+  ],
+  "eur_avoided_per_container_month": [
+   0.005763,
+   0.903187,
+   128.649164
+  ]
+ },
+ "perfect": {
+  "recall_energy": [
+   0.207965,
+   0.152702,
+   0.113926
+  ],
+  "recall_risk": [
+   0.207963,
+   0.15269,
+   0.113701
+  ],
+  "alarms_per_1000_emptyings": [
+   20.0,
+   20.0,
+   20.0
+  ],
+  "avoided_fire_fraction": [
+   0.079953,
+   0.057972,
+   0.041118
+  ],
+  "fires_per_1000_containers_year": [
+   0.071469,
+   1.270573,
+   48.081312
+  ],
+  "ppv_container_ge75": [
+   0.22,
+   0.673333,
+   1.0
+  ],
+  "eur_avoided_per_container_month": [
+   0.004762,
+   0.153454,
+   8.237563
+  ]
+ },
+ "random": {
+  "recall_energy": [
+   0.021117,
+   0.015182,
+   0.019388
+  ],
+  "recall_risk": [
+   0.021117,
+   0.015183,
+   0.019392
+  ],
+  "alarms_per_1000_emptyings": [
+   20.0,
+   20.0,
+   20.0
+  ],
+  "avoided_fire_fraction": [
+   0.007403,
+   0.005205,
+   0.006439
+  ],
+  "fires_per_1000_containers_year": [
+   0.071469,
+   1.270573,
+   48.081312
+  ],
+  "ppv_container_ge75": [
+   0.01,
+   0.011667,
+   0.133333
+  ],
+  "eur_avoided_per_container_month": [
+   0.000441,
+   0.013777,
+   1.289993
+  ]
+ }
+}

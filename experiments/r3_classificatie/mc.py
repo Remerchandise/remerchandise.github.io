@@ -43,6 +43,7 @@ OPS = {
     "bags_per_emptying": P.CONTAINER["bags_per_emptying"][1],
 }
 SCEN_INDEX = {"laag": 0, "basis": 1, "hoog": 2}
+BUDGET_VARIANTS = (5, 50)  # naast 'budget' (= 20 per 1 000 ledigingen)
 # A1-drempels R3 (Orchestrator-bericht 2026-10-25; params.THRESH_* nog op R1-waarden)
 A1_R3 = {"throw_oranje": 50, "throw_rood": 75, "cont_oranje": 75, "cont_rood": 150}
 
@@ -69,7 +70,18 @@ def load_sensor(concept):
         v = np.asarray(v, float)
         pm[i] = v / v.sum()
     mask = np.asarray(m.get("masking", {}).get("p_miss_li_given_n_metal", [0, 0, 0, 0]), float)
-    return dict(concept=concept, p=pm, mask=mask, path=os.path.relpath(p, ROOT), placeholder=placeholder)
+    out = dict(concept=concept, p=pm, mask=mask, path=os.path.relpath(p, ROOT), placeholder=placeholder, mode="independent_or")
+    # A2-aanbeveling: realistische zak-modellen (superpositie gesimuleerd) indien aanwezig
+    if "clutter_bag" in m and "p_out_given_item_in_bag" in m:
+        cb = m["clutter_bag"]
+        pn = cb.get("p_out_given_n_metal", {})
+        cl = np.array([pn.get(str(j), cb["p_out"]) for j in range(4)], float)
+        pib = np.zeros((NI, 3))
+        for i, n in enumerate(ITEM_NAMES):
+            v = np.asarray(m["p_out_given_item_in_bag"].get(n, m["p_out_given_item"].get(n, [1, 0, 0])), float)
+            pib[i] = v / v.sum()
+        out.update(mode="in_bag", clutter_n=cl / cl.sum(1, keepdims=True), p_in_bag=pib)
+    return out
 
 
 def load_event(name):
@@ -159,6 +171,35 @@ def sample_bags(rng, n_cont, n_bags, scen):
 
 
 def sensor_output(rng, counts, n_metal, model):
+    if model.get("mode") == "in_bag":
+        return sensor_output_in_bag(rng, counts, n_metal, model)
+    return sensor_output_indep(rng, counts, n_metal, model)
+
+
+def sensor_output_in_bag(rng, counts, n_metal, model):
+    """A2-zakmodel: Li-loze zak -> clutter_bag.p_out_given_n_metal[n_metal];
+    zak met Li -> max over Li-items van p_out_given_item_in_bag (bevat al realistische clutter/maskering)."""
+    nb = counts.shape[0]
+    bucket = np.minimum(n_metal, 3)
+    has_li = counts[:, IS_LI].sum(1) > 0
+    cum = np.cumsum(model["clutter_n"], 1)[bucket]  # (nb,3)
+    u = rng.random(nb)
+    out = np.where(u < cum[:, 0], 0, np.where(u < cum[:, 1], 1, 2)).astype(np.int8)
+    idx = np.nonzero(has_li)[0]
+    if idx.size:
+        p = model["p_in_bag"]
+        F0, F1 = p[:, 0], p[:, 0] + p[:, 1]
+        cl = lambda x: np.log(np.clip(x, 1e-15, 1.0))
+        lp0 = np.zeros(idx.size); lp1 = np.zeros(idx.size)
+        for i in np.nonzero(IS_LI)[0]:
+            c = counts[idx, i]
+            lp0 += c * cl(F0[i]); lp1 += c * cl(F1[i])
+        u2 = rng.random(idx.size)
+        out[idx] = np.where(u2 < np.exp(lp0), 0, np.where(u2 < np.exp(lp1), 1, 2))
+    return out
+
+
+def sensor_output_indep(rng, counts, n_metal, model):
     """Zak-output = max over objecten (independent_or). Li-objecten krijgen extra miskans door ander metaal."""
     p = model["p"]
     F0, F1 = p[:, 0], p[:, 0] + p[:, 1]
@@ -309,6 +350,8 @@ def run(n_cont, seed, scenarios, outdir):
         for cname, skey in concepts.items():
             sc = scores[skey]
             rules = [("budget", dict(rule_q=(q_o, q_r)))]
+            for b in BUDGET_VARIANTS:  # extra werkpunten: b meldingen per 1 000 ledigingen (rood-budget gelijk)
+                rules.append((f"budget{b}", dict(rule_q=(b / 1000, min(q_r, b / 1000)))))
             if skey.endswith("bayes"):  # absolute Wh-eq-drempel alleen zinvol voor gekalibreerde Bayes-score
                 rules += [("A1-R3", dict(thr=A1_R3, bagmax=bagmax[skey])),
                           ("A1-R3+pakket", dict(thr=A1_R3, bagmax=bagmax[skey], pakket_any=pakany[skey]))]
@@ -360,7 +403,7 @@ def run(n_cont, seed, scenarios, outdir):
             + np.nan_to_num(r.get("containerbranden_schade_eq_vermeden_per_1000c_jr", 0.0)) * cc_[si]
         r["vermeden_schade_eur_per_container_maand"] = float(eq / 1000 / 12)
     meta = dict(n_containers=n_cont, bags=nbag, seed=seed, risk=risk_src, ops=OPS,
-                sensors={k: dict(path=v["path"], placeholder=v["placeholder"]) for k, v in sensors.items()},
+                sensors={k: dict(path=v["path"], placeholder=v["placeholder"], mode=v["mode"]) for k, v in sensors.items()},
                 events={"K4": ev_k4["_path"], "B1": ev_b1["_path"]},
                 placeholder_any=any(v["placeholder"] for v in sensors.values()) or ev_k4["_placeholder"] or ev_b1["_placeholder"])
     write_outputs(outdir, results, bagres, curves, meta)
@@ -382,7 +425,96 @@ def write_outputs(outdir, results, bagres, curves, meta):
         for (s, n), v in bagres.items():
             w.writerow([s, n] + [f"{v[k]:.4g}" for k in bk])
     json.dump(meta, open(os.path.join(outdir, "mc_meta.json"), "w"), indent=1)
+    export_a7(outdir, results, meta)
     plot(outdir, results, bagres, curves, meta)
+    plot_overview(outdir, results, meta)
+
+
+A7_MAP = {  # A7-concept-ID -> (MC-concept, regel)
+    "K1": ("K1 VLF teller", "budget"), "K2": ("K2 pakketwachter", "budget"), "K3": ("K3 rontgen", "budget"),
+    "K4": ("K4 deksel-event", "budget+event"), "K5": ("K5 hybride (K2+K4)", "budget+event"),
+    "B0": ("B0 risicokaart", "budget"), "B1": ("B1 camera wagen", "budget+event"),
+    "perfect": ("perfect (bovengrens)", "budget"), "random": ("willekeurig", "budget"),
+}
+
+
+def _get(results, concept, regel, scen):
+    rr = [r for r in results if r["concept"] == concept and r["regel"] == regel and r["scenario"] == scen]
+    return rr[0] if rr else None
+
+
+def export_a7(outdir, results, meta):
+    """mc_results.json in het formaat van experiments/r3_business (A7). Werkpunt: <= 20 meldingen/1 000 ledigingen."""
+    cpd, tdw = OPS["containers_per_truck_day"], OPS["truck_days_per_week"]
+    out = {"_meta": {"bron": "experiments/r3_classificatie/mc.py", "werkpunt": "rangorde-budget: oranje <= 20 per 1 000 ledigingen, rood <= 1 per wagen per week",
+                     "volgorde": ["laag", "basis", "hoog"], "sensoren": meta["sensors"], "risico": meta["risk"],
+                     "toelichting": {"recall_energy": "aandeel Wh-eq in gemelde containers",
+                                     "recall_risk": "aandeel brandkans in gemelde containers",
+                                     "avoided_fire_fraction": "aandeel wagenbranden vermeden (oranje 30 %, rood 80 % effect [A]); B1: schade-equivalent; K4: 0 wagen (alleen containerbranden)",
+                                     "alarms_per_1000_emptyings": "oranje+rood; K4: vlag actief bij lediging; B1: n.v.t. (null)",
+                                     "eur_avoided_per_container_month": "A6-schatting (ECON), ter vergelijking"}}}
+    for cid, (cname, regel) in A7_MAP.items():
+        d = {k: [] for k in ("recall_energy", "recall_risk", "alarms_per_1000_emptyings", "avoided_fire_fraction",
+                             "fires_per_1000_containers_year", "ppv_container_ge75", "eur_avoided_per_container_month")}
+        for scen in ("laag", "basis", "hoog"):
+            r = _get(results, cname, regel, scen)
+            f = lambda k: (None if r is None or r.get(k) is None or (isinstance(r.get(k), float) and np.isnan(r[k])) else round(float(r[k]), 6))
+            fires = f("branden_per_1000c_jr")
+            if cid == "K4":
+                rec_e, rec_r, ppv = 0.0, 0.0, None
+                alarms = round(r["meld_rood_per_wagen_week"] / (cpd * tdw) * 1000, 4)
+                aff = 0.0
+            elif cid == "B1":
+                rec_e, rec_r, ppv, alarms = None, None, None, None
+                aff = round(r["wagenbranden_schade_eq_vermeden_per_1000c_jr"] / r["branden_per_1000c_jr"], 4) if r["branden_per_1000c_jr"] else None
+            else:
+                rec_e, rec_r, ppv, aff = f("energierecall"), f("risicorecall"), f("ppv_cont>=75"), f("frac_branden_vermeden")
+                alarms = f("meld_per_1000_ledigingen")
+                if cid == "K5":
+                    alarms = round(alarms + r["meld_rood_per_wagen_week"] * 0 + _get(results, "K4 deksel-event", "budget+event", scen)["meld_rood_per_wagen_week"] / (cpd * tdw) * 1000, 4)
+            for k, v in (("recall_energy", rec_e), ("recall_risk", rec_r), ("alarms_per_1000_emptyings", alarms),
+                         ("avoided_fire_fraction", aff), ("fires_per_1000_containers_year", fires), ("ppv_container_ge75", ppv),
+                         ("eur_avoided_per_container_month", f("vermeden_schade_eur_per_container_maand"))):
+                d[k].append(v)
+        out[cid] = d
+    json.dump(out, open(os.path.join(outdir, "mc_results.json"), "w"), indent=1)
+
+
+def plot_overview(outdir, results, meta):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    ink, ink2, grid = "#0b0b0b", "#52514e", "#e4e3df"
+    cons = [("K1 VLF teller", "K1 VLF"), ("K2 pakketwachter", "K2 pakket-\nwachter"), ("K3 rontgen", "K3 röntgen"),
+            ("B0 risicokaart", "B0 risico-\nkaart"), ("perfect (bovengrens)", "perfecte\nsensor"), ("willekeurig", "willekeurig")]
+    regels = [("budget5", "5 / 1 000"), ("budget", "20 / 1 000 (werkbaar)"), ("budget50", "50 / 1 000")]
+    cols = ["#a9cdf3", "#2a78d6", "#123f75"]
+    fig, axes = plt.subplots(1, 3, figsize=(13, 4.2))
+    mets = [("energierecall", "Energiegewogen recall"), ("ppv_cont>=75", "PPV (container ≥ 75 Wh-eq)"), ("far_cont<75", "Vals-alarmratio (container < 75 Wh-eq)")]
+    x = np.arange(len(cons))
+    for ax, (mk, title) in zip(axes, mets):
+        for j, (rg, lab) in enumerate(regels):
+            v = []
+            for cn, _ in cons:
+                r = _get(results, cn, rg, "basis")
+                v.append(np.nan_to_num(r[mk]) if r else 0)
+            ax.bar(x + (j - 1) * 0.27, v, 0.25, color=cols[j], label=lab)
+            if rg == "budget" and mk != "far_cont<75":
+                for xi, vi in zip(x, v):
+                    ax.text(xi, -0.035 * (0.32 if mk == "energierecall" else 1.0), f"{vi:.2f}",
+                            ha="center", va="top", fontsize=6.5, color=ink)
+        ax.set_xticks(x, [c[1] for c in cons], fontsize=7)
+        ax.tick_params(axis="x", pad=14 if mk != "far_cont<75" else 3)
+        ax.set_title(title, fontsize=9, color=ink, loc="left")
+        ax.grid(True, axis="y", color=grid, lw=0.6)
+        ax.spines[["top", "right"]].set_visible(False)
+    axes[0].legend(frameon=False, fontsize=7, title="meldingen per\n1 000 ledigingen", title_fontsize=7)
+    ph = " [deels placeholder]" if meta["placeholder_any"] else ""
+    fig.suptitle("Concepten bij rangorde-drempels, scenario basis (K4/B1: eventkanalen, zie tabel)" + ph,
+                 fontsize=10, color=ink, x=0.01, ha="left")
+    fig.tight_layout()
+    fig.savefig(os.path.join(outdir, "fig_concepten_recall_valsalarm.png"), dpi=150)
+    plt.close(fig)
 
 
 def plot(outdir, results, bagres, curves, meta):

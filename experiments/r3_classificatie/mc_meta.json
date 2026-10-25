@@ -16,21 +16,24 @@
  },
  "sensors": {
   "K1": {
-   "path": "experiments/r3_classificatie/placeholders/sensor_model_K1.json",
-   "placeholder": true
+   "path": "experiments/r3_inductie/sensor_model_K1.json",
+   "placeholder": false,
+   "mode": "in_bag"
   },
   "K2": {
-   "path": "experiments/r3_classificatie/placeholders/sensor_model_K2.json",
-   "placeholder": true
+   "path": "experiments/r3_inductie/sensor_model_K2.json",
+   "placeholder": false,
+   "mode": "in_bag"
   },
   "K3": {
    "path": "experiments/r3_rontgen/sensor_model_K3.json",
-   "placeholder": false
+   "placeholder": false,
+   "mode": "independent_or"
   }
  },
  "events": {
   "K4": "experiments/r3_thermisch/event_model_K4.json",
   "B1": "experiments/r3_thermisch/b1_resultaten.json"
  },
- "placeholder_any": true
+ "placeholder_any": false
 }
