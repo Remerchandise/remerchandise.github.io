@@ -1,6 +1,6 @@
 # A2 – Inductie & metaaldetectie (Ronde 0, research)
 
-Agent 2. Peildatum 2026-10. EUR 2026 excl. btw (consumentenprijzen ÷1,21). Aannames **[A]**. Rekenwerk: `scratchpad/tau.py` (orde-grootte, wordt in Ronde 3 formeel in `experiments/`).
+Agent 2. Peildatum 2026-10. EUR 2026 excl. btw (consumentenprijzen ÷1,21). Aannames **[A]**. Rekenwerk: eigen Python-orde-grootteschattingen (Biot-Savart, τ-formules); worden in Ronde 3 formeel in `experiments/A2_inductie_sim/` opgenomen.
 
 ## 1. Principes in één tabel
 
@@ -20,7 +20,7 @@ Kernpunt: **geen enkele commerciële batterij-sorteerder vertrouwt op inductie a
 Een object reageert met (i) een **magnetische** term (ferro: μr≫1, in fase met veld, frequentie-onafhankelijk bij lage f, *positieve* inductantieverandering) en (ii) **wervelstroom**-modes (elk een L-R-kring met τk; geven Q-component piek bij ωτ=1, in PI een e^(−t/τ)-staart). Eerste-orde τ:
 - massieve bol: τ ≈ μσa²/π²; dunne cilinderschil (axiaal veld): τ ≈ μ0σ·a·d/2; ferro-wand diffusie: τ ≈ μrμ0σd².
 
-### Schattingen per object (orde-grootte, scratchpad/tau.py)
+### Schattingen per object (orde-grootte, eigen berekening)
 
 | Object | Metaal | Ferro? | τ dominante mode | Anisotropie | Opmerking |
 |---|---|---|---|---|---|
@@ -40,7 +40,7 @@ Conclusie fysica:
 
 ## 3. Spoelgeometrie rond inworpopening (~40×40 cm)
 
-Biot-Savart, vierkante lus 40×40 cm (scratchpad/tau.py), respons ∝ B_tx·B_rx ≈ B² (monostatisch):
+Biot-Savart, vierkante lus 40×40 cm (eigen berekening), respons ∝ B_tx·B_rx ≈ B² (monostatisch):
 
 | Positie object | B/B0 | Relatieve respons |
 |---|---|---|
