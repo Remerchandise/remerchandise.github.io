@@ -1,0 +1,51 @@
+t_min [s] voor pixel-SNR >= 5 (2x2 mm), object = 18650 | oortje; ">30" = niet binnen 30 s
+
+GOS + RPi HQ-camera (1/2.3")
+  1 W, zak  2 g/cm2: t_min 18650 =  2.89 s | oortje =  2.89 s
+  1 W, zak  5 g/cm2: t_min 18650 =   >30 s | oortje =   >30 s
+  1 W, zak 10 g/cm2: t_min 18650 =   >30 s | oortje =   >30 s
+  1 W, zak 13 g/cm2: t_min 18650 =   >30 s | oortje =   >30 s
+  4 W, zak  2 g/cm2: t_min 18650 =  0.58 s | oortje =  0.58 s
+  4 W, zak  5 g/cm2: t_min 18650 =  4.48 s | oortje =  4.48 s
+  4 W, zak 10 g/cm2: t_min 18650 =   >30 s | oortje =   >30 s
+  4 W, zak 13 g/cm2: t_min 18650 =   >30 s | oortje =   >30 s
+
+GOS + 4/3"-camera f/0,95
+  1 W, zak  2 g/cm2: t_min 18650 =  0.12 s | oortje =  0.12 s
+  1 W, zak  5 g/cm2: t_min 18650 =  0.77 s | oortje =  0.77 s
+  1 W, zak 10 g/cm2: t_min 18650 = 14.44 s | oortje = 14.44 s
+  1 W, zak 13 g/cm2: t_min 18650 =   >30 s | oortje =   >30 s
+  4 W, zak  2 g/cm2: t_min 18650 =  0.10 s | oortje =  0.10 s
+  4 W, zak  5 g/cm2: t_min 18650 =  0.18 s | oortje =  0.18 s
+  4 W, zak 10 g/cm2: t_min 18650 =  2.50 s | oortje =  2.50 s
+  4 W, zak 13 g/cm2: t_min 18650 = 14.44 s | oortje = 14.44 s
+
+CsI-lijnarray 1,6 mm (scan)
+  1 W, zak  2 g/cm2: t_min 18650 =  0.50 s | oortje =  0.50 s
+  1 W, zak  5 g/cm2: t_min 18650 =  3.34 s | oortje =  3.34 s
+  1 W, zak 10 g/cm2: t_min 18650 =   >30 s | oortje =   >30 s
+  1 W, zak 13 g/cm2: t_min 18650 =   >30 s | oortje =   >30 s
+  4 W, zak  2 g/cm2: t_min 18650 =  0.12 s | oortje =  0.12 s
+  4 W, zak  5 g/cm2: t_min 18650 =  0.77 s | oortje =  0.77 s
+  4 W, zak 10 g/cm2: t_min 18650 = 10.78 s | oortje = 10.78 s
+  4 W, zak 13 g/cm2: t_min 18650 =   >30 s | oortje =   >30 s
+
+CMOS-flatpanel 43x43
+  1 W, zak  2 g/cm2: t_min 18650 =  0.10 s | oortje =  0.10 s
+  1 W, zak  5 g/cm2: t_min 18650 =  0.10 s | oortje =  0.10 s
+  1 W, zak 10 g/cm2: t_min 18650 =  0.58 s | oortje =  0.58 s
+  1 W, zak 13 g/cm2: t_min 18650 =  2.50 s | oortje =  2.50 s
+  4 W, zak  2 g/cm2: t_min 18650 =  0.10 s | oortje =  0.10 s
+  4 W, zak  5 g/cm2: t_min 18650 =  0.10 s | oortje =  0.10 s
+  4 W, zak 10 g/cm2: t_min 18650 =  0.13 s | oortje =  0.13 s
+  4 W, zak 13 g/cm2: t_min 18650 =  0.67 s | oortje =  0.67 s
+
+Energie per inworp [Wh] = (2*P_buis + 1,5 W) * t / 3600
+  1 W buis,  1 s: 0.0010 Wh  -> 80 inworpen/dag: 0.08 Wh/dag
+  1 W buis,  5 s: 0.0049 Wh  -> 80 inworpen/dag: 0.39 Wh/dag
+  1 W buis, 10 s: 0.0097 Wh  -> 80 inworpen/dag: 0.78 Wh/dag
+  1 W buis, 30 s: 0.0292 Wh  -> 80 inworpen/dag: 2.33 Wh/dag
+  4 W buis,  1 s: 0.0026 Wh  -> 80 inworpen/dag: 0.21 Wh/dag
+  4 W buis,  5 s: 0.0132 Wh  -> 80 inworpen/dag: 1.06 Wh/dag
+  4 W buis, 10 s: 0.0264 Wh  -> 80 inworpen/dag: 2.11 Wh/dag
+  4 W buis, 30 s: 0.0792 Wh  -> 80 inworpen/dag: 6.33 Wh/dag

@@ -1,5 +1,5 @@
 {
- "n_containers": 3000,
+ "n_containers": 30000,
  "bags": 100,
  "seed": 20261025,
  "risk": "eigen: 1-exp(-k*Wh-eq) (params.K_PER_WHEQ)",

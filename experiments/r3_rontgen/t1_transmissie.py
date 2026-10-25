@@ -48,7 +48,7 @@ for k, (kv, lo, hi) in enumerate([(30, 0.0, 1.0), (80, 0.0, 3.0)]):
         out.append(f'{kv} kV  {name:26s} mu_t laag={a:6.2f} hoog={b:6.2f} R={R_:5.2f}{"  (opaak)" if opaque else ""}')
         # ruis: 1e4 fotonen per pixel achter zak in laag kanaal [A]
         n = 1e4
-        al = -np.log(rng.poisson(n * np.exp(-a), 200).clip(1) / n); bl = -np.log(rng.poisson(n * np.exp(-b), 200).clip(1) / n)
+        al = -np.log(rng.poisson(n * np.exp(-a), 200).clip(1) / n); bl = (-np.log(rng.poisson(n * np.exp(-b), 200).clip(1) / n)).clip(1e-3)
         ax[k].scatter(bl, al / bl, s=4, label=name)
     ax[k].set_xscale('log'); ax[k].set_xlabel('µt hoog-energiekanaal'); ax[k].set_ylabel('R = µt_laag/µt_hoog')
     ax[k].set_title(f'{kv} kV split-filter ({lo:g}/{hi:g} mm Cu), 1e4 fotonen/pixel')

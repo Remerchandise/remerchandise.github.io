@@ -1,0 +1,35 @@
+Spectraal gemiddelde relatieve transmissie object (t.o.v. zak), 30 kV, filter 0,5 mm Al + PE-vensters
+object                            2        5       10       13
+18650 (hart)                1.8e-13  3.6e-13  7.1e-13  9.4e-13
+telefoon-pouch (plat)       8.5e-05  1.5e-04  2.6e-04  3.3e-04
+vape (Al-huls+13350)        2.8e-08  5.4e-08  1.0e-07  1.3e-07
+oortje/knoopcel             7.0e-04  1.2e-03  2.0e-03  2.5e-03
+AA alkaline (hart)          6.3e-14  1.2e-13  2.4e-13  3.2e-13
+Al-blikje                   8.5e-01  8.8e-01  9.0e-01  9.1e-01
+staalblik (wanden)          8.7e-03  1.4e-02  2.2e-02  2.5e-02
+Al-folieprop                8.8e-01  9.1e-01  9.3e-01  9.3e-01
+sleutel messing             2.0e-11  3.8e-11  7.4e-11  9.8e-11
+glazen fles                 4.2e-02  6.2e-02  8.6e-02  9.7e-02
+zak t.o.v. leeg             2.1e-01  3.8e-02  3.4e-03  8.8e-04
+
+Dual-energy R = ln(1/T_laag)/ln(1/T_hoog) (zak 5 g/cm2); NaN = opaak (T<1e-4) in laag kanaal
+30 kV  18650 (hart)               mu_t laag= 28.65 hoog= 27.87 R= 1.03  (opaak)
+30 kV  telefoon-pouch (plat)      mu_t laag=  8.79 hoog=  8.16 R= 1.08
+30 kV  vape (Al-huls+13350)       mu_t laag= 16.74 hoog= 16.01 R= 1.05  (opaak)
+30 kV  oortje/knoopcel            mu_t laag=  6.71 hoog=  6.13 R= 1.09
+30 kV  AA alkaline (hart)         mu_t laag= 29.73 hoog= 28.94 R= 1.03  (opaak)
+30 kV  Al-blikje                  mu_t laag=  0.13 hoog=  0.10 R= 1.26
+30 kV  staalblik (wanden)         mu_t laag=  4.25 hoog=  3.77 R= 1.13
+30 kV  Al-folieprop               mu_t laag=  0.09 hoog=  0.07 R= 1.26
+30 kV  sleutel messing            mu_t laag= 23.99 hoog= 23.22 R= 1.03  (opaak)
+30 kV  glazen fles                mu_t laag=  2.77 hoog=  2.41 R= 1.15
+80 kV  18650 (hart)               mu_t laag=  4.85 hoog=  4.06 R= 1.19
+80 kV  telefoon-pouch (plat)      mu_t laag=  2.01 hoog=  1.42 R= 1.41
+80 kV  vape (Al-huls+13350)       mu_t laag=  3.28 hoog=  2.57 R= 1.28
+80 kV  oortje/knoopcel            mu_t laag=  1.54 hoog=  1.02 R= 1.52
+80 kV  AA alkaline (hart)         mu_t laag=  4.84 hoog=  4.05 R= 1.20
+80 kV  Al-blikje                  mu_t laag=  0.04 hoog=  0.02 R= 1.89
+80 kV  staalblik (wanden)         mu_t laag=  1.03 hoog=  0.61 R= 1.69
+80 kV  Al-folieprop               mu_t laag=  0.03 hoog=  0.02 R= 1.89
+80 kV  sleutel messing            mu_t laag=  3.93 hoog=  3.16 R= 1.24
+80 kV  glazen fles                mu_t laag=  0.86 hoog=  0.56 R= 1.54
