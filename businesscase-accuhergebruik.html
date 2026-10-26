@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Businesscase Accuhergebruik</title>
+<style>
+:root{
+  --accent:#0d6b6b; --accent-soft:#e3f1f0; --ink:#1c2526; --muted:#5b6b6d; --line:#d7dfdf;
+  --bg:#eef2f2; --slide:#ffffff;
+  --ok:#2e7d32; --part:#c77700; --no:#c62828; --unk:#6b7280;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;}
+#viewport{position:fixed;inset:0 0 64px 0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#stage{width:1920px;height:1080px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;background:var(--slide);padding:96px 120px 90px;display:none;
+  box-shadow:0 10px 40px rgba(0,0,0,.12);overflow:hidden}
+.slide.active{display:flex;flex-direction:column}
+.slide::after{content:attr(data-num);position:absolute;right:56px;bottom:36px;font-size:22px;color:var(--muted)}
+.slide .kicker{font-size:24px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:14px}
+.slide h2{font-size:58px;line-height:1.12;font-weight:650;margin-bottom:40px;max-width:1500px}
+.slide h3{font-size:30px;color:var(--accent);margin-bottom:14px;font-weight:600}
+.slide p,.slide li{font-size:32px;line-height:1.42}
+.slide ul{list-style:none}
+.slide ul li{position:relative;padding-left:36px;margin-bottom:16px}
+.slide ul li::before{content:"";position:absolute;left:4px;top:.6em;width:12px;height:12px;background:var(--accent);border-radius:2px}
+.small{font-size:24px!important;color:var(--muted)}
+.ref{font-size:.62em;color:var(--accent);font-weight:600;vertical-align:super;margin-left:2px;white-space:nowrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:64px;flex:1;min-height:0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+.g-60-40{display:grid;grid-template-columns:1.25fr 1fr;gap:64px;flex:1;min-height:0}
+.card{background:var(--accent-soft);border-radius:14px;padding:30px 34px}
+.card p,.card li{font-size:28px}
+.foot{margin-top:auto;font-size:22px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+/* labels */
+.tag{display:inline-block;font-size:20px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  padding:4px 12px;border-radius:6px;vertical-align:middle;margin-left:6px;border:2px solid currentColor}
+.tag.est{color:var(--accent)}
+.tag.ass{color:var(--muted);border-style:dashed}
+.verdict{display:inline-block;font-size:24px;font-weight:700;color:#fff;padding:8px 18px;border-radius:8px;letter-spacing:.03em}
+.v-ok{background:var(--ok)}.v-part{background:var(--part)}.v-no{background:var(--no)}.v-unk{background:var(--unk)}
+.hypo{display:flex;align-items:center;gap:22px;background:#f7f9f9;border-left:8px solid var(--accent);
+  padding:20px 28px;border-radius:8px;margin-bottom:28px}
+.hypo p{font-size:28px}
+/* tables */
+table{border-collapse:collapse;width:100%;font-size:26px}
+th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:22px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:2px solid var(--ink)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.hl td{background:var(--accent-soft);font-weight:600}
+/* title slide */
+.title-slide{background:var(--accent)!important;color:#fff;justify-content:center}
+.title-slide h1{font-size:88px;line-height:1.05;font-weight:700;max-width:1500px;margin-bottom:36px}
+.title-slide .sub{font-size:38px;opacity:.9;max-width:1400px}
+.title-slide .meta{position:absolute;left:120px;bottom:80px;font-size:26px;opacity:.85}
+.title-slide::after{color:rgba(255,255,255,.7)}
+.section-mark{display:flex;gap:10px;margin-bottom:10px}
+.chart{width:100%;height:100%}
+.chart text{font-family:inherit}
+.legend{display:flex;gap:28px;font-size:22px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:18px;height:18px;border-radius:3px;margin-right:8px;vertical-align:-2px;background:var(--c)}
+.srcs{columns:2;column-gap:60px}
+.srcs li{font-size:19px!important;line-height:1.35;margin-bottom:9px;padding-left:0!important;break-inside:avoid}
+.srcs li::before{display:none}
+.srcs a{color:var(--accent);word-break:break-all}
+.notes{display:none}
+/* controls */
+#bar{position:fixed;left:0;right:0;bottom:0;height:64px;background:#fff;border-top:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;gap:14px;font-size:16px;z-index:10}
+#bar button{font:inherit;padding:9px 18px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--ink)}
+#bar button:hover{border-color:var(--accent);color:var(--accent)}
+#bar button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+#counter{min-width:80px;text-align:center;font-variant-numeric:tabular-nums;color:var(--muted)}
+#notesPanel{position:fixed;left:0;right:0;bottom:64px;max-height:38vh;overflow:auto;background:#fffdf5;
+  border-top:2px solid var(--accent);padding:16px 24px;font-size:16px;line-height:1.5;display:none;z-index:9}
+#notesPanel.open{display:block}
+#notesPanel h4{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:6px}
+#notesPanel li{margin-left:18px}
+@media (max-width:700px){#bar{gap:6px;font-size:13px}#bar button{padding:7px 10px}}
+/* print */
+@page{size:1920px 1080px;margin:0}
+@media print{
+  html,body{background:#fff;width:1920px}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #bar,#notesPanel{display:none!important}
+  #viewport{position:static;display:block;overflow:visible}
+  #stage{transform:none!important;width:1920px;height:auto}
+  .slide{display:flex!important;flex-direction:column;position:relative;inset:auto;width:1920px;height:1080px;
+    box-shadow:none;break-after:page;page-break-after:always}
+  .slide:last-child{break-after:auto;page-break-after:auto}
+}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage">
+
+<!-- 1 TITEL -->
+<section class="slide title-slide">
+  <div class="kicker" style="color:#bfe3e1">Businesscase · oktober 2026</div>
+  <h1>Hoogwaardig hergebruik van lithium-ion accu's in Nederland</h1>
+  <p class="sub">E-bike-, LEV- en gereedschapsaccu's: van black mass naar repair, refurbish en second life — veilig, legaal en gecertificeerd</p>
+  <div class="meta">Onderzoeksteam: coördinator + 6 thematische analyses · Vertrouwelijk concept</div>
+  <aside class="notes"><p>Dit deck combineert zes deelanalyses (regelgeving, transport/ADR, certificering, techniek, markt, financiën) plus een red-team-toets. Bronperiode 2024–2026. Alle cijfers zijn voorzien van een bronverwijzing of gelabeld als <b>schatting</b> of <b>aanname</b>.</p>
+  <p>Belangrijk: dit is geen juridisch advies. De juridische conclusies (afvalstatus, aansprakelijkheid) moeten door een milieu- en productrechtjurist worden bevestigd voordat er wordt geïnvesteerd.</p></aside>
+</section>
+
+<!-- 2 MANAGEMENTSAMENVATTING -->
+<section class="slide">
+  <div class="kicker">Managementsamenvatting</div>
+  <h2>De waarde zit in reparatie en revisie, niet in de metalen</h2>
+  <ul>
+    <li>Nederland zamelt maar een klein deel van de fietsaccu's in: 427 t in 2024, terwijl er in 2023 1.955 t op de markt kwam <span class="ref">[11][12]</span></li>
+    <li>Black mass levert per e-bike-accu maar een paar euro op; repair en refurbish leveren per pack € 90–110 marge op <span class="tag est">schatting</span> <span class="ref">[29]</span></li>
+    <li>De grootste drempel is productconformiteit en aansprakelijkheid (EN 50604-1, UN 38.3, nieuwe richtlijn productaansprakelijkheid), meer dan de afvalstatus <span class="ref">[19][21][22]</span></li>
+    <li>De ADR-kosten lopen sterk uiteen. Sortering aan de bron en gebundelde stromen halen de meerkosten fors omlaag <span class="ref">[14][17]</span></li>
+    <li>Advies: start als regionale hub (scenario A) met een contract met Stichting OPEN. De terugverdientijd is ca. 4–5 jaar <span class="tag est">schatting</span></li>
+  </ul>
+  <aside class="notes"><ul>
+  <li>Inzamelgat: 334 t ingezameld in 2023 tegenover 1.955 t op de markt gebracht (ca. 17%). In 2024 was dat 427 t. Op de markt gebracht en afgedankt in hetzelfde jaar zijn niet hetzelfde (een e-bike-accu gaat ca. 4–8 jaar mee). Het gat is dus een indicatie, geen bewijs van een zwarte markt.</li>
+  <li>De black-mass-waarde voor NMC lag in 2025 in Europa rond $3.000–3.600/t (Fastmarkets). Een accu van 3 kg levert ca. 1,0–1,2 kg black mass op, dus ca. € 2–4 bruto vóór verwerkingskosten.</li>
+  <li>Het verdienmodel draait op reparatie/revisie (deels vóór de afvalfase) plus geregisseerde recycling via de producentenorganisatie.</li></ul></aside>
+</section>
+
+<!-- 3 HYPOTHESES OVERZICHT -->
+<section class="slide">
+  <div class="kicker">Toets van de hypotheses</div>
+  <h2>Geen van de zes hypotheses is volledig bevestigd of weerlegd</h2>
+  <table>
+    <tr><th>#</th><th>Hypothese opdrachtgever</th><th>Oordeel</th><th>Kern</th></tr>
+    <tr><td>1</td><td>Grote zwarte/informele markt</td><td><span class="verdict v-part">Deels bevestigd</span></td><td>Groot inzamelgat; volumes informeel onbekend <span class="ref">[11][12]</span></td></tr>
+    <tr><td>2</td><td>ADR en afvalstatus blokkeren hergebruik</td><td><span class="verdict v-part">Deels bevestigd</span></td><td>Kosten ja; juridische ruimte bestaat (art. 73) <span class="ref">[1][8]</span></td></tr>
+    <tr><td>3</td><td>CENELEC-certificering is de sleutel</td><td><span class="verdict v-part">Deels bevestigd</span></td><td>CENELEC schrijft normen maar certificeert niet <span class="ref">[18]</span></td></tr>
+    <tr><td>4</td><td>Vervoer is ca. 12× duurder</td><td><span class="verdict v-unk">Onbekend</span></td><td>Factor 2–15× afhankelijk van stroom <span class="tag est">schatting</span></td></tr>
+    <tr><td>5</td><td>Veel cellen nog goed bruikbaar</td><td><span class="verdict v-ok">Bevestigd</span></td><td>60–67% van de cellen &gt;80% SoH; inzet beperkt <span class="ref">[24][25]</span></td></tr>
+    <tr><td>6</td><td>Er zit financiële waarde in</td><td><span class="verdict v-part">Deels bevestigd</span></td><td>Waarde in de dienstverlening, niet in de grondstof <span class="ref">[29]</span></td></tr>
+  </table>
+  <aside class="notes"><p>Legenda: <b>Bevestigd</b> (groen), <b>Deels bevestigd</b> (oranje), <b>Weerlegd</b> (rood), <b>Onbekend</b> (grijs). Hypothese 4 staat op "onbekend": er zijn geen openbare offertes gevonden. De bandbreedte is een schatting op basis van verpakkingskosten en vrachtregels, en moet met 3 offertes worden gevalideerd (zie dia "Ontbrekende informatie").</p></aside>
+</section>
+
+<!-- 4 LEESWIJZER -->
+<section class="slide">
+  <div class="kicker">Aanpak &amp; leeswijzer</div>
+  <h2>Zes onafhankelijke analyses, daarna samengevoegd en kritisch getoetst</h2>
+  <div class="grid3" style="margin-bottom:44px">
+    <div class="card"><h3>1–3 Kader</h3><p>Afvalstatus, ADR-transport, normen en certificering</p></div>
+    <div class="card"><h3>4–5 Praktijk</h3><p>Techniek op celniveau, keten en informele markt</p></div>
+    <div class="card"><h3>6 + coördinator</h3><p>Businesscase, tegenstrijdigheden, red team</p></div>
+  </div>
+  <p>Labels: feit = met bronverwijzing <span class="ref">[n]</span> &nbsp;·&nbsp; <span class="tag est">schatting</span> = berekend of afgeleid &nbsp;·&nbsp; <span class="tag ass">aanname</span> = te valideren</p>
+  <p class="foot">Pijltjestoetsen of knoppen om te navigeren · N = sprekersnotities · Details staan in de notities en de bronnenlijst</p>
+  <aside class="notes"><p>Elke analyse begint met eigen bronnenonderzoek. De coördinator signaleert daarna tegenstrijdigheden (dia 27) en voert een red-team-toets uit (dia 28). Bandbreedtes staan tussen haakjes of als "x–y".</p></aside>
+</section>
+
+<!-- ===== AGENT 1 ===== -->
+<section class="slide">
+  <div class="kicker">Analyse 1 · Afvalstatus &amp; regelgeving</div>
+  <h2>Of een accu afval is, hangt af van de intentie van de eigenaar</h2>
+  <div class="g-60-40">
+    <ul>
+      <li>Afval = waarvan de houder zich ontdoet of wil ontdoen (KRA art. 3) <span class="ref">[8]</span></li>
+      <li>Ingeleverd bij een inzamelpunt is afval; aangeboden ter reparatie is product <span class="tag ass">interpretatie</span> <span class="ref">[8]</span></li>
+      <li>Einde-afval kan via voorbereiding voor hergebruik (KRA art. 6) of via repurposing/remanufacturing (Batterijverordening art. 73) <span class="ref">[1][8]</span></li>
+      <li>Wie een gebruikte accu als 'geen afval' vervoert, moet de werking kunnen aantonen (bijlage XIV) <span class="ref">[1]</span></li>
+    </ul>
+    <div class="card" style="align-self:start">
+      <h3>Strategische consequentie</h3>
+      <p>Organiseer twee stromen: een <b>reparatieservice</b> (de accu blijft product) en een <b>afvalstroom</b> (vergund, met einde-afval via een gecertificeerd proces).</p>
+    </div>
+  </div>
+  <aside class="notes"><ul>
+  <li>Kaderrichtlijn Afvalstoffen 2008/98/EG: art. 3 (definitie afval, voorbereiding voor hergebruik), art. 5 (bijproduct, niet relevant voor accu's) en art. 6 (einde-afvalcriteria: gangbaar gebruik, markt, technische eisen/normen, geen nadelige effecten).</li>
+  <li>Verordening (EU) 2023/1542, art. 73 regelt repurposing en remanufacturing: SoH-onderzoek, testen en voldoen aan productvereisten. De gerepurposede/geremanufacturede accu wordt een nieuw product, met nieuwe conformiteit en een eigen batterijpaspoort dat aan het origineel gekoppeld is. <b>Te verifiëren in de geconsolideerde tekst</b>: het exacte moment waarop de afvalstatus vervalt en de bewijslast.</li>
+  <li>Bijlage XIV (minimumeisen voor overbrenging van gebruikte accu's die mogelijk afval zijn): documentatie van test/SoH, bescherming tegen schade en een verklaring van functionaliteit. Zonder die documentatie geldt de zending als afval (EVOA).</li>
+  <li>Een accu die bij de fietsenwinkel binnenkomt met een reparatieopdracht van de eigenaar is geen afval. Die route valt dus buiten de afvalvergunning, maar wel onder ADR en productveiligheid.</li></ul></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 1 · Batterijverordening (EU) 2023/1542</div>
+  <h2>De doelen en verplichtingen worden tussen 2025 en 2031 steeds strenger</h2>
+  <div style="flex:1;min-height:0"><svg class="chart" id="timeline" viewBox="0 0 1680 560"></svg></div>
+  <p class="small">Bronnen: <span class="ref">[1][2][3][4][5]</span> · Mogelijk Omnibus-uitstel voor het batterijpaspoort: status open <span class="ref">[4]</span></p>
+  <aside class="notes"><ul>
+  <li>Inzameldoel LMT-accu's (o.a. e-bike): 51% eind 2028 en 61% eind 2031 (art. 60). Draagbare accu's: 63% (2027) en 73% (2030).</li>
+  <li>Recyclingefficiëntie Li-ion: 65% eind 2025, 70% eind 2030. Materiaalterugwinning: lithium 50% (2027) en 80% (2031); Co/Ni/Cu 90% (2027) en 95% (2031).</li>
+  <li>Batterijpaspoort voor LMT-accu's en industriële accu's &gt;2 kWh vanaf 18 februari 2027. EUROBAT bepleit uitstel in de Environmental Omnibus (juli 2026); de uitkomst is onzeker.</li>
+  <li>Art. 11: LMT-accu's moeten vanaf 18 februari 2027 door een onafhankelijke vakman vervangbaar zijn. <b>Te verifiëren</b> of dit ook celvervanging binnen het pack omvat.</li>
+  <li>Due diligence uitgesteld naar 18 augustus 2027 (Verordening 2025/1561).</li>
+  <li>Producentenverantwoordelijkheid: wie een gerepurposede of geremanufacturede accu op de markt brengt, geldt als producent (registratie, EPR-bijdrage).</li></ul></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 1 · Nederland &amp; EVOA</div>
+  <h2>Black mass is sinds 2025 gevaarlijk afval: legale export naar Azië buiten de OESO is verboden</h2>
+  <div class="grid2">
+    <ul>
+      <li>Producentenverantwoordelijkheid via Stichting OPEN (fusie met Stibat per 1-1-2024) <span class="ref">[11]</span></li>
+      <li>Verwerken vereist een omgevingsvergunning (LAP3-minimumstandaard; opslag volgens PGS 37-2) <span class="ref">[10][30]</span></li>
+      <li>Omgevingsdienst: vergunning en toezicht. ILT: EVOA, ADR en VIHB <span class="ref">[39]</span></li>
+    </ul>
+    <ul>
+      <li>De nieuwe EVOA (2024/1157) geldt sinds 21-5-2026 en verbiedt export van gevaarlijk afval naar niet-OESO-landen <span class="ref">[5]</span></li>
+      <li>Black mass staat sinds 2025 als gevaarlijk afval op de EU-afvalstoffenlijst <span class="ref">[6][7]</span></li>
+      <li>Export naar Zuid-Korea (OESO) blijft legaal met een kennisgeving <span class="ref">[5][29]</span></li>
+    </ul>
+  </div>
+  <aside class="notes"><ul>
+  <li>Het Besluit beheer batterijen en accu's (Bbb) was de NL-implementatie van de oude richtlijn. Sinds de Verordening rechtstreeks werkt, gaat het in NL vooral om uitvoering en handhaving (registratie, EPR via Stichting OPEN/Wecycle).</li>
+  <li>Onder de Omgevingswet (sinds 1-1-2024) is het bevoegd gezag voor afvalverwerking doorgaans de provincie of gemeente, uitgevoerd door de omgevingsdienst. LAP3 is niet rechtstreeks bindend maar werkt door in de vergunning.</li>
+  <li>Black mass en export: de leakage naar China verloopt dus niet (legaal) als black mass, maar vooral als (1) export naar OESO-raffinaderijen (Korea), of (2) illegaal/verkeerd geclassificeerd als 'gebruikte goederen'. Dit laatste is een handhavingsthema voor ILT en Douane.</li>
+  <li>VIHB: inzamelaars, vervoerders, handelaars en bemiddelaars van afval moeten op de VIHB-lijst staan; afgifte en ontvangst worden gemeld bij het LMA.</li></ul></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 1 · Blokkades en ruimte</div>
+  <div class="hypo"><span class="verdict v-part">H2 · Deels bevestigd</span><p>De regelgeving maakt hergebruik duurder en complexer, maar verbiedt het niet</p></div>
+  <table>
+    <tr><th>Blokkeert</th><th>Ruimte die er al is</th><th>Kans op wijziging/pilot</th></tr>
+    <tr><td>Einde-afvalbewijs per accu <span class="ref">[8]</span></td><td>Art. 73: repurposing/remanufacturing expliciet geregeld <span class="ref">[1]</span></td><td>Landelijk einde-afvaloordeel via RWS/ministerie <span class="tag ass">aanname</span></td></tr>
+    <tr><td>Afvalstatus bij vervoer en opslag <span class="ref">[1]</span></td><td>Reparatiestroom valt buiten het afvalregime</td><td>Pilot met omgevingsdienst ('experimenteerruimte')</td></tr>
+    <tr><td>Paspoort en EPR voor de reviseerder <span class="ref">[1]</span></td><td>Inzameldoel 51% dwingt OPEN tot extra kanalen <span class="ref">[2]</span></td><td>Inbreng in EU-Omnibus via brancheorganisatie <span class="ref">[4]</span></td></tr>
+  </table>
+  <aside class="notes"><p>Concreet te onderzoeken: (1) een vooroverleg met het bevoegd gezag over een vergunning voor 'voorbereiding voor hergebruik' plus repurposing; (2) of Rijkswaterstaat (LAP-uitvoering) een landelijk einde-afvaloordeel wil afgeven voor geteste LMT-accu's/cellen; (3) een pilotafspraak met ILT over traceerbaarheid. Dit zijn aannames over de bereidheid van overheden; die moeten in gesprekken worden getoetst.</p></aside>
+</section>
+
+<!-- ===== AGENT 2 ===== -->
+<section class="slide">
+  <div class="kicker">Analyse 2 · Transport &amp; ADR</div>
+  <h2>De toestand van de accu bepaalt het ADR-regime en dus de kosten</h2>
+  <table>
+    <tr><th>Toestand</th><th>ADR-grondslag</th><th>Verpakking</th><th>Kostenimpact</th></tr>
+    <tr><td>Intact, voor recycling</td><td>UN 3480/3481, BB 377</td><td>P909 (vaten, IBC's)</td><td>Laag–middel</td></tr>
+    <tr><td>Kleine accu's ≤500 g</td><td>BB 636 (inzamelpunten)</td><td>Verlicht regime</td><td>Laag</td></tr>
+    <tr><td>Beschadigd/defect</td><td>BB 376</td><td>P908 / LP904</td><td>Hoog</td></tr>
+    <tr><td>Kritiek defect</td><td>BB 376</td><td>P911 / LP906 (typegekeurd)</td><td>Zeer hoog</td></tr>
+  </table>
+  <p class="small" style="margin-top:22px">Bronnen: <span class="ref">[14][15][16]</span> · BB = bijzondere bepaling · e-bike-accu's (2–4 kg) vallen buiten BB 636</p>
+  <aside class="notes"><ul>
+  <li>BB 376 definieert beschadigd/defect: afwijkend van het geteste type, gelekt of gevent, niet te diagnosticeren vóór vervoer, of fysiek/mechanisch beschadigd. Volgens een toelichting van het UN-subcomité moet de beoordeling plaatsvinden op basis van fabriekscriteria of door een technisch deskundige.</li>
+  <li>Kernpunt voor de kosten: een accu die bij de winkel <i>niet beoordeeld</i> kan worden, geldt als 'niet te diagnosticeren' en valt in de dure categorie. Een korte, gestandaardiseerde beoordeling aan de bron verplaatst het grootste deel naar BB 377.</li>
+  <li>P911-verpakkingen moeten bij een thermal runaway buiten de verpakking veilig blijven (geen vlammen, beperkte temperatuur); die zijn duur en volumineus.</li>
+  <li>Daarnaast: ADR-certificaat voor de chauffeur en een veiligheidsadviseur (boven de vrijstellingsgrenzen van 1.1.3.6), VIHB-registratie en een begeleidingsbrief afvalstoffen.</li></ul></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 2 · Toets hypothese 4</div>
+  <div class="hypo"><span class="verdict v-unk">H4 · Onbekend</span><p>"12× duurder" past bij kleine, ongesorteerde partijen, maar niet bij gebundelde intacte stromen</p></div>
+  <div class="g-60-40">
+    <div style="min-height:0"><svg class="chart" id="transportChart" viewBox="0 0 900 470"></svg></div>
+    <ul>
+      <li>De literatuur noemt een bandbreedte van &lt; $0,30 tot &gt; $5 per kg <span class="ref">[17]</span></li>
+      <li>Transport is gemiddeld ca. 41% van de recyclingkosten (EV) <span class="ref">[17]</span></li>
+      <li>OPEN-tarief voor fietsaccu's: € 1,268/kg (2026) <span class="ref">[13]</span></li>
+    </ul>
+  </div>
+  <aside class="notes"><p><b>Schatting</b> van de kostenfactor ten opzichte van regulier stukgoed per kg: intacte accu's gebundeld in P909/IBC ca. 2–4×; kleine ongesorteerde partijen ca. 5–8×; beschadigd in P908 ca. 6–10×; kritiek defect in P911 ca. 10–15× (vooral door de verpakkingskosten per stuk en de lage beladingsgraad). De '12×' van de opdrachtgever valt dus in de bovenste bandbreedte. Er zijn geen openbare tarieven gevonden: <b>valideren met minimaal 3 offertes</b> van ADR-afvalvervoerders.</p></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 2 · Kostenverlaging</div>
+  <h2>Beoordeel aan de bron en vervoer gebundeld in volle ladingen</h2>
+  <ul>
+    <li>Triage in de fietsenwinkel (5 min, visueel + spanning) haalt de 'niet te diagnosticeren'-categorie omlaag <span class="ref">[15]</span></li>
+    <li>Regionale hub binnen ca. 50 km: melkrondes in plaats van losse ophaalritten <span class="tag ass">aanname</span></li>
+    <li>Herbruikbare P909-bakken (pendelverpakking) in plaats van eenmalige dozen</li>
+    <li>Combineren met de bestaande ritten van OPEN/Wecycle en van fietsgroothandels <span class="ref">[12]</span></li>
+    <li>Reparatie-accu's (geen afval) gaan mee in de reguliere servicelogistiek, onder ADR maar zonder afvaldocumenten</li>
+  </ul>
+  <aside class="notes"><p>Geschat effect: 30–60% lagere transportkosten per accu ten opzichte van ad-hocophaling <span class="tag est">schatting</span>. Voorwaarden: training van winkelpersoneel (ADR 1.3-instructie), een eenvoudige app voor triage en registratie (sluit aan op het batterijpaspoort) en een quarantainebak voor twijfelgevallen. Let op: fietsgroothandels zijn geen afvalvervoerder. Voor de afvalstroom is VIHB-registratie van de vervoerder nodig.</p></aside>
+</section>
+
+<!-- ===== AGENT 3 ===== -->
+<section class="slide">
+  <div class="kicker">Analyse 3 · Certificering &amp; normen</div>
+  <div class="hypo"><span class="verdict v-part">H3 · Deels bevestigd</span><p>CENELEC ontwikkelt de normen; certificatie loopt via private, geaccrediteerde instellingen</p></div>
+  <table>
+    <tr><th>Norm</th><th>Waarvoor</th><th>Relevant voor</th></tr>
+    <tr><td>EN 50625-reeks <span class="ref">[18]</span></td><td>Inzameling, logistiek en verwerking van e-waste</td><td>Hub/verwerker (vaak WEEELABEX-audit)</td></tr>
+    <tr><td>EN 50604-1 <span class="ref">[19][20]</span></td><td>Veiligheid van LEV-lithiumaccu's</td><td>Gereviseerde e-bike-accu</td></tr>
+    <tr><td>EN 15194 <span class="ref">[20]</span></td><td>E-bike (EPAC); verwijst naar EN 50604-1</td><td>CE-markering e-bike</td></tr>
+    <tr><td>IEC 62133-2 · IEC 62619 · UN 38.3 <span class="ref">[37]</span></td><td>Draagbaar · stationair · transporttest</td><td>Gereedschap · second life · vervoer</td></tr>
+    <tr><td>UL 1974 <span class="ref">[37]</span></td><td>Beoordeling voor repurposing</td><td>Second-life-proces (VS-norm)</td></tr>
+  </table>
+  <aside class="notes"><ul>
+  <li>CENELEC is de normalisatie-instelling en certificeert zelf niet. Certificatie van verwerkers gebeurt door private, geaccrediteerde partijen, bijvoorbeeld via WEEELABEX (vereist o.a. ISO 9001/14001). NEN is in Nederland de ingang voor de normcommissies.</li>
+  <li>EN 50604-1 is volgens de eigen scope niet bedoeld om reparatie- en onderhoudsdiensten te beoordelen. Er bestaat dus <b>geen</b> specifieke Europese norm voor het reviseren van e-bike-accu's. Dat is een gat en een kans (bijv. een NTA via NEN).</li>
+  <li>Indicatieve kosten en doorlooptijd voor type-testen (UN 38.3 + EN 50604-1) per accuontwerp: ca. € 15.000–40.000 en 8–16 weken bij TÜV, DEKRA, Kiwa e.d. <span class="tag est">schatting, offertes nodig</span>. ISO 9001/14001 en WEEELABEX: ca. € 10.000–30.000 per jaar.</li></ul></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 3 · Opnieuw op de markt brengen</div>
+  <h2>Wie een accu wezenlijk wijzigt, wordt fabrikant, met alle aansprakelijkheid van dien</h2>
+  <ul>
+    <li>Repair zonder ontwerpwijziging: het geteste type blijft geldig (CONEBI-visie) <span class="ref">[21]</span></li>
+    <li>Andere cellen of een andere configuratie betekent opnieuw testen: UN 38.3, EN 50604-1 en IEC 62133-2 <span class="ref">[21]</span></li>
+    <li>Nieuwe richtlijn productaansprakelijkheid (2024/2853): wie een product wezenlijk wijzigt, geldt als fabrikant; omzetting vóór 9-12-2026 <span class="ref">[22]</span></li>
+    <li>GPSR (2023/988): risicoanalyse, traceerbaarheid en terugroepprocedure <span class="ref">[23]</span></li>
+    <li>Een verzekeraar eist in de praktijk: certificering, een PGS 37-2-opslag en een recall-dekking <span class="tag ass">aanname</span></li>
+  </ul>
+  <aside class="notes"><ul>
+  <li>Een praktische route is <b>type-gebonden revisie</b>: per OEM-model een vast revisieprotocol met identieke celspecificaties (zelfde fabrikant/type), waarvoor eenmalig een type-test wordt gedaan. Dat beperkt de testkosten per eenheid.</li>
+  <li>OEM-BMS-koppeling (bijv. software-pairing bij grote systeemleveranciers) kan revisie technisch blokkeren. Samenwerking met de OEM of de importeur is dan nodig.</li>
+  <li>Verzekerbaarheid is niet getoetst. Plan gesprekken met 2–3 verzekeraars/makelaars in de eerste 3 maanden.</li></ul></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 3 · Veiligheid</div>
+  <h2>Thermal runaway is het kernrisico en moet op vier plekken worden afgedekt</h2>
+  <div class="grid2">
+    <div class="card"><h3>Bron &amp; transport</h3><ul><li>Triage plus quarantainebak</li><li>BB 376-beoordeling, polen afplakken</li><li>P909/P911-verpakking <span class="ref">[14]</span></li></ul></div>
+    <div class="card"><h3>Opslag</h3><ul><li>PGS 37-2: compartimentering, detectie <span class="ref">[30]</span></li><li>Maximale voorraad per zone</li><li>Buitenquarantaine voor defecte accu's</li></ul></div>
+    <div class="card"><h3>Demontage &amp; test</h3><ul><li>Ontladen tot veilige SoC</li><li>ESD- en isolatiewerkplek, brandblusmiddelen</li><li>Test op zelfontlading (≥ 7 dagen)</li></ul></div>
+    <div class="card"><h3>Product</h3><ul><li>Gematchte cellen, BMS-test</li><li>End-of-line test + serienummer</li><li>Garantie en recall-procedure <span class="ref">[23]</span></li></ul></div>
+  </div>
+  <aside class="notes"><p>Zelfontlading is de belangrijkste indicator voor interne kortsluiting. Bij gerecyclede cellen is een rustperiode van 7–14 dagen met spanningsmeting gangbare praktijk <span class="tag est">schatting</span>. Ook relevant: afstemming met de brandweer/veiligheidsregio over de opslag en een incidentenregistratie. Eén brand kan de vergunning en de reputatie kosten (zie red team).</p></aside>
+</section>
+
+<!-- ===== AGENT 4 ===== -->
+<section class="slide">
+  <div class="kicker">Analyse 4 · Technisch hergebruik</div>
+  <div class="hypo"><span class="verdict v-ok">H5 · Bevestigd</span><p>De meeste cellen zijn technisch goed; er zijn kanttekeningen voor tractiegebruik</p></div>
+  <div class="g-60-40">
+    <div style="min-height:0"><svg class="chart" id="funnel" viewBox="0 0 900 430"></svg></div>
+    <ul>
+      <li>Ca. 60% van de cellen blijft bruikbaar (Libattion/ZHAW) <span class="ref">[24]</span></li>
+      <li>Ca. 2/3 van de cellen heeft &gt;80% capaciteit (BFE-pilot) <span class="ref">[25]</span></li>
+      <li>Een pack op 75% SoH kan cellen bevatten van &gt;90% <span class="ref">[26]</span></li>
+      <li>Defecten zitten vaker in BMS en connectoren dan in de cel <span class="ref">[27]</span></li>
+    </ul>
+  </div>
+  <aside class="notes"><ul>
+  <li>Testprotocol: (1) visuele inspectie; (2) open klemspanning; (3) interne weerstand (AC-IR, 1 kHz); (4) capaciteitstest (volledige cyclus); (5) zelfontlading over 7–14 dagen; (6) matching op capaciteit en IR.</li>
+  <li>Heskon (NL) stelt dat één 'kapotte' cel zelden het probleem is, maar ook dat na ca. 4 jaar het hele pack in prestatie terugloopt. Voor tractie (e-bike) is dat een reden om eerder te kiezen voor nieuwe cellen in de bestaande behuizing en BMS. De oude cellen gaan dan naar laagbelaste toepassingen.</li>
+  <li>Funnel op de dia is een <b>schatting</b> voor een gemiddelde instroom: 100 packs → ca. 85 veilig te openen → ca. 60% van de cellen bruikbaar.</li></ul></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 4 · Routes vergeleken</div>
+  <h2>Per pack verdient revisie het meest, recycling het minst</h2>
+  <table>
+    <tr><th>Route</th><th class="num">Opbrengst/pack</th><th class="num">Kosten/pack</th><th class="num">Marge</th><th>Aandeel instroom</th></tr>
+    <tr><td>Repair (BMS, connector, behuizing)</td><td class="num">€ 150–220</td><td class="num">€ 70–110</td><td class="num">€ 90</td><td>10–20%</td></tr>
+    <tr class="hl"><td>Refurbish (nieuwe/geteste cellen)</td><td class="num">€ 300–420</td><td class="num">€ 200–290</td><td class="num">€ 110</td><td>10–20%</td></tr>
+    <tr><td>Second life (cellen → modules)</td><td class="num">€ 20–40</td><td class="num">€ 15–30</td><td class="num">€ 10</td><td>25–35%</td></tr>
+    <tr><td>Recycling / black mass</td><td class="num">€ 1–4</td><td class="num">€ 3–6</td><td class="num">€ –2</td><td>35–50%</td></tr>
+  </table>
+  <p class="small" style="margin-top:20px"><span class="tag est">schatting</span> pack ca. 0,5 kWh / 3 kg; marge = basiswaarde · black mass: <span class="ref">[29]</span> · OPEN-tarief: <span class="ref">[13]</span></p>
+  <aside class="notes"><ul>
+  <li>Black mass: een NMC-pack van 3 kg levert ca. 1,0–1,2 kg black mass op. Bij $3.000–3.600/t (Europa ex-works 2025, Fastmarkets) is dat ca. € 3–4 bruto. Voor LFP is de waarde veel lager.</li>
+  <li>Second life: 24 bruikbare cellen × ca. 12,6 Wh ≈ 0,3 kWh per pack. Tegen € 80–130/kWh modulewaarde is dat € 25–40. Nieuwe LFP-opslag is goedkoop geworden, waardoor second life met kleine cilindercellen marginaal is.</li>
+  <li>Repair/refurbish vergeleken met een nieuwe OEM-accu (€ 500–900): voor de consument is 40–60% besparing het verkoopargument <span class="tag ass">aanname</span>.</li></ul></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 4 · Interview gecertificeerde reviseerder</div>
+  <h2>Acht vragen om de claims te kwantificeren</h2>
+  <div class="grid2">
+    <ul>
+      <li>Welk % van de packs/cellen voldoet aan uw drempels, en welke drempels zijn dat?</li>
+      <li>Welke certificaten heeft u (door wie) en wat kostten die?</li>
+      <li>Welke certificeringseis blokkeert precies, en per wanneer?</li>
+      <li>Testtijd en arbeid per pack en per cel?</li>
+    </ul>
+    <ul>
+      <li>Hoe gaat u om met OEM-BMS-koppeling?</li>
+      <li>Retour- en garantieclaims na revisie (%)?</li>
+      <li>Wat betaalt u nu aan transport per kg, per toestandsklasse?</li>
+      <li>Wilt u data delen of deelnemen in een pilot?</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>Vraag om documenten in plaats van indrukken: testrapporten, certificaten, facturen van vervoerders en een anonieme dataset van een maand instroom. Vraag ook naar de verdeling naar merk en model (de top-10 merken bepalen de schaal van type-gebonden revisie) en naar incidenten (brand, venting) in de afgelopen 3 jaar.</p></aside>
+</section>
+
+<!-- ===== AGENT 5 ===== -->
+<section class="slide">
+  <div class="kicker">Analyse 5 · De keten</div>
+  <h2>De fietsenwinkel bepaalt waar een afgedankte accu heen gaat</h2>
+  <div style="flex:1;min-height:0"><svg class="chart" id="chain" viewBox="0 0 1680 560"></svg></div>
+  <p class="small">Inzameling 2024 per kanaal: afvalinzamelaars 187 t · bedrijven 130 t · fietsenwinkels 76 t · derden 27 t <span class="ref">[12]</span></p>
+  <aside class="notes"><p>Formele route: consument → winkel/milieustraat → OPEN/Wecycle → sorteerder → recycler (NL/EU) → black mass naar een raffinaderij (EU of Korea). Informele route (gestippeld): winkel of particulier → opkoper → (a) celhandel/onofficiële revisie, (b) export als 'gebruikte goederen' of met gebruikte fietsen. Het aandeel van de fietsenwinkels in de formele inzameling is relatief klein (76 t), terwijl daar de meeste vervangingen plaatsvinden. Dat is een sterke indicatie dat accu's via andere kanalen weglekken.</p></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 5 · Toets hypothese 1</div>
+  <div class="hypo"><span class="verdict v-part">H1 · Deels bevestigd</span><p>Het inzamelgat is groot; welk deel daarvan informeel is, is niet gemeten</p></div>
+  <div class="g-60-40">
+    <div style="min-height:0"><svg class="chart" id="gapChart" viewBox="0 0 900 430"></svg></div>
+    <ul>
+      <li>Op de markt in 2023: 1.955 t; ingezameld: 334 t (ca. 17%) <span class="ref">[11]</span></li>
+      <li>Ingezameld in 2024: 427 t <span class="ref">[12]</span></li>
+      <li>Opkopers bieden contant geld, gemak en snelheid; de winkel betaalt niets <span class="tag ass">aanname</span></li>
+    </ul>
+  </div>
+  <aside class="notes"><ul>
+  <li>Het gat bestaat niet volledig uit zwarte markt: een deel ligt nog thuis, zit nog in gebruik (levensduur 4–8 jaar) of belandt in het restafval. Het informele aandeel is <b>onbekend</b>. Schatting voor een eerste orde: 10–30% van de afgedankte accu's <span class="tag est">schatting, lage zekerheid</span>.</li>
+  <li>Aantrekkelijk voor winkels: geen opslagrisico, geen administratie en soms een vergoeding per accu. Voor opkopers is een werkende accu of cel € 1–5 per cel waard op de tweedehandsmarkt, veel meer dan de black-mass-waarde.</li>
+  <li>Verificatie: mystery-shopping bij 20 winkels, analyse van advertenties op tweedehandsplatforms en een gesprek met ILT/Douane over onderscheppingen.</li></ul></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 5 · Concurreren met de informele markt</div>
+  <h2>Ontzorg de winkel en betaal voor bruikbare accu's</h2>
+  <div class="grid2">
+    <ul>
+      <li>Vergoeding per bruikbare accu (statiegeldachtig) en gratis afvoer van de rest</li>
+      <li>Ophaalabonnement plus brandveilige bak in de winkel</li>
+      <li>Compliance-certificaat voor de winkel (VIHB, ADR, inzamelplicht)</li>
+      <li>Traceerbaarheid via scan per accu, gekoppeld aan het paspoort <span class="ref">[1]</span></li>
+    </ul>
+    <div class="card" style="align-self:start"><h3>Buitenlandse voorbeelden</h3>
+      <p>BE: Bebat, record van 4.029 t ingezameld in 2024 <span class="ref">[33]</span><br>CH: Libattion, second-life-modules uit e-bike-cellen <span class="ref">[24]</span><br>DE: Liofit, gecertificeerde celvervanging <span class="ref">[28]</span><br>VS: Call2Recycle, e-bike-programma via dealers <span class="ref">[34]</span></p></div>
+  </div>
+  <aside class="notes"><p>Een samenwerking met ILT/omgevingsdiensten werkt twee kanten op: een legale partij levert data (welke winkels leveren wel/niet aan) en handhaving maakt de informele route duurder. Producentenorganisatie: OPEN moet naar 51% inzameling in 2028. Een partij die extra volume uit winkels haalt, is voor OPEN direct waardevol en kan een handlingvergoeding per kg krijgen (onderhandelbaar, nu niet in de basiscase).</p></aside>
+</section>
+
+<!-- ===== AGENT 6 ===== -->
+<section class="slide">
+  <div class="kicker">Analyse 6 · Verdienmodel</div>
+  <div class="hypo"><span class="verdict v-part">H6 · Deels bevestigd</span><p>De waarde zit in de dienstverlening en de cellen, niet in de grondstof</p></div>
+  <div class="g-60-40">
+    <ul>
+      <li>Opbrengsten: repair, refurbish, verkoop van cellen/modules en een handlingvergoeding</li>
+      <li>Gewogen marge per pack ca. € 27–29 (bandbreedte € 15–45) <span class="tag est">schatting</span></li>
+      <li>Mix: 15% repair · 15% refurbish · 30% second life · 40% recycling <span class="tag ass">aanname</span></li>
+    </ul>
+    <div class="card" style="align-self:start"><h3>Per pack (basis)</h3>
+      <table style="font-size:24px"><tr><td>Bruto-opbrengst</td><td class="num">€ 88,5</td></tr>
+      <tr><td>Variabele kosten</td><td class="num">€ 56,3</td></tr>
+      <tr><td>Transport</td><td class="num">€ 3–5</td></tr>
+      <tr class="hl"><td>Marge</td><td class="num">€ 27–29</td></tr></table></div>
+  </div>
+  <aside class="notes"><p>Berekening van de bruto-opbrengst: 0,15×180 + 0,15×350 + 0,30×30 = € 88,5. Variabele kosten: 0,15×90 + 0,15×240 + 0,30×20 + 0,40×2 = € 56,3, plus transport (€ 5 in scenario A, € 3 in B/C). De marge is dus € 27 (A) of € 29 (B/C). Alle prijzen en het aandeel per route zijn aannames die in de pilot gemeten moeten worden. Niet meegenomen zijn de handlingvergoeding van OPEN en subsidies (upside).</p></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 6 · Scenario's</div>
+  <h2>Drie scenario's: regionaal starten, samenwerken of landelijk opschalen</h2>
+  <table>
+    <tr><th></th><th class="num">A · Regionale hub</th><th class="num">B · Met OPEN/ketenpartners</th><th class="num">C · Landelijk</th></tr>
+    <tr><td>Packs/jaar (jaar 3)</td><td class="num">20.000</td><td class="num">60.000</td><td class="num">150.000</td></tr>
+    <tr><td>Investering</td><td class="num">€ 0,5 mln</td><td class="num">€ 1,2 mln</td><td class="num">€ 4,0 mln</td></tr>
+    <tr><td>Vaste kosten/jaar</td><td class="num">€ 0,35 mln</td><td class="num">€ 0,9 mln</td><td class="num">€ 2,6 mln</td></tr>
+    <tr><td>Fte</td><td class="num">3–4</td><td class="num">9–11</td><td class="num">25–30</td></tr>
+    <tr class="hl"><td>EBITDA jaar 3</td><td class="num">€ 0,19 mln</td><td class="num">€ 0,84 mln</td><td class="num">€ 1,75 mln</td></tr>
+    <tr><td>Break-even-volume</td><td class="num">13.000 packs</td><td class="num">31.000 packs</td><td class="num">90.000 packs</td></tr>
+  </table>
+  <p class="small" style="margin-top:16px">Alle waarden zijn een <span class="tag est">schatting</span>, op basis van een marge van € 27 (A) of € 29 (B/C) per pack</p>
+  <aside class="notes"><ul>
+  <li>Investering A: testapparatuur (celtesters, cyclers) € 150k; brandveilige opslag/inrichting € 150k; vergunning en certificering € 75k; IT/traceerbaarheid € 50k; werkkapitaal € 75k.</li>
+  <li>Volume C (150.000 packs ≈ 450 t) is meer dan de totale inzameling in 2024 (427 t). Dat is alleen haalbaar als het inzameldoel van 51% (2028) wordt gehaald en LEV- en gereedschapsaccu's worden toegevoegd. Grote <span class="tag ass">aanname</span>.</li>
+  <li>Bandbreedte break-even A bij een marge van € 15–45: 8.000–23.000 packs.</li></ul></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 6 · Kosten en opbrengsten (jaar 3)</div>
+  <h2>De variabele kosten wegen het zwaarst; vaste kosten bepalen het break-evenpunt</h2>
+  <div style="flex:1;min-height:0"><svg class="chart" id="costRev" viewBox="0 0 1680 560"></svg></div>
+  <div class="legend"><span style="--c:#0d6b6b">Opbrengsten</span><span style="--c:#9cc9c6">Variabele kosten</span><span style="--c:#5b6b6d">Vaste kosten</span><span style="--c:#c77700">EBITDA</span></div>
+  <aside class="notes"><p>Jaar 3, in € mln. A: opbrengst 1,77 / variabel 1,23 / vast 0,35 / EBITDA 0,19. B: 5,31 / 3,57 / 0,90 / 0,84. C: 13,28 / 8,93 / 2,60 / 1,75. <span class="tag est">schatting</span>. Opvallend: de EBITDA-marge ligt rond 11–16%. Dat is gevoelig voor de prijs van gereviseerde accu's (zie tornado).</p></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 6 · Break-even</div>
+  <h2>Scenario B verdient zich het snelst terug: in jaar 4</h2>
+  <div style="flex:1;min-height:0"><svg class="chart" id="cumCash" viewBox="0 0 1680 560"></svg></div>
+  <div class="legend"><span style="--c:#9cc9c6">A · Regionaal</span><span style="--c:#0d6b6b">B · Ketenpartners</span><span style="--c:#5b6b6d">C · Landelijk</span></div>
+  <aside class="notes"><p>Cumulatieve kasstroom (EBITDA minus investering, zonder belasting, rente of subsidie), in € mln. Groeipad van het volume: jaar 1 40%, jaar 2 70%, jaar 3 100%, jaar 4 110%, jaar 5 120% van het doelvolume. A: –0,50 / –0,63 / –0,61 / –0,42 / –0,17 / +0,13. B: –1,20 / –1,40 / –1,09 / –0,25 / +0,77 / +1,96. C: –4,00 / –4,86 / –4,42 / –2,67 / –0,48 / +2,14. <span class="tag est">schatting</span></p></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 6 · Gevoeligheid (scenario B, EBITDA jaar 3)</div>
+  <h2>Revisieprijs en uitvalpercentage wegen zwaar; metaalprijzen nauwelijks</h2>
+  <div style="flex:1;min-height:0"><svg class="chart" id="tornado" viewBox="0 0 1680 560"></svg></div>
+  <p class="small">Basis-EBITDA € 0,84 mln · effect in € k · <span class="tag est">schatting</span></p>
+  <aside class="notes"><ul>
+  <li>Prijs gereviseerde accu ±20%: ±€ 630k. Aandeel geschikt voor repair/refurbish 30% ±10 procentpunt: ±€ 590k. Arbeidskosten ±20%: ±€ 450k. Prijs gerepareerde accu ±20%: ±€ 325k. Transport ±50%: ±€ 90k. Black-mass-/metaalprijs ±50%: ±€ 35k.</li>
+  <li>Conclusie: zelfs een transportfactor van 12× vormt geen bedreiging voor het model zolang de stroom gebundeld is. Het verdienmodel staat of valt met de afzet en de prijs van gereviseerde accu's en met de opbrengst van de triage.</li></ul></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Analyse 6 · Subsidie &amp; financiering</div>
+  <h2>De subsidiemogelijkheden voor circulaire projecten zijn in 2026 beperkt</h2>
+  <table>
+    <tr><th>Regeling</th><th>Status / fit</th></tr>
+    <tr><td>DEI+ Circulaire economie (RVO)</td><td>Open van 16-6 t/m 17-12-2026, € 60 mln, overtekend <span class="ref">[31][35]</span></td></tr>
+    <tr><td>Circulaire ketenprojecten (CKP)</td><td>Niet opengesteld in 2026 <span class="ref">[32]</span></td></tr>
+    <tr><td>MIT (haalbaarheid/R&amp;D), MIA/Vamil</td><td>Mogelijk passend voor apparatuur; te verifiëren <span class="tag ass">aanname</span></td></tr>
+    <tr><td>EU LIFE · Horizon Europe (BATT4EU)</td><td>Voor pilots en consortia; doorlooptijd 9–12 mnd</td></tr>
+    <tr><td>Invest-NL / ROM's (Oost NL, BOM e.d.)</td><td>Groeikapitaal voor B/C</td></tr>
+  </table>
+  <aside class="notes"><p>Advies: dien de DEI+-aanvraag alleen in als de pilot (scenario A) al technisch is onderbouwd. Gezien de overtekening is een LIFE-consortium met een producentenorganisatie en een kennisinstelling (bijv. TNO of een TU) een realistischere route voor 2027. Check MIA/Vamil op de Milieulijst van het betreffende jaar. Bedragen en openstellingen moeten op rvo.nl worden geverifieerd.</p></aside>
+</section>
+
+<!-- ===== COÖRDINATOR ===== -->
+<section class="slide">
+  <div class="kicker">Coördinator · Tegenstrijdigheden</div>
+  <h2>Vijf spanningen tussen de analyses, en hoe we ze oplossen</h2>
+  <table>
+    <tr><th>Spanning</th><th>Oplossing in dit deck</th></tr>
+    <tr><td>"Cellen zijn goed" (4) tegenover "het hele pack veroudert" <span class="ref">[24][27]</span></td><td>Oude cellen naar laagbelaste toepassingen; voor tractie nieuwe cellen</td></tr>
+    <tr><td>"Cellen zijn waardevol" (4) tegenover lage marge op second life (6)</td><td>Second life levert geen winst op en dient alleen als afzetkanaal</td></tr>
+    <tr><td>Afvalstatus blokkeert (1) tegenover product-aansprakelijkheid (3)</td><td>Aansprakelijkheid is de grootste drempel</td></tr>
+    <tr><td>12× transport (2) tegenover lage impact in het model (6)</td><td>Alleen kritisch bij ongesorteerde, kleine stromen</td></tr>
+    <tr><td>"Naar China" tegenover het exportverbod <span class="ref">[5][6]</span></td><td>Legaal naar Korea (OESO); de rest is illegaal of verkeerd geclassificeerd</td></tr>
+  </table>
+  <aside class="notes"><p>Nog open: of art. 11 (vervangbaarheid) het reviseren van cellen in LEV-packs wettelijk ondersteunt, en of de OEM's hun BMS openstellen. Die twee punten kunnen de route refurbish versterken of juist blokkeren.</p></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Coördinator · Red team</div>
+  <h2>Waarom deze businesscase kan mislukken</h2>
+  <div class="grid3">
+    <div class="card"><h3>Juridisch</h3><ul><li>Einde-afval niet erkend per batch</li><li>Aansprakelijkheid als fabrikant <span class="ref">[22]</span></li><li>Vergunning duurt 6–12+ mnd</li></ul></div>
+    <div class="card"><h3>Technisch</h3><ul><li>OEM-BMS blokkeert revisie</li><li>Honderden packtypes</li><li>Eén brand = sluiting</li></ul></div>
+    <div class="card"><h3>Financieel</h3><ul><li>Goedkope nieuwe cellen</li><li>Volume hangt af van OPEN</li><li>Opkopers bieden meer</li></ul></div>
+  </div>
+  <p style="margin-top:40px"><b>Grootste risico:</b> geen afzet voor gereviseerde accu's zonder steun van OEM's of dealers <span class="tag ass">aanname</span></p>
+  <aside class="notes"><ul>
+  <li>Mitigaties: een vooroverleg met het bevoegd gezag vóór de investering; type-gebonden revisie voor de top-10 modellen; een contract met OPEN vóór opschaling; brandveiligheid boven PGS 37-2; afzetafspraken met 2–3 dealerketens; een recall-verzekering.</li>
+  <li>Strategisch risico: OEM's (en CONEBI) staan kritisch tegenover celvervanging. Als de Europese regels en normen strenger worden, valt de route refurbish weg en blijft alleen repair over.</li>
+  <li>Marktrisico: de prijs van nieuwe LFP-/NMC-cellen blijft dalen en drukt de waarde van gereviseerde accu's en second life.</li></ul></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Vervolgstappen</div>
+  <h2>Eerst valideren, daarna pas investeren</h2>
+  <div class="grid2">
+    <div class="card"><h3>0–3 maanden</h3><ul>
+      <li>Interview met de reviseerder plus datadeling</li>
+      <li>3 ADR-offertes; meting bij 20 winkels</li>
+      <li>Vooroverleg met omgevingsdienst en ILT</li>
+      <li>Verzekeraar en testlab: offertes</li></ul></div>
+    <div class="card"><h3>3–12 maanden</h3><ul>
+      <li>Pilot scenario A in 1 regio (30–50 winkels)</li>
+      <li>Vergunningaanvraag; certificering</li>
+      <li>Contract met OPEN; LIFE- of DEI+-aanvraag</li>
+      <li>Go/no-go voor scenario B</li></ul></div>
+  </div>
+  <p class="small" style="margin-top:24px">Te benaderen: Stichting OPEN/Wecycle · BOVAG · RAI Vereniging · ILT · omgevingsdienst · NEN · TÜV/DEKRA/Kiwa · Heskon · OEM's (Pon, Accell, Bosch) · verzekeraars · TNO/TU's</p>
+  <aside class="notes"><p>Go/no-go-criteria na 12 maanden: (1) meer dan 25% van de instroom geschikt voor repair/refurbish; (2) afzetprijs van gereviseerde accu's ≥ € 300; (3) vergunning en verzekering rond; (4) intentieverklaring van OPEN voor volume. Heskon is zowel concurrent als potentiële partner (capaciteit, kennis).</p></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Ontbrekende informatie</div>
+  <h2>Deze gegevens bepalen of de case doorgaat</h2>
+  <div class="grid2">
+    <ul>
+      <li>Volume en route van de informele markt</li>
+      <li>Werkelijke ADR-tarieven per toestandsklasse</li>
+      <li>Data en certificaten van de reviseerder</li>
+      <li>Exacte einde-afvalcriteria van art. 73 en bijlage XIV</li>
+    </ul>
+    <ul>
+      <li>Uitkomst van de Omnibus (paspoort, art. 11)</li>
+      <li>Openheid van OEM-BMS en verdeling naar model</li>
+      <li>Verzekeringsvoorwaarden en premie</li>
+      <li>Betalingsbereidheid voor gereviseerde accu's</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>Ook ontbreekt: de verdeling van de instroom over de chemie (NMC/LFP) en de LEV- en gereedschapsvolumes (die vallen onder 'draagbaar' of 'LMT' met andere doelen en tarieven). De geconsolideerde EUR-Lex-tekst kon in dit onderzoek niet rechtstreeks worden opgehaald. Juridische details over art. 73 en bijlage XIV moeten daarom op de officiële tekst worden gecontroleerd.</p></aside>
+</section>
+
+<!-- BRONNEN -->
+<section class="slide">
+  <div class="kicker">Bronnen (1/2)</div>
+  <ol class="srcs" style="list-style:none">
+    <li>[1] Verordening (EU) 2023/1542 Batterijen, geconsolideerd — <a href="https://eur-lex.europa.eu/eli/reg/2023/1542">eur-lex.europa.eu/eli/reg/2023/1542</a></li>
+    <li>[2] Europees Parlement, samenvatting 2023/1542 — <a href="https://oeil.europarl.europa.eu/oeil/en/document-summary?id=1754181">oeil.europarl.europa.eu</a></li>
+    <li>[3] Slaughter and May (2025), uitstel en wijziging Batterijverordening — <a href="https://sustainability.slaughterandmay.com/post/102kr06/european-commission-proposes-delays-and-amendments-to-batteries-regulation">sustainability.slaughterandmay.com</a></li>
+    <li>[4] EUROBAT (juli 2026), amendementen op de Environmental Omnibus — <a href="https://eurobat.org/wp-content/uploads/2026/08/EUROBATs-Proposed-Amendments-to-the-Environmental-Omnibus-06.07.2026.pdf">eurobat.org</a></li>
+    <li>[5] IEA, Verordening (EU) 2024/1157 overbrenging afvalstoffen — <a href="https://www.iea.org/policies/25103">iea.org/policies/25103</a></li>
+    <li>[6] EUWID (2025), EU classificeert black mass als gevaarlijk — <a href="https://www.euwid-recycling.com/news/policy/eu-classifies-black-mass-as-hazardous-waste-effectively-barring-exports-to-non-oecd-states-110325/">euwid-recycling.com</a></li>
+    <li>[7] Recycling International (2025), black mass officieel gevaarlijk — <a href="https://recyclinginternational.com/commodities/battery-recycling/black-mass-now-officially-hazardous-in-the-eu/60304/">recyclinginternational.com</a></li>
+    <li>[8] Kaderrichtlijn Afvalstoffen 2008/98/EG — <a href="https://eur-lex.europa.eu/eli/dir/2008/98/oj">eur-lex.europa.eu/eli/dir/2008/98/oj</a></li>
+    <li>[9] ARN, wet- en regelgeving recycling batterijen — <a href="https://arn.nl/en/legislation-and-regulations-for-recycling-batteries/">arn.nl</a></li>
+    <li>[10] LAP3-toets in vergunningbesluit (2024) — <a href="https://repository.officiele-overheidspublicaties.nl/Bijlagen/TerInzageLegging/2025/til-2025-38350/1/bijlage/11_LAP3-toets_01-12-2024.pdf_(geanonimiseerd).pdf">officiele-overheidspublicaties.nl</a></li>
+    <li>[11] Stichting OPEN, factsheet resultaten fietsaccu 2023 — <a href="https://stichting-open.org/wp-content/uploads/2024/06/st-open_factsheet-resultaten-fietsaccu-2023_nl.pdf">stichting-open.org</a></li>
+    <li>[12] Stichting OPEN, jaarverslag 2024 — <a href="https://www.stichting-open.org/wp-content/uploads/2025/05/2025.05.28-Stichting-OPEN-Jaarverslag-2024_online.pdf">stichting-open.org</a></li>
+    <li>[13] Stichting OPEN, afvalbeheerbijdrage batterijen 2026 — <a href="https://www.stichting-open.org/wp-content/uploads/2025/10/Waste-management-fee-batteries-2026.pdf">stichting-open.org</a></li>
+    <li>[14] UNECE, ADR 2025 (BB 376, 377, 636; P908, P909, P911) — <a href="https://unece.org/transport/standards/transport/dangerous-goods/adr-2025-agreement-concerning-international-carriage">unece.org</a></li>
+    <li>[15] Lithium-Batterie-Service, definitie BB 376 — <a href="https://www.lithium-batterie-service.de/en/newsblog/clear-definition-on-damaged-defective-by-the-un-subcommittee-of-experts-special-provision-376">lithium-batterie-service.de</a></li>
+    <li>[16] BAM, GGR 024 verpakking defecte lithiumaccu's — <a href="https://tes.bam.de/fileadmin/TES/DE/Downloads/bam-ggr-024-general_part_ENGL.pdf">tes.bam.de</a></li>
+    <li>[17] UC Davis ITS, review transportkosten EV-accu-recycling — <a href="https://itspubs.ucdavis.edu/publication_detail.php?id=3724">itspubs.ucdavis.edu</a></li>
+    <li>[18] The Recycler, WEEE Forum over EN 50625 en certificering — <a href="https://therecycler.com/posts/weee-forum-responds-to-standards-study">therecycler.com</a></li>
+    <li>[19] EN 50604-1:2016/A1:2021 — <a href="https://genorma.com/en/standards/en-50604-1-2016-a1-2021">genorma.com</a></li>
+    <li>[20] Tritek, EN 50604 vs EN 15194 (leveranciersbron) — <a href="https://tritekbattery.com/en50604-vs-en15194/">tritekbattery.com</a></li>
+  </ol>
+  <aside class="notes"><p>Bron [20] is een leveranciersbron; check de status van EN 15194 in het Publicatieblad. Bron [4] is een lobbypositie, geen besluit.</p></aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Bronnen (2/2)</div>
+  <ol class="srcs" style="list-style:none">
+    <li>[21] CONEBI (2021), position paper on e-bike battery repair — <a href="https://cyclingindustry.news/wp-content/uploads/2022/12/01-CONEBI_Position_Paper_on_E-Bike_Battery_Repair_December_2021.pdf">cyclingindustry.news</a></li>
+    <li>[22] Richtlijn (EU) 2024/2853 productaansprakelijkheid — <a href="https://eur-lex.europa.eu/eli/dir/2024/2853/oj">eur-lex.europa.eu</a></li>
+    <li>[23] Verordening (EU) 2023/988 algemene productveiligheid (GPSR) — <a href="https://eur-lex.europa.eu/eli/reg/2023/988/oj">eur-lex.europa.eu</a></li>
+    <li>[24] ZHAW Impact, A second life for e-bike batteries (Libattion) — <a href="https://impact.zhaw.ch/en/article/a-second-life-for-e-bike-batteries">impact.zhaw.ch</a></li>
+    <li>[25] Bundesamt für Energie (BFE), pilotstudie e-bike-accu's — <a href="https://pubdb.bfe.admin.ch/de/publication/download/11029">pubdb.bfe.admin.ch</a></li>
+    <li>[26] UPC Commons, verouderde micromobiliteitsaccu's voor stationaire opslag — <a href="https://upcommons.upc.edu/entities/publication/c7bd00ee-5817-4971-81a4-1ded122a8317">upcommons.upc.edu</a></li>
+    <li>[27] ebiketips/road.cc, Heskon over accureparatie — <a href="https://road.cc/content/feature/new-e-bike-battery-regs-will-they-make-batteries-safer-315159">road.cc</a></li>
+    <li>[28] Liofit, B2B-brochure accureparatie — <a href="https://www.liofit.com/wp-content/uploads/2024/07/B2B-Broschuere-EN-doppelseitig.pdf">liofit.com</a></li>
+    <li>[29] Fastmarkets (2025), Europese en Aziatische black-mass-prijzen en payables — <a href="https://fastmarkets.com/insights/cif-asia-black-mass-payables-firm-in-may-amid-strong-demand">fastmarkets.com</a></li>
+    <li>[30] PGS 37-2 Opslag van lithiumhoudende energiedragers — <a href="https://publicatiereeksgevaarlijkestoffen.nl">publicatiereeksgevaarlijkestoffen.nl</a></li>
+    <li>[31] RVO, DEI+ Circulaire economie — <a href="https://www.rvo.nl/subsidies-financiering/dei/circulaire-economie">rvo.nl</a></li>
+    <li>[32] Rendement (2025), subsidieaanbod circulaire economie 2026 — <a href="https://www.rendement.nl/zakelijke-financiering/nieuws/subsidieaanbod-circulaire-economie-gewijzigd-voor-2026.html">rendement.nl</a></li>
+    <li>[33] Bebat, jaarrapport 2024 — <a href="https://cms.bebat.be/sites/default/files/2025-04/BEBAT_JAARRAPPORT%202024_NL.pdf">bebat.be</a></li>
+    <li>[34] Call2Recycle, e-bike battery recycling program — <a href="https://www.call2recycle.org/ebike/">call2recycle.org</a></li>
+    <li>[35] Hezelburcht (2026), nieuwe DEI+-openstelling circulair — <a href="https://www.hezelburcht.com/nieuws/nieuwe-dei-openstelling-voor-circulaire-innovatie-opent-op-16-juni-2026-en-extra-mooi-budget/">hezelburcht.com</a></li>
+    <li>[36] Brujula Bike, waarom Europa geen accureparatie wil — <a href="https://en.brujulabike.com/why-europe-does-not-want-batteries-to-be-repaired-ebikes">brujulabike.com</a></li>
+    <li>[37] Normcatalogi: IEC 62133-2, IEC 62619 (<a href="https://webstore.iec.ch">webstore.iec.ch</a>), UL 1974 (<a href="https://www.shopulstandards.com">shopulstandards.com</a>), UN 38.3 (UNECE Manual of Tests)</li>
+    <li>[38] Stichting OPEN, tariefbrief fietsaccu's 2026 — <a href="https://www.stichting-open.org/wp-content/uploads/2025/10/Bijlage-tariefbrief-2026-fietsaccus-final.pdf">stichting-open.org</a></li>
+    <li>[39] LMA / VIHB-registratie afvalvervoer — <a href="https://www.lma.nl">lma.nl</a></li>
+  </ol>
+  <p class="foot">Bronnen [34] en [37] zijn niet in deze ronde geopend, maar gebaseerd op algemeen bekende documentatie; controleer ze vóór externe publicatie.</p>
+  <aside class="notes"><p>Bronperiode: 2021–2026; de nadruk ligt op 2024–2026. Oudere bronnen (CONEBI 2021) zijn opgenomen omdat ze nog steeds de positie van de branche weergeven.</p></aside>
+</section>
+
+</div></div>
+
+<div id="notesPanel"><h4>Sprekersnotities</h4><div id="notesBody"></div></div>
+<div id="bar">
+  <button id="prev" aria-label="Vorige dia">‹ Vorige</button>
+  <span id="counter">1/1</span>
+  <button id="next" aria-label="Volgende dia">Volgende ›</button>
+  <button id="notesBtn">Notities (N)</button>
+  <button id="pdf" class="primary">Download als PDF</button>
+</div>
+
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  const total=slides.length;
+  slides.forEach((s,i)=>s.setAttribute('data-num',(i+1)+'/'+total));
+  let cur=0;
+  const counter=document.getElementById('counter'),notesBody=document.getElementById('notesBody'),panel=document.getElementById('notesPanel');
+  function show(i){
+    cur=Math.max(0,Math.min(total-1,i));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===cur));
+    counter.textContent=(cur+1)+'/'+total;
+    const n=slides[cur].querySelector('.notes');
+    notesBody.innerHTML=n?n.innerHTML:'<p>Geen notities.</p>';
+    try{history.replaceState(null,'','#'+(cur+1));}catch(e){}
+  }
+  function fit(){
+    const vp=document.getElementById('viewport');
+    const sc=Math.min(vp.clientWidth/1920,vp.clientHeight/1080)*0.96;
+    document.getElementById('stage').style.transform='scale('+sc+')';
+  }
+  document.getElementById('prev').onclick=()=>show(cur-1);
+  document.getElementById('next').onclick=()=>show(cur+1);
+  document.getElementById('notesBtn').onclick=()=>panel.classList.toggle('open');
+  document.getElementById('pdf').onclick=()=>window.print();
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();show(cur+1);}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();show(cur-1);}
+    else if(e.key==='Home')show(0);
+    else if(e.key==='End')show(total-1);
+    else if(e.key==='n'||e.key==='N')panel.classList.toggle('open');
+  });
+  let tx=null;
+  document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)show(cur+(d<0?1:-1));tx=null;});
+  window.addEventListener('resize',fit);
+  fit();
+  const start=parseInt(location.hash.slice(1),10);
+  show(isNaN(start)?0:start-1);
+
+  /* ---------- charts (inline SVG) ---------- */
+  const A='#0d6b6b',A2='#9cc9c6',G='#5b6b6d',O='#c77700',INK='#1c2526',LINE='#d7dfdf';
+  const NS='http://www.w3.org/2000/svg';
+  function el(svg,tag,attrs,text){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!==undefined)e.textContent=text;svg.appendChild(e);return e;}
+  const T=(svg,x,y,t,o={})=>el(svg,'text',Object.assign({x,y,'font-size':24,fill:INK},o),t);
+
+  // Timeline
+  (function(){
+    const s=document.getElementById('timeline');
+    // [jaar, datum, tekst, niveau (-2/-1 boven, 1/2 onder), anker]
+    const ev=[[2024.1,'feb 2024','Verordening van toepassing',1,'start'],[2025.6,'aug 2025','EPR/inzameling · recycling Li-ion 65% (eind 2025)',-2,'middle'],
+      [2026.4,'mei 2026','EVOA 2024/1157 van kracht',2,'middle'],[2027.1,'feb 2027','Batterijpaspoort LMT + vervangbaarheid',-1,'middle'],
+      [2027.6,'aug 2027','Due diligence (uitgesteld)',1,'middle'],[2028.0,'eind 2027','Terugwinning Li 50%, Co/Ni/Cu 90%',-2,'start'],
+      [2028.9,'eind 2028','Inzameldoel LMT 51%',2,'middle'],[2030.9,'eind 2030','Recyclingefficiëntie Li-ion 70%',-1,'middle'],[2031.9,'eind 2031','LMT 61% · Li 80%',1,'end']];
+    const x0=60,x1=1620,y=280,xs=v=>x0+(v-2024)/(2032-2024)*(x1-x0);
+    el(s,'line',{x1:x0,y1:y,x2:x1,y2:y,stroke:A,'stroke-width':6,'stroke-linecap':'round'});
+    for(let yr=2024;yr<=2032;yr++){el(s,'line',{x1:xs(yr),y1:y-10,x2:xs(yr),y2:y+10,stroke:A,'stroke-width':3});T(s,xs(yr),y+48,yr,{'text-anchor':'middle',fill:'#5b6b6d','font-size':22});}
+    ev.forEach(([v,d,t,lvl,anc],i)=>{const x=xs(v),up=lvl<0,yy=up?y-70-(lvl===-2?110:0):y+110+(lvl===2?100:0);
+      el(s,'circle',{cx:x,cy:y,r:11,fill:i===6||i===8?O:A,stroke:'#fff','stroke-width':3});
+      el(s,'line',{x1:x,y1:y+(up?-12:12),x2:x,y2:up?yy+10:yy-30,stroke:LINE,'stroke-width':2});
+      const tx=anc==='start'?x-6:anc==='end'?x+6:x;
+      T(s,tx,up?yy-30:yy,d,{'text-anchor':anc,'font-size':21,'font-weight':700,fill:A});
+      T(s,tx,up?yy:yy+30,t,{'text-anchor':anc,'font-size':20});});
+  })();
+
+  // Horizontal bar helper
+  function hbars(id,data,opt){
+    const s=document.getElementById(id);const W=+s.viewBox.baseVal.width,H=+s.viewBox.baseVal.height;
+    const lw=opt.labelW||300,top=20,bh=(H-top-40)/data.length,max=opt.max;
+    const xs=v=>lw+v/max*(W-lw-120);
+    data.forEach((d,i)=>{const y=top+i*bh;
+      T(s,lw-16,y+bh/2+8,d[0],{'text-anchor':'end','font-size':opt.fs||22});
+      if(d.length>3){el(s,'rect',{x:xs(d[1]),y:y+bh*.18,width:Math.max(2,xs(d[2])-xs(d[1])),height:bh*.64,fill:d[3]||A,rx:4});
+        T(s,xs(d[2])+10,y+bh/2+8,d[4],{'font-size':22,fill:G});}
+      else{el(s,'rect',{x:lw,y:y+bh*.18,width:xs(d[1])-lw,height:bh*.64,fill:d[2]||A,rx:4});
+        T(s,xs(d[1])+10,y+bh/2+8,opt.fmt?opt.fmt(d[1]):d[1],{'font-size':22,fill:G});}
+    });
+    el(s,'line',{x1:lw,y1:top,x2:lw,y2:H-40,stroke:INK,'stroke-width':2});
+    if(opt.axis)T(s,(lw+W)/2,H-6,opt.axis,{'text-anchor':'middle','font-size':20,fill:G});
+  }
+  hbars('transportChart',[['Regulier stukgoed',1,1,G,'1×'],['Intact, gebundeld (P909)',2,4,A2,'2–4×'],['Klein, ongesorteerd',5,8,A2,'5–8×'],['Beschadigd (P908)',6,10,A,'6–10×'],['Kritiek defect (P911)',10,15,O,'10–15×']],
+    {max:16,labelW:330,axis:'Kostenfactor per kg t.o.v. regulier (schatting)'});
+  hbars('funnel',[['Instroom packs',100,G],['Veilig te openen',85,A2],['Cellen getest',85,A2],['Cellen >80% SoH',57,A],['Na matching/zelfontl.',50,O]],
+    {max:110,labelW:290,fmt:v=>v+'%',axis:'Index (100 = instroom) · schatting o.b.v. [24][25]'});
+  hbars('gapChart',[['Op markt 2023',1955,G],['Ingezameld 2023',334,A],['Ingezameld 2024',427,A],['  w.v. fietsenwinkels',76,O]],
+    {max:2300,labelW:290,fmt:v=>v.toLocaleString('nl-NL')+' t',axis:'Ton fietsaccu\'s [11][12]'});
+
+  // Chain diagram
+  (function(){
+    const s=document.getElementById('chain');
+    const nodes=[['Consument',60,230],['Fietsenwinkel',330,230],['Milieustraat /\ninzamelpunt',330,60],['OPEN / Wecycle\nsorteerder',650,140],['Reviseerder /\nhub',650,330],['Recycler\n(NL/EU)',970,140],['Raffinage\nEU / Korea',1290,140],['Opkoper\n(informeel)',650,470],['Celhandel /\nexport',970,470],['Hergebruik\n(repair/2nd life)',970,330]];
+    const box=(n,dash)=>{const [t,x,y]=n;el(s,'rect',{x,y,width:240,height:84,rx:12,fill:dash?'#fff':'#e3f1f0',stroke:dash?O:A,'stroke-width':3,'stroke-dasharray':dash?'10 7':''});
+      t.split('\n').forEach((l,i,a)=>T(s,x+120,y+42+(i-(a.length-1)/2)*26+8,l,{'text-anchor':'middle','font-size':22}));};
+    const arr=(a,b,dash)=>{const [,x1,y1]=nodes[a],[,x2,y2]=nodes[b];
+      let sx=x1+240,sy=y1+42,ex=x2,ey=y2+42;
+      if(Math.abs(x1-x2)<5){sx=x1+120;sy=y1+(y2>y1?84:0);ex=x2+120;ey=y2+(y2>y1?0:84);}
+      el(s,'path',{d:`M${sx},${sy} C${(sx+ex)/2},${sy} ${(sx+ex)/2},${ey} ${ex},${ey}`,fill:'none',stroke:dash?O:A,'stroke-width':3,'stroke-dasharray':dash?'10 7':'','marker-end':dash?'url(#mo)':'url(#ma)'});};
+    const defs=el(s,'defs',{});
+    [['ma',A],['mo',O]].forEach(([id,c])=>{const m=document.createElementNS(NS,'marker');m.setAttribute('id',id);m.setAttribute('viewBox','0 0 10 10');m.setAttribute('refX','9');m.setAttribute('refY','5');m.setAttribute('markerWidth','7');m.setAttribute('markerHeight','7');m.setAttribute('orient','auto');const p=document.createElementNS(NS,'path');p.setAttribute('d','M0,0 L10,5 L0,10z');p.setAttribute('fill',c);m.appendChild(p);defs.appendChild(m);});
+    arr(0,1);arr(0,2);arr(1,3);arr(2,3);arr(3,5);arr(5,6);arr(1,4);arr(4,9);arr(4,5);arr(1,7,1);arr(7,8,1);
+    nodes.forEach((n,i)=>box(n,i===7||i===8));
+    T(s,1290,420,'— formeel',{'font-size':22,fill:A,'font-weight':700});T(s,1290,455,'- - informeel',{'font-size':22,fill:O,'font-weight':700});
+  })();
+
+  // Grouped bars cost/revenue
+  (function(){
+    const s=document.getElementById('costRev');
+    const data=[['A · Regionaal',1.77,1.23,0.35,0.19],['B · Ketenpartners',5.31,3.57,0.90,0.84],['C · Landelijk',13.28,8.93,2.60,1.75]];
+    const cols=[A,A2,G,O],x0=110,y0=500,h=440,max=14,ys=v=>y0-v/max*h;
+    for(let v=0;v<=14;v+=2){el(s,'line',{x1:x0,y1:ys(v),x2:1640,y2:ys(v),stroke:LINE});T(s,x0-14,ys(v)+8,'€'+v+'m',{'text-anchor':'end','font-size':20,fill:G});}
+    const gw=500,bw=88;
+    data.forEach((d,i)=>{const gx=x0+40+i*gw;
+      for(let k=0;k<4;k++){const v=d[k+1],x=gx+k*(bw+12);el(s,'rect',{x,y:ys(v),width:bw,height:y0-ys(v),fill:cols[k],rx:3});
+        T(s,x+bw/2,ys(v)-10,v.toFixed(2).replace('.',','),{'text-anchor':'middle','font-size':20,fill:INK});}
+      T(s,gx+2*(bw+12)-6,y0+40,d[0],{'text-anchor':'middle','font-size':24,'font-weight':600});});
+    el(s,'line',{x1:x0,y1:y0,x2:1640,y2:y0,stroke:INK,'stroke-width':2});
+  })();
+
+  // Cumulative cash lines
+  (function(){
+    const s=document.getElementById('cumCash');
+    const series=[['A',[-0.50,-0.63,-0.61,-0.42,-0.17,0.13],A2],['B',[-1.20,-1.40,-1.09,-0.25,0.77,1.96],A],['C',[-4.00,-4.86,-4.42,-2.67,-0.48,2.14],G]];
+    const x0=130,x1=1440,yTop=30,yBot=480,mn=-5,mx=2.5,ys=v=>yTop+(mx-v)/(mx-mn)*(yBot-yTop),xs=i=>x0+i/5*(x1-x0);
+    for(let v=-5;v<=2;v+=1){el(s,'line',{x1:x0,y1:ys(v),x2:x1,y2:ys(v),stroke:v===0?INK:LINE,'stroke-width':v===0?2:1});T(s,x0-14,ys(v)+8,'€'+String(v).replace('-','−')+'m',{'text-anchor':'end','font-size':20,fill:G});}
+    for(let i=0;i<=5;i++)T(s,xs(i),yBot+40,'Jaar '+i,{'text-anchor':'middle','font-size':22,fill:G});
+    series.forEach(([n,v,c])=>{el(s,'polyline',{points:v.map((y,i)=>xs(i)+','+ys(y)).join(' '),fill:'none',stroke:c,'stroke-width':6,'stroke-linejoin':'round'});
+      v.forEach((y,i)=>el(s,'circle',{cx:xs(i),cy:ys(y),r:8,fill:c,stroke:'#fff','stroke-width':2}));
+      T(s,xs(5)+18,ys(v[5])+(n==='C'?-14:n==='B'?30:8),n+': '+v[5].toFixed(2).replace('.',','),{'font-size':22,'font-weight':700,fill:c==='#9cc9c6'?'#3d8f8a':c});});
+    T(s,xs(0.1),ys(0)-14,'break-even',{'font-size':20,fill:G});
+  })();
+
+  // Tornado
+  (function(){
+    const s=document.getElementById('tornado');
+    const d=[['Prijs gereviseerde accu ±20%',630],['Geschikt aandeel ±10 pp',590],['Arbeidskosten ±20%',450],['Prijs repair ±20%',325],['Transportkosten ±50%',90],['Black mass/metaal ±50%',35]];
+    const cx=1050,half=560,max=700,top=20,bh=78,xs=v=>v/max*half;
+    d.forEach(([l,v],i)=>{const y=top+i*bh;
+      T(s,cx-half-30,y+bh/2+8,l,{'text-anchor':'end','font-size':24});
+      el(s,'rect',{x:cx-xs(v),y:y+12,width:xs(v),height:bh-24,fill:O,rx:3});
+      el(s,'rect',{x:cx,y:y+12,width:xs(v),height:bh-24,fill:A,rx:3});
+      T(s,cx-xs(v)-10,y+bh/2+8,'−'+v,{'text-anchor':'end','font-size':21,fill:G});
+      T(s,cx+xs(v)+10,y+bh/2+8,'+'+v,{'font-size':21,fill:G});});
+    el(s,'line',{x1:cx,y1:top-6,x2:cx,y2:top+d.length*bh+6,stroke:INK,'stroke-width':3});
+    T(s,cx,top+d.length*bh+44,'€ 0,84 mln (basis)',{'text-anchor':'middle','font-size':22,fill:G});
+    T(s,cx-half/2,top+d.length*bh+44,'◀ ongunstig',{'text-anchor':'middle','font-size':22,fill:O});
+    T(s,cx+half/2,top+d.length*bh+44,'gunstig ▶',{'text-anchor':'middle','font-size':22,fill:A});
+  })();
+})();
+</script>
+</body>
+</html>
