@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Batterijdetectie vóór de shredder</title>
+<style>
+/* Layout: vaste 16:9-bühne (1920×1080) die met JS wordt geschaald; bij afdrukken één dia per pagina. */
+:root{
+  --page:#e6e9ee;        /* achtergrond rond de dia */
+  --paper:#ffffff;       /* dia */
+  --ink:#1c2330;         /* hoofdtekst */
+  --muted:#5a6473;       /* secundaire tekst */
+  --line:#d6dbe2;        /* lijnen */
+  --wash:#f3f5f8;        /* lichte vlakken */
+  --accent:#cf4a12;      /* veiligheidsoranje: de enige accentkleur */
+  --accent-soft:#fdf0e8;
+  --good:#2e7a4d; --good-bg:#e1f1e7;
+  --mid:#9a6a12;  --mid-bg:#fbeed2;
+  --bad:#a8302a;  --bad-bg:#f7e0de;
+  --na:#8a93a0;   --na-bg:#eceff3;
+  --sans:"Aptos","Segoe UI","Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
+  --mono:"Cascadia Mono","SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--page);color:var(--ink);font-family:var(--sans);overflow:hidden}
+
+/* ---------- bühne ---------- */
+#viewport{position:fixed;inset:0 0 64px 0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#stage{width:1920px;height:1080px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;background:var(--paper);display:none;flex-direction:column;padding:84px 120px 70px;box-shadow:0 10px 40px rgba(28,35,48,.18);overflow:hidden}
+.slide.active{display:flex}
+
+/* ---------- typografie ---------- */
+.eyebrow{font-family:var(--mono);font-size:21px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 14px;font-weight:600}
+h1{font-size:92px;line-height:1.02;margin:0;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+h2{font-size:56px;line-height:1.08;margin:0 0 36px;font-weight:700;letter-spacing:-.01em;text-wrap:balance;max-width:1600px}
+h3{font-size:30px;margin:0 0 12px;font-weight:700}
+p,li{font-size:30px;line-height:1.42}
+p{margin:0 0 16px}
+ul{margin:0;padding-left:1.1em}
+li{margin:0 0 12px}
+li::marker{color:var(--accent)}
+.muted{color:var(--muted)}
+.small{font-size:24px;line-height:1.4}
+.xs{font-size:20px;line-height:1.38}
+.num{font-variant-numeric:tabular-nums}
+.ref{font-family:var(--mono);font-size:.62em;color:var(--accent);vertical-align:super;line-height:0;margin-left:2px;white-space:nowrap}
+b,strong{font-weight:700}
+
+/* ---------- markeringen ---------- */
+.tag{display:inline-block;font-family:var(--mono);font-size:17px;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px 2px;border-radius:4px;vertical-align:middle;font-weight:600;line-height:1.3;white-space:nowrap}
+.tag.est{background:var(--mid-bg);color:var(--mid)}
+.tag.ass{background:var(--na-bg);color:#4a5361;border:1px dashed #9aa3af}
+.tag.unv{background:var(--bad-bg);color:var(--bad)}
+.tag.ven{background:var(--wash);color:var(--muted);border:1px solid var(--line)}
+
+/* ---------- belangrijk inzicht ---------- */
+.insight{margin-top:auto;display:grid;grid-template-columns:64px 1fr;gap:26px;align-items:start;background:var(--accent-soft);border:2px solid var(--accent);border-radius:8px;padding:24px 34px 24px 26px}
+.insight svg{width:64px;height:64px}
+.insight .lbl{font-family:var(--mono);font-size:19px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px}
+.insight p{font-size:31px;line-height:1.36;margin:0;font-weight:600}
+
+/* ---------- rasters ---------- */
+.cols{display:grid;gap:56px;min-height:0}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c64{grid-template-columns:1.5fr 1fr}
+.c46{grid-template-columns:1fr 1.4fr}
+.cols>*{min-width:0}
+.card{border:1px solid var(--line);border-radius:8px;padding:28px 30px;background:var(--paper)}
+.card h3{font-size:28px}
+.card p,.card li{font-size:25px;line-height:1.4}
+.card .kicker{font-family:var(--mono);font-size:18px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.stack{display:flex;flex-direction:column;gap:22px}
+
+/* ---------- tabellen ---------- */
+table{border-collapse:collapse;width:100%;font-size:23px;line-height:1.3}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:19px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:2px solid var(--ink)}
+td.k{font-weight:700;white-space:nowrap}
+.cell{border-radius:5px;padding:9px 12px;font-size:20px;line-height:1.25;font-weight:600}
+.g{background:var(--good-bg);color:var(--good)}
+.o{background:var(--mid-bg);color:var(--mid)}
+.r{background:var(--bad-bg);color:var(--bad)}
+.n{background:var(--na-bg);color:var(--na)}
+table.matrix td{padding:5px 6px;border-bottom:none}
+table.matrix th{border-bottom:2px solid var(--ink)}
+table.matrix td.k{font-size:22px;padding-right:18px;vertical-align:middle}
+.dots{font-family:var(--mono);letter-spacing:.08em;font-size:24px;white-space:nowrap}
+.legend{display:flex;gap:26px;flex-wrap:wrap;font-size:20px;color:var(--muted);margin-top:14px;align-items:center}
+.legend span.sw{display:inline-block;width:22px;height:22px;border-radius:4px;vertical-align:-4px;margin-right:8px}
+
+/* ---------- titeldia ---------- */
+.title-slide{padding:0;flex-direction:row}
+.title-slide .left{flex:1.05;padding:120px 90px 90px 120px;display:flex;flex-direction:column}
+.title-slide .right{flex:1;background:var(--wash);display:flex;align-items:center;justify-content:center;border-left:1px solid var(--line)}
+.title-slide .sub{font-size:34px;line-height:1.35;color:var(--muted);margin-top:34px;max-width:780px}
+.title-slide .meta{margin-top:auto;font-size:22px;color:var(--muted);line-height:1.5;font-family:var(--mono)}
+
+/* ---------- sectiedia ---------- */
+.section-slide{justify-content:center;background:var(--ink);color:#fff}
+.section-slide .eyebrow{color:#f2a172}
+.section-slide h2{font-size:76px;color:#fff;max-width:1400px}
+.section-slide p{color:#c9d0da;max-width:1300px;font-size:32px}
+
+/* ---------- voettekst ---------- */
+.foot{position:absolute;left:120px;right:120px;bottom:26px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:17px;color:var(--na);letter-spacing:.04em}
+.section-slide .foot{color:#7d8796}
+
+/* ---------- bronnen ---------- */
+ol.src{columns:2;column-gap:60px;margin:0;padding-left:1.8em}
+ol.src li{font-size:17px;line-height:1.32;margin:0 0 7px;break-inside:avoid}
+ol.src li a{color:var(--ink);text-decoration:none;word-break:break-all}
+ol.src li .u{color:var(--muted);font-family:var(--mono);font-size:14px;word-break:break-all}
+
+/* ---------- jargon ---------- */
+dl.gl{display:grid;grid-template-columns:230px 1fr 230px 1fr;gap:8px 26px;margin:0}
+dl.gl dt{font-weight:700;font-size:20px;line-height:1.3}
+dl.gl dd{margin:0;font-size:20px;line-height:1.3;color:var(--ink)}
+
+/* ---------- notities ---------- */
+.notes{display:none}
+#notesPanel{position:fixed;left:0;right:0;bottom:64px;max-height:34vh;overflow:auto;background:#fff;border-top:2px solid var(--accent);padding:16px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));font-size:16px;line-height:1.5;color:var(--ink);box-shadow:0 -6px 20px rgba(0,0,0,.08)}
+#notesPanel h4{margin:0 0 6px;font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+#notesPanel p{font-size:16px;margin:0 0 8px;max-width:1100px}
+
+/* ---------- navigatie ---------- */
+#nav{position:fixed;left:0;right:0;bottom:0;height:64px;display:flex;align-items:center;justify-content:center;gap:12px;background:var(--ink);padding:0 max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px));flex-wrap:nowrap}
+#nav button{font:600 15px var(--sans);background:#2d3646;color:#fff;border:1px solid #475166;border-radius:6px;padding:9px 16px;cursor:pointer;white-space:nowrap}
+#nav button:hover{background:#3a4458}
+#nav button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#nav button.primary{background:var(--accent);border-color:var(--accent)}
+#counter{font:600 16px var(--mono);color:#fff;min-width:84px;text-align:center}
+@media (max-width:640px){#nav button{padding:8px 10px;font-size:13px}#nav .hide-sm{display:none}}
+
+/* ---------- print ---------- */
+@page{size:1920px 1080px;margin:0}
+@media print{
+  html,body{height:auto;overflow:visible;background:#fff}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #nav,#notesPanel{display:none!important}
+  #viewport{position:static;display:block;overflow:visible}
+  #stage{transform:none!important;width:1920px;height:auto}
+  .slide{display:flex!important;position:relative;inset:auto;width:1920px;height:1080px;box-shadow:none;break-after:page;page-break-after:always}
+  .slide:last-child{break-after:auto;page-break-after:auto}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-bat" viewBox="0 0 64 64">
+      <rect x="8" y="18" width="42" height="28" rx="4" fill="none" stroke="#cf4a12" stroke-width="4"/>
+      <rect x="50" y="26" width="6" height="12" rx="1.5" fill="#cf4a12"/>
+      <path d="M31 22 L22 34 H30 L27 43 L37 30 H29 Z" fill="#cf4a12"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="viewport"><div id="stage">
+
+<!-- ===================================================== 1 TITEL -->
+<section class="slide title-slide" data-title="Titel">
+  <div class="left">
+    <div class="eyebrow">Verkenning · oktober 2026</div>
+    <h1>Batterijen vinden vóór de shredder</h1>
+    <div class="sub">Welke detectietechniek werkt in ongesorteerd afval, en waar in de keten zet je die in?</div>
+    <div class="meta">Onderzoeksteam: coördinator + 6 specialistische agents<br>Bronnen 2023–2026 · feiten, schattingen en aannames gemarkeerd</div>
+  </div>
+  <div class="right">
+    <svg style="width:90%;height:auto" viewBox="0 0 860 640" role="img" aria-label="Schema van de afvalketen: afvalwagen, stortvloer, doseerband met scanner, shredder">
+      <g font-family="Segoe UI, Arial, sans-serif" font-size="20" fill="#1c2330">
+        <!-- afvalwagen -->
+        <rect x="40" y="110" width="170" height="90" rx="8" fill="#ffffff" stroke="#5a6473" stroke-width="3"/>
+        <rect x="210" y="140" width="60" height="60" rx="6" fill="#ffffff" stroke="#5a6473" stroke-width="3"/>
+        <circle cx="85" cy="212" r="17" fill="#5a6473"/><circle cx="235" cy="212" r="17" fill="#5a6473"/>
+        <text x="40" y="270">a · afvalwagen</text>
+        <!-- pijl -->
+        <path d="M300 160 H360" stroke="#8a93a0" stroke-width="4" marker-end="url(#ah)"/>
+        <!-- bunker -->
+        <path d="M380 110 L380 220 L620 220 L620 110" fill="none" stroke="#5a6473" stroke-width="3"/>
+        <path d="M384 216 Q430 150 480 175 Q530 140 580 180 Q605 170 616 190 L616 216 Z" fill="#d6dbe2"/>
+        <rect x="520" y="70" width="70" height="40" rx="6" fill="#ffffff" stroke="#5a6473" stroke-width="3"/>
+        <text x="380" y="270">b · stortvloer / bunker</text>
+        <text x="520" y="58" font-size="17" fill="#5a6473">c · shovel</text>
+        <!-- pijl omlaag -->
+        <path d="M500 290 V340" stroke="#8a93a0" stroke-width="4" marker-end="url(#ah)"/>
+        <!-- doseerband -->
+        <rect x="120" y="390" width="560" height="22" rx="11" fill="#5a6473"/>
+        <circle cx="131" cy="401" r="8" fill="#ffffff"/><circle cx="669" cy="401" r="8" fill="#ffffff"/>
+        <rect x="300" y="330" width="150" height="100" rx="8" fill="#fdf0e8" stroke="#cf4a12" stroke-width="4"/>
+        <text x="318" y="372" font-weight="700" fill="#cf4a12">SCAN</text>
+        <text x="318" y="400" font-size="17" fill="#cf4a12">score 0–100</text>
+        <path d="M150 382 l26 -12 l18 8 l22 -8 l20 12 Z" fill="#8a93a0"/>
+        <path d="M520 382 l24 -10 l20 6 l26 -6 l14 10 Z" fill="#8a93a0"/>
+        <text x="120" y="455">d · doseerband vóór de shredder</text>
+        <!-- uitsluis -->
+        <path d="M560 412 L600 500" stroke="#cf4a12" stroke-width="4" stroke-dasharray="8 6" marker-end="url(#ahr)"/>
+        <rect x="560" y="510" width="150" height="70" rx="6" fill="#ffffff" stroke="#cf4a12" stroke-width="3"/>
+        <text x="575" y="552" font-size="18" fill="#cf4a12">quarantaine</text>
+        <!-- shredder -->
+        <path d="M700 401 H750" stroke="#8a93a0" stroke-width="4" marker-end="url(#ah)"/>
+        <rect x="760" y="350" width="80" height="100" rx="6" fill="#1c2330"/>
+        <path d="M772 420 l10 -14 l10 14 l10 -14 l10 14 l10 -14 l10 14" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <text x="742" y="480" font-size="18">shredder</text>
+      </g>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#8a93a0"/></marker>
+        <marker id="ahr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#cf4a12"/></marker>
+      </defs>
+    </svg>
+  </div>
+  <aside class="notes"><p>Dit deck is het resultaat van een desk research met zes deelonderzoeken (technologie, locatie, signaalverwerking, regelgeving, aanbieders, advies) en een kritische toets door de coördinator. Peildatum: oktober 2026. Een aantal Nederlandse bronnen (Taskforce Batterijbranden, Stichting OPEN, Kamerstukken) is alleen via zoekresultaten bekend en niet volledig ingezien; dat staat bij de bronnen vermeld.</p></aside>
+</section>
+
+<!-- ===================================================== 2 MANAGEMENTSAMENVATTING -->
+<section class="slide" data-title="Managementsamenvatting">
+  <div class="eyebrow">Managementsamenvatting</div>
+  <h2>Kernboodschap: scan het afval op een korte doseerband, niet op de wagen of in de bunker</h2>
+  <ul>
+    <li><b>Röntgen (dual- of multi-energy) met AI</b> is de enige techniek die bewezen batterijen ín zakken en lagen afval ziet; in Duitsland, Japan en de VS draaien systemen in de praktijk.<span class="ref">[1][4][6]</span></li>
+    <li><b>Röntgen werkt alleen door een dunne laag</b> (circa 10–40 cm) <span class="tag est">schatting</span>: dus op een band, niet door een volle wagen of bunker.</li>
+    <li><b>Thermische camera's</b> zijn goedkoop en volwassen, maar zien alleen batterijen die al warm worden: een vangnet, geen preventie.<span class="ref">[19][20]</span></li>
+    <li>Verwachte detectie 80–95% van zichtbare cellen <span class="tag est">schatting</span>; 100% is niet haalbaar, dus blusvoorzieningen blijven nodig.<span class="ref">[4][10][32]</span></li>
+    <li>Advies: pilot van 6–9 maanden met een bestaande leverancier en ANVS-registratie; kosten ca. € 0,5–1,5 mln per lijn <span class="tag est">schatting</span>.</li>
+  </ul>
+  <aside class="notes"><p>De vijf punten zijn de kern. Het beeld uit de bronnen is consistent: alle praktijksystemen die batterijen in gemengd afval vinden gebruiken röntgentransmissie met AI-beeldherkenning, vaak aangevuld met inductie of camera's (Fraunhofer DangerSort bij Lobbe, WeSort.AI/Sesotec, Visia bij Rumpke, PFU Raptor VISION BATTERY, Steinert). Geen enkel systeem scant met succes een volle afvalwagen of bunker op kleine cellen. De locatie die de opdracht noemt (wagen, stortvloer, shovel) is daarom voor röntgen niet geschikt; een tussenstap met een doseerband is nodig.</p></aside>
+</section>
+
+<!-- ===================================================== 3 PROBLEEM -->
+<section class="slide" data-title="Probleem">
+  <div class="eyebrow">Context</div>
+  <h2>Het probleem groeit, maar harde Nederlandse cijfers ontbreken</h2>
+  <div class="cols c3">
+    <div class="card"><div class="kicker">Nederland</div><h3 class="num">± 120 branden / jaar</h3><p>bij afvalbedrijven door accu's, volgens de Vereniging Afvalbedrijven.<span class="ref">[22]</span> De overheid houdt zelf geen telling bij.<span class="ref">[24]</span></p></div>
+    <div class="card"><div class="kicker">Nederland</div><h3 class="num">± 100 mln batterijen</h3><p>in huishoudelijk restafval in 2025, een extrapolatie met onzekerheden.<span class="ref">[26]</span> <span class="tag unv">bron niet ingezien</span></p></div>
+    <div class="card"><div class="kicker">Verenigd Koninkrijk</div><h3 class="num">&gt; 1.200 branden (2023)</h3><p>in afvalvoertuigen en -locaties; schade geschat op &gt; £ 1 mrd per jaar.<span class="ref">[27]</span></p></div>
+  </div>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Het risico is reëel en groeit, maar de schade per bedrijf is in Nederland niet openbaar onderbouwd. Leg in de pilot daarom eerst de eigen nulmeting vast.</p></div></div>
+  <aside class="notes"><p>Cijfers lopen sterk uiteen per bron en definitie. De Vereniging Afvalbedrijven noemt ongeveer tien branden per maand. De sector noemt in recente Kamervragen (branden Alkmaar, 29 juli 2026 en Rotterdam-Charlois, augustus 2026) een aandeel van ca. 38% batterijgerelateerde branden; dat is een sectorclaim. In Duitsland noemt de BDE meer dan 10.000 branden per jaar in sorteerinstallaties (via Fraunhofer, bron 2). In de VS telde de EPA 245 branden bij 64 faciliteiten in 2013–2020, met duidelijke onderrapportage (bron 28). De Britse kosten zijn gestegen van £158 mln (Eunomia 2021) naar &gt;£1 mrd (Eunomia/ESA, recenter); scopes verschillen.</p></aside>
+  <div class="foot"><span>Context</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== SECTIE AGENT 1 -->
+<section class="slide section-slide" data-title="Agent 1">
+  <div class="eyebrow">Agent 1</div>
+  <h2>Detectietechnologieën</h2>
+  <p>Welke sensoren kunnen een lithiumcel in afval herkennen, en wat zien ze precies?</p>
+  <div class="foot"><span>Agent 1 · Detectietechnologieën</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A1.1 OVERZICHT -->
+<section class="slide" data-title="Technologie-overzicht">
+  <div class="eyebrow">Agent 1 · Detectietechnologieën</div>
+  <h2>Tien technieken, maar slechts één kijkt echt door het afval heen</h2>
+  <table>
+    <thead><tr><th>Techniek</th><th>Wat wordt gezien</th><th>Diepte</th><th>Valse alarmen</th><th>TRL afval</th><th>Kosten <span class="tag est">schatting</span></th></tr></thead>
+    <tbody>
+      <tr><td class="k">Röntgen dual/multi-energy</td><td>vorm + dichtheid van cel</td><td>10–40 cm</td><td><span class="cell o">midden</span></td><td>7–8</td><td>€ 250k–1 mln</td></tr>
+      <tr><td class="k">CT (3D-röntgen)</td><td>3D-structuur van cel</td><td>tot ~1 m tunnel</td><td><span class="cell g">laag</span></td><td>4–5</td><td>€ 0,7–2 mln</td></tr>
+      <tr><td class="k">Metaal / inductie</td><td>elke geleidende massa</td><td>20–50 cm</td><td><span class="cell r">hoog</span></td><td>8–9</td><td>€ 20–80k</td></tr>
+      <tr><td class="k">Thermisch IR</td><td>warmte aan oppervlak</td><td>oppervlak</td><td><span class="cell o">midden</span></td><td>9 (brand)</td><td>€ 30–250k</td></tr>
+      <tr><td class="k">RGB-camera + AI</td><td>zichtbare vorm/label</td><td>oppervlak</td><td><span class="cell o">midden</span></td><td>7–8</td><td>€ 50–200k</td></tr>
+      <tr><td class="k">Gas / damp</td><td>elektrolytdamp bij lekken</td><td>n.v.t. (lucht)</td><td><span class="cell o">midden</span></td><td>4–6</td><td>€ 5–40k</td></tr>
+    </tbody>
+  </table>
+  <p class="xs muted" style="margin-top:14px">Magnetisch, backscatter, hyperspectraal/NIR en radar: zie volgende dia's en notities. Bronnen: [1][4][11][19][21][15]. TRL = volwassenheid voor toepassing in afval (team-inschatting).</p>
+  <aside class="notes"><p>Werkingsprincipes in het kort. Röntgen transmissie meet hoeveel straling door het materiaal komt; met twee of meer energieniveaus kan de effectieve atoommassa (Z-eff) worden geschat, zodat de combinatie van metalen omhulsel, gewikkelde elektrodes en organisch elektrolyt een herkenbaar patroon geeft. AI herkent de vorm (cilindrisch 18650/21700, prismatisch, pouch). CT maakt 3D-beelden en is op vliegvelden standaard (Smiths HI-SCAN 10080 XCT met iCMORE lithium-algoritme, bron 15), maar heeft een beperkte tunnel en doorvoer. Metaal- en inductiesensoren detecteren elk geleidend object: blikjes, folie, sleutels. Ze leveren een snelle, goedkope extra feature (Steinert combineert röntgen, kleur, 3D en inductie, bron 11). Thermische camera's zien alleen warmte aan het oppervlak; een intacte cel is koud. Gas-sensoren (Honeywell Li-ion Tamer, bron 21) detecteren elektrolytoplosmiddelen (DMC, DEC, EMC) zodra een cel 'vent'; in een open hal verdunt dat snel. TRL en kosten zijn team-inschattingen op basis van marktbeelden; leveranciers geven geen openbare prijzen.</p></aside>
+  <div class="foot"><span>Agent 1 · Detectietechnologieën</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A1.2 RÖNTGEN -->
+<section class="slide" data-title="Röntgen in detail">
+  <div class="eyebrow">Agent 1 · Detectietechnologieën</div>
+  <h2>Röntgen met AI is de koploper, mits het afval in een dunne laag ligt</h2>
+  <div class="cols c64">
+    <div>
+      <ul>
+        <li>Fraunhofer DangerSort bij Lobbe: tot ca. 30 t/u, bandsnelheid 2–3,5 m/s.<span class="ref">[1][3]</span></li>
+        <li>PFU/Ricoh scant <b>dichte vuilniszakken</b>; gewone camera's bleken daar onbruikbaar.<span class="ref">[4]</span></li>
+        <li>Visia (VS) draait op 25 locaties vóór de handmatige voorsortering.<span class="ref">[8]</span></li>
+        <li>Zwakke punt: veel ander metaal en dikke, natte lagen verstoren het beeld.<span class="ref">[17]</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="kicker">Wat de röntgenstraal ziet</div>
+      <svg viewBox="0 0 560 300" width="100%" role="img" aria-label="Schets: cel met metalen mantel en gewikkelde elektrodes geeft herkenbaar patroon">
+        <rect x="30" y="60" width="200" height="90" rx="44" fill="#d6dbe2" stroke="#1c2330" stroke-width="3"/>
+        <g stroke="#1c2330" stroke-width="2"><path d="M70 64 V146"/><path d="M95 64 V146"/><path d="M120 64 V146"/><path d="M145 64 V146"/><path d="M170 64 V146"/><path d="M195 64 V146"/></g>
+        <text x="30" y="185" font-size="19" fill="#1c2330" font-family="Segoe UI, Arial">cilindercel: mantel + rollen</text>
+        <rect x="300" y="70" width="90" height="70" rx="4" fill="#d6dbe2" stroke="#1c2330" stroke-width="3"/>
+        <text x="300" y="185" font-size="19" fill="#1c2330" font-family="Segoe UI, Arial">blikje:</text><text x="300" y="209" font-size="19" fill="#1c2330" font-family="Segoe UI, Arial">dunne wand</text>
+        <rect x="430" y="80" width="100" height="50" rx="4" fill="#fdf0e8" stroke="#cf4a12" stroke-width="3"/>
+        <path d="M440 92 H520 M440 104 H520 M440 116 H520" stroke="#cf4a12" stroke-width="2"/>
+        <text x="430" y="185" font-size="19" fill="#cf4a12" font-family="Segoe UI, Arial">pouchcel</text><text x="430" y="209" font-size="19" fill="#cf4a12" font-family="Segoe UI, Arial">(vape, telefoon)</text>
+        <text x="30" y="250" font-size="19" fill="#5a6473" font-family="Segoe UI, Arial">Dual-energy onderscheidt zware metalen (Ni, Co, Cu)</text>
+        <text x="30" y="276" font-size="19" fill="#5a6473" font-family="Segoe UI, Arial">van aluminium en organisch materiaal.</text>
+      </svg>
+    </div>
+  </div>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Röntgen ziet de batterij zelf, ook in een dichte zak. Dat kan geen andere sensor, maar het vraagt een band met een laag van hooguit enkele decimeters.</p></div></div>
+  <aside class="notes"><p>De diepte van 10–40 cm is een schatting op basis van typische industriële röntgensorteerders (160–450 kV) en het feit dat alle praktijksystemen op een band met een gespreide laag werken. Hoe dikker en natter de laag, hoe meer straling wordt geabsorbeerd en hoe meer objecten overlappen. Backscatter-röntgen (alleen van één kant) dringt slechts enkele centimeters in en is daarom zwakker. Battery Detection Solutions (VS) gebruikt multi-spectrale röntgen met ca. acht energiebanden en experimenteert met röntgen op een vuilniswagen om containers bij het legen te controleren; resultaten zijn niet gepubliceerd (bron 5). Rapiscan heeft een patent op automatische lithiumdetectie in vracht en bagage (bron 17), waarin wordt erkend dat bestaande vrachtscanners lithiumcellen slecht onderscheiden.</p></aside>
+  <div class="foot"><span>Agent 1 · Detectietechnologieën</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A1.3 OPPERVLAKTE -->
+<section class="slide" data-title="Overige technieken">
+  <div class="eyebrow">Agent 1 · Detectietechnologieën</div>
+  <h2>De andere sensoren zien vooral de buitenkant of pas het begin van een brand</h2>
+  <div class="cols c3">
+    <div class="card"><div class="kicker">Oppervlak</div><h3>Camera + AI, NIR, hyperspectraal</h3><p>Herkent losse batterijen en vapes goed, maar niets in een zak of onder ander afval.<span class="ref">[4][12]</span></p></div>
+    <div class="card"><div class="kicker">Metaal</div><h3>Inductie, wervelstroom, magnetisch</h3><p>Snel en goedkoop, maar ziet het verschil tussen cel en blikje niet. Pouchcellen zijn niet magnetisch.<span class="ref">[11]</span></p></div>
+    <div class="card"><div class="kicker">Te laat</div><h3>Thermisch IR en gas</h3><p>Reageert pas als een cel al opwarmt of lekt. Nuttig als vangnet in bunker en wagen.<span class="ref">[19][21]</span></p></div>
+  </div>
+  <p class="small muted" style="margin-top:26px">Radar/millimetergolf en terahertz: ziet metaal door plastic, maar geen onderscheid tussen objecten; TRL 2–4 voor deze toepassing <span class="tag est">schatting</span>.</p>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Deze sensoren zijn alleen zinvol als aanvulling op röntgen (sensorfusie) of als brandbeveiliging, niet als hoofdsysteem.</p></div></div>
+  <aside class="notes"><p>RGB- en hyperspectrale camera's: Lion Vision (Manchester) herkent ruim 40 batterijsubtypes op een band, inclusief vapes, met ruim 600 cilinderbatterijen per uur (bron 12). AMP Robotics traint zijn visiesysteem op batterijen en gastanks (bron 14). PFU/Ricoh geeft aan dat zichtbaar licht faalt bij batterijen in zakken (bron 4). Magnetische detectie: veel cilindercellen hebben een vernikkeld stalen mantel, maar pouchcellen (telefoons, vapes) hebben een aluminiumlaminaat; blik is ook magnetisch. Thermisch: radiometrische camera's meten absolute temperatuur, ook door rook (bron 19/20). Gas: Li-ion Tamer reageert op ca. 1 ppm/s binnen 5 s (fabrikant, bron 21); een FM Global-test bevestigt vroegtijdige waarschuwing bij thermisch of elektrisch misbruik, maar niet altijd bij mechanische schade, juist het scenario in een shredder. Sodium-ion en solid-state cellen geven andere signaturen; modellen moeten worden bijgetraind.</p></aside>
+  <div class="foot"><span>Agent 1 · Detectietechnologieën</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A1.4 VLIEGVELD -->
+<section class="slide" data-title="Vergelijking vliegveld">
+  <div class="eyebrow">Agent 1 · Detectietechnologieën</div>
+  <h2>De vliegveldvergelijking klopt half: dezelfde fysica, een totaal andere stroom</h2>
+  <table>
+    <thead><tr><th style="width:26%">Kenmerk</th><th>Bagage op vliegveld</th><th>Restafval vóór shredder</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Object</td><td>één tas, losse inhoud</td><td>geperste massa, overlap</td></tr>
+      <tr><td class="k">Doorvoer</td><td>± 0,2–0,5 m/s, één stuk tegelijk</td><td>10–30 ton per uur<span class="ref">[1]</span></td></tr>
+      <tr><td class="k">Omgeving</td><td>schoon, droog, binnen</td><td>stof, vocht, trillingen</td></tr>
+      <tr><td class="k">Gevraagde uitkomst</td><td>beeld voor beveiliger + alarm<span class="ref">[15]</span></td><td>alleen een score: wel/niet apart</td></tr>
+      <tr><td class="k">Gevolg vals alarm</td><td>handmatige controle tas</td><td>zak of bandsegment apart</td></tr>
+    </tbody>
+  </table>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Het voordeel bij afval: je hoeft alleen 'verdacht' aan te wijzen en mag vaker vals alarm geven. Het nadeel: het afval moet eerst gespreid worden, net als bagage op een band.</p></div></div>
+  <aside class="notes"><p>Op vliegvelden werken CT-scanners en lithium-algoritmes omdat elke tas apart en langzaam door een afgeschermde tunnel gaat. Smiths Detection levert automatische lithiumdetectie op de HI-SCAN 10080 XCT en EDX-2is, gericht op luchtvracht en ruimbagage (bron 15). Het principe is overdraagbaar; de mechanica (spreiden, doseren, afvoeren) en de robuustheid (stof, slijtage) niet. Smiths zet zelf deze stap via CIRQURA for Batteries met Xbat.ai (VITO/Sortbat), maar dat is sortering van een al gescheiden batterijstroom, niet van restafval (bron 16).</p></aside>
+  <div class="foot"><span>Agent 1 · Detectietechnologieën</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== SECTIE AGENT 2 -->
+<section class="slide section-slide" data-title="Agent 2">
+  <div class="eyebrow">Agent 2</div>
+  <h2>Locatie &amp; integratie</h2>
+  <p>Afvalwagen, stortvloer of shovel: waar kan een sensor het afval goed genoeg 'zien'?</p>
+  <div class="foot"><span>Agent 2 · Locatie &amp; integratie</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A2.1 LOCATIES -->
+<section class="slide" data-title="Drie locaties">
+  <div class="eyebrow">Agent 2 · Locatie &amp; integratie</div>
+  <h2>Geen van de drie voorgestelde locaties is geschikt voor röntgen</h2>
+  <div class="cols c3">
+    <div class="card"><div class="kicker">a · Afvalwagen</div><h3><span class="cell o">Mogelijk met aanpassingen</span></h3><p>Camera bij het kiepen of IR/gas in de laadbak kan. Röntgen op straat is zwaar, duur per wagen en vraagt een vergunning.<span class="ref">[5][29]</span></p></div>
+    <div class="card"><div class="kicker">b · Stortvloer / bunker</div><h3><span class="cell o">Mogelijk met aanpassingen</span></h3><p>Afval ligt meters dik; alleen thermische camera's werken hier goed, als brandvroegdetectie.<span class="ref">[19][20]</span></p></div>
+    <div class="card"><div class="kicker">c · Shovel / pusher</div><h3><span class="cell r">Niet geschikt</span></h3><p>Trillingen, stof, geen vaste afstand. Hooguit een thermische camera als mobiele 'hotspot-kijker'.</p></div>
+  </div>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Op alle drie de plekken ligt het afval te dik of beweegt het te wild. Er is een extra stap nodig waar het afval kort en dun over een band gaat.</p></div></div>
+  <aside class="notes"><p>Afvalwagen: 24 V boordnet, trillingen, vocht, kort tijdvenster bij het kiepen (enkele seconden per container), en een vloot van tientallen wagens per verwerker. Röntgen op straat vraagt afscherming en dosisbewaking voor publiek; dat maakt een vergunning bij de ANVS waarschijnlijk en de opbouw zwaar. Een camera bij de stortopening ziet alleen het bovenste deel van de inhoud en roept AVG-vragen op. Thermische en gassensoren in de laadbak zijn wel nuttig tegen branden in de wagen zelf (NVRD meldt tientallen per jaar, bron 22). Stortvloer/bunker: thermische camera's met automatische blusmonitoren zijn standaard (InfraTec WASTE-SCAN bij Amager Resource Center, Orglmeister + FireDos, Fire Rover). Een röntgenportaal waar de hele wagen doorheen rijdt (Visia biedt truckscanners, bron 8) ziet grote accu's mogelijk wel, maar kleine cellen in een geperste lading waarschijnlijk niet: niet geverifieerd. Shovel: een inductiesensor in de bak geeft alleen 'veel metaal'; trillingen en stof maken optiek onbetrouwbaar.</p></aside>
+  <div class="foot"><span>Agent 2 · Locatie &amp; integratie</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A2.2 DOSEERBAND -->
+<section class="slide" data-title="Tussenoplossing doseerband">
+  <div class="eyebrow">Agent 2 · Locatie &amp; integratie</div>
+  <h2>De tussenoplossing: een korte doseerband met scanner en uitsluis</h2>
+  <svg viewBox="0 0 1680 430" width="100%" role="img" aria-label="Opstelling: doseerbunker, band met scanners, wissel naar quarantaine, shredder">
+    <g font-family="Segoe UI, Arial, sans-serif" fill="#1c2330">
+      <path d="M40 60 L220 60 L180 190 L80 190 Z" fill="#eceff3" stroke="#5a6473" stroke-width="3"/>
+      <text x="50" y="40" font-size="24" font-weight="700">1 · Doseerbunker</text>
+      <text x="50" y="232" font-size="20" fill="#5a6473">kraan/shovel vult</text>
+      <rect x="150" y="250" width="1130" height="26" rx="13" fill="#5a6473"/>
+      <text x="300" y="320" font-size="24" font-weight="700">2 · Spreiden tot laag ≤ 30 cm</text>
+      <text x="300" y="350" font-size="20" fill="#5a6473">bandbreedte 1,2–2 m <tspan fill="#9a6a12">(aanname)</tspan></text>
+      <path d="M330 248 l30 -18 l26 10 l30 -14 l28 22 Z" fill="#8a93a0"/>
+      <path d="M1020 248 l30 -16 l24 8 l34 -10 l20 18 Z" fill="#8a93a0"/>
+      <rect x="640" y="120" width="250" height="180" rx="10" fill="#fdf0e8" stroke="#cf4a12" stroke-width="4"/>
+      <text x="660" y="160" font-size="24" font-weight="700" fill="#cf4a12">3 · Scanstation</text>
+      <text x="660" y="194" font-size="20">röntgen DE/ME</text>
+      <text x="660" y="220" font-size="20">inductie · camera</text>
+      <text x="660" y="246" font-size="20">thermisch IR</text>
+      <text x="660" y="350" font-size="20" fill="#5a6473">afgeschermde tunnel</text>
+      <path d="M1180 276 L1250 380" stroke="#cf4a12" stroke-width="5" stroke-dasharray="10 8"/>
+      <rect x="1180" y="380" width="230" height="44" rx="6" fill="#ffffff" stroke="#cf4a12" stroke-width="3"/>
+      <text x="1196" y="410" font-size="21" fill="#cf4a12">4 · Quarantaine</text>
+      <path d="M1290 263 H1380" stroke="#8a93a0" stroke-width="5"/>
+      <rect x="1400" y="170" width="200" height="180" rx="8" fill="#1c2330"/>
+      <path d="M1420 290 l20 -26 l20 26 l20 -26 l20 26 l20 -26 l20 26 l20 -26 l20 26" stroke="#ffffff" stroke-width="4" fill="none"/>
+      <text x="1420" y="215" font-size="24" font-weight="700" fill="#ffffff">5 · Shredder</text>
+      <text x="1020" y="120" font-size="20" fill="#5a6473">score &gt; drempel → wissel/klep</text>
+      <path d="M1100 130 L1180 250" stroke="#5a6473" stroke-width="2" stroke-dasharray="4 5"/>
+    </g>
+  </svg>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Deze opstelling bestaat al in Duitsland en de VS. Het vraagt circa 15–30 meter ruimte vóór de shredder <span class="tag est">schatting</span> en een manier om verdacht afval veilig apart te zetten.</p></div></div>
+  <aside class="notes"><p>Bij veel restafvallijnen is de voorbreker (shredder) de eerste stap na de bunker. Dan moet de scan tussen kraan en shredder worden geplaatst: kraan of shovel vult een doseerbunker, een bandtransporteur spreidt het materiaal, de scanstation geeft per bandsegment een score, en bij een te hoge score gaat een klep of wissel open naar een brandwerende quarantainecontainer, of stopt de band zodat een medewerker de zak kan pakken. DangerSort draait tot 30 t/u (bron 1); WeSort.AI bij Lobbe ca. 20 t/u (bron 10, secundair). Bij een hogere lijncapaciteit zijn twee banden nodig of moet de bandsnelheid omhoog, wat de detectie verlaagt. De quarantaineopslag moet voldoen aan PGS 37-1 voor lithiumbatterijen (te verifiëren met de veiligheidsregio).</p></aside>
+  <div class="foot"><span>Agent 2 · Locatie &amp; integratie</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A2.3 OMGEVING -->
+<section class="slide" data-title="Integratie-eisen">
+  <div class="eyebrow">Agent 2 · Locatie &amp; integratie</div>
+  <h2>Wat de doseerband in de praktijk moet kunnen</h2>
+  <table>
+    <thead><tr><th>Eis</th><th>Afvalwagen</th><th>Bunker / shovel</th><th>Doseerband</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Laagdikte</td><td><span class="cell r">1–2 m geperst</span></td><td><span class="cell r">meters</span></td><td><span class="cell g">10–30 cm</span></td></tr>
+      <tr><td class="k">Afstand sensor</td><td><span class="cell o">wisselend</span></td><td><span class="cell r">5–20 m</span></td><td><span class="cell g">vast, &lt; 1 m</span></td></tr>
+      <tr><td class="k">Stof / trilling</td><td><span class="cell r">hoog</span></td><td><span class="cell r">hoog</span></td><td><span class="cell o">midden, behuizing</span></td></tr>
+      <tr><td class="k">Stroom / ruimte</td><td><span class="cell r">24 V, krap</span></td><td><span class="cell o">beperkt</span></td><td><span class="cell g">400 V, vaste plek</span></td></tr>
+      <tr><td class="k">Apart houden</td><td><span class="cell o">container laten staan</span></td><td><span class="cell r">lastig in stort</span></td><td><span class="cell g">klep → quarantaine</span></td></tr>
+    </tbody>
+  </table>
+  <p class="xs muted" style="margin-top:12px">Alle waarden zijn team-schattingen <span class="tag est">schatting</span>, gebaseerd op [1][5][10][19].</p>
+  <aside class="notes"><p>Onderhoud: röntgenbronnen en detectoren vragen jaarlijkse controle door een stralingsdeskundige en periodieke kalibratie; banden en kleppen slijten door glas en metaal. Doorlooptijd: elk bandsegment passeert in minder dan een seconde, dus de score moet in real time (&lt; 200 ms) beschikbaar zijn om de klep te sturen. Op de wagen is de 'apart houden'-optie relatief eenvoudig (container niet legen, sticker voor bewoner), maar alleen als de detectie vóór het legen plaatsvindt, wat met röntgen op straat niet realistisch is.</p></aside>
+  <div class="foot"><span>Agent 2 · Locatie &amp; integratie</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== SECTIE AGENT 3 -->
+<section class="slide section-slide" data-title="Agent 3">
+  <div class="eyebrow">Agent 3</div>
+  <h2>Signaal, grenswaarde &amp; betrouwbaarheid</h2>
+  <p>Van sensordata naar één score, en hoeveel valse alarmen een ploeg accepteert.</p>
+  <div class="foot"><span>Agent 3 · Signaal &amp; betrouwbaarheid</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A3.1 SCORE -->
+<section class="slide" data-title="Van sensor naar score">
+  <div class="eyebrow">Agent 3 · Signaal &amp; betrouwbaarheid</div>
+  <h2>Van ruwe data naar één score per bandsegment</h2>
+  <svg viewBox="0 0 1680 380" width="100%" role="img" aria-label="Sensoren leveren kansen, die worden gecombineerd tot een score met drie zones">
+    <g font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#1c2330">
+      <g>
+        <rect x="0" y="10" width="270" height="62" rx="6" fill="#fdf0e8" stroke="#cf4a12" stroke-width="2"/><text x="18" y="50">Röntgen + AI</text>
+        <rect x="0" y="100" width="270" height="62" rx="6" fill="#f3f5f8" stroke="#8a93a0" stroke-width="2"/><text x="18" y="140">Inductie (metaal)</text>
+        <rect x="0" y="190" width="270" height="62" rx="6" fill="#f3f5f8" stroke="#8a93a0" stroke-width="2"/><text x="18" y="230">Camera (RGB)</text>
+        <rect x="0" y="280" width="270" height="62" rx="6" fill="#f3f5f8" stroke="#8a93a0" stroke-width="2"/><text x="18" y="320">Thermisch IR</text>
+      </g>
+      <g stroke="#8a93a0" stroke-width="3" fill="none"><path d="M270 41 C350 41 350 176 420 176"/><path d="M270 131 C350 131 350 176 420 176"/><path d="M270 221 C350 221 350 176 420 176"/><path d="M270 311 C350 311 350 176 420 176"/></g>
+      <rect x="420" y="116" width="330" height="120" rx="8" fill="#ffffff" stroke="#1c2330" stroke-width="3"/>
+      <text x="440" y="160" font-weight="700">Sensorfusie</text>
+      <text x="440" y="192" font-size="19" fill="#5a6473">kans per object →</text>
+      <text x="440" y="216" font-size="19" fill="#5a6473">max of 'noisy-OR'</text>
+      <path d="M750 176 H830" stroke="#8a93a0" stroke-width="3"/>
+      <text x="850" y="100" font-weight="700">Score per segment (0–100)</text>
+      <rect x="850" y="130" width="330" height="90" fill="#e1f1e7"/>
+      <rect x="1180" y="130" width="220" height="90" fill="#fbeed2"/>
+      <rect x="1400" y="130" width="270" height="90" fill="#f7e0de"/>
+      <text x="866" y="184" fill="#2e7a4d" font-weight="700">0–40 · door</text>
+      <text x="1194" y="184" fill="#9a6a12" font-weight="700">40–70 · log</text>
+      <text x="1414" y="184" fill="#a8302a" font-weight="700">&gt; 70 · uitsluis</text>
+      <text x="850" y="262" font-size="19" fill="#5a6473">drempels zijn een voorbeeld <tspan fill="#9a6a12">(aanname)</tspan>; afstellen in de pilot</text>
+      <text x="850" y="300" font-size="19" fill="#5a6473">extra regel: IR-hotspot = altijd uitsluis, los van de score</text>
+    </g>
+  </svg>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Röntgen bepaalt de score; de andere sensoren verhogen of verlagen het vertrouwen. Zo voorkom je dat elk blikje een alarm geeft.</p></div></div>
+  <aside class="notes"><p>Aanpak: een objectdetectiemodel (bijvoorbeeld een convolutioneel netwerk) markeert in het röntgenbeeld kandidaat-cellen met een kans p. Per bandsegment (bijv. 1 m of één zak) wordt de hoogste kans genomen, of de 'noisy-OR' 1 − Π(1 − p_i) als er meerdere kandidaten zijn. Inductie en camera werken als extra features in een tweede, eenvoudig model (bijv. gradient boosting) dat leert dat 'röntgenvorm cilinder + metaal + geen blikvorm op camera' sterker telt. Een thermische hotspot is een harde regel. Synthetische trainingsdata (gesimuleerde röntgenbeelden) verbetert de nauwkeurigheid aantoonbaar, aldus het EU-project GRINNER (bron 33). Alle scores en beelden loggen voor bijtraining en audit.</p></aside>
+  <div class="foot"><span>Agent 3 · Signaal &amp; betrouwbaarheid</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A3.2 DETECTIEKANS -->
+<section class="slide" data-title="Detectiekans">
+  <div class="eyebrow">Agent 3 · Signaal &amp; betrouwbaarheid</div>
+  <h2>Gerapporteerde detectie ligt rond 80–95%, vrijwel steeds volgens de leverancier</h2>
+  <svg viewBox="0 0 1680 420" width="100%" role="img" aria-label="Staafdiagram van gerapporteerde detectiepercentages tussen 50 en 100 procent">
+    <g font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#1c2330">
+      <!-- as: x = 560 + (v-50)*20 -->
+      <g stroke="#d6dbe2" stroke-width="1">
+        <path d="M560 20 V340"/><path d="M760 20 V340"/><path d="M960 20 V340"/><path d="M1160 20 V340"/><path d="M1360 20 V340"/><path d="M1560 20 V340"/>
+      </g>
+      <g fill="#5a6473" font-size="19" text-anchor="middle">
+        <text x="560" y="372">50%</text><text x="760" y="372">60%</text><text x="960" y="372">70%</text><text x="1160" y="372">80%</text><text x="1360" y="372">90%</text><text x="1560" y="372">100%</text>
+      </g>
+      <text x="0" y="62">PFU Raptor (zakken)</text><text x="0" y="86" font-size="17" fill="#5a6473">leverancier [4]</text>
+      <rect x="560" y="44" width="880" height="34" fill="#cf4a12"/><text x="1452" y="69" font-weight="700">94%</text>
+      <text x="0" y="132">WeSort.AI veldtest</text><text x="0" y="156" font-size="17" fill="#5a6473">secundaire bron [10]</text>
+      <rect x="560" y="114" width="600" height="34" fill="#f3c4a8"/><rect x="1160" y="114" width="280" height="34" fill="#cf4a12"/><text x="1452" y="139" font-weight="700">80–94%</text>
+      <text x="0" y="202">DangerSort 'yield'</text><text x="0" y="226" font-size="17" fill="#5a6473">leverancier, definitie vaag [3]</text>
+      <rect x="560" y="184" width="800" height="34" fill="#cf4a12"/><text x="1372" y="209" font-weight="700">&gt; 90%</text>
+      <text x="0" y="272">Onderzoek röntgen AEEA</text><text x="0" y="296" font-size="17" fill="#5a6473">wetenschappelijk, recall [32]</text>
+      <rect x="560" y="254" width="620" height="34" fill="#5a6473"/><text x="1192" y="279" font-weight="700">81%</text>
+      <text x="0" y="412" font-size="18" fill="#5a6473">Niet in grafiek: Xbat.ai/CIRQURA &gt; 98%, maar in een al gescheiden batterijstroom, niet in afval [16].</text>
+    </g>
+  </svg>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Reken op 80–95% van de batterijen <span class="tag est">schatting</span>. Er blijft altijd een rest over, dus het systeem vervangt geen brandbeveiliging na de shredder.</p></div></div>
+  <aside class="notes"><p>De cijfers zijn niet onderling vergelijkbaar: verschillende afvalstromen (restafval, AEEA, verpakkingen), definities (detectie, recall, 'yield') en testopzet. Geen enkel cijfer is onafhankelijk gevalideerd in Nederlands restafval. Het Belgische onderzoek (532 apparaten, deep learning op röntgenbeelden) is het enige wetenschappelijke cijfer: precisie 89%, recall 81%. Visia meldt 'nul shredderbranden' bij Rumpke sinds ingebruikname (bron 6), terwijl een ander artikel 50–60 branden in 2024 noemt op dezelfde locatie (bron 7); waarschijnlijk andere brandtypes of plekken, maar het laat zien dat claims met voorzichtigheid gelezen moeten worden.</p></aside>
+  <div class="foot"><span>Agent 3 · Signaal &amp; betrouwbaarheid</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A3.3 VALSE ALARMEN + KALIBRATIE -->
+<section class="slide" data-title="Valse alarmen en kalibratie">
+  <div class="eyebrow">Agent 3 · Signaal &amp; betrouwbaarheid</div>
+  <h2>Valse alarmen bepalen of de ploeg het systeem blijft vertrouwen</h2>
+  <div class="cols c2">
+    <div class="card"><div class="kicker">Acceptabel niveau <span class="tag ass">aanname</span></div>
+      <ul><li>Automatische uitsluis: maximaal 2–5% van de massa apart.</li><li>Handmatige controle: maximaal 1–3 alarmen per uur per lijn.</li><li>Daarboven worden alarmen genegeerd of uitgezet.</li></ul></div>
+    <div class="card"><div class="kicker">Testen en kalibreren</div>
+      <ul><li>Lab: ontladen testcellen en dummy's van bekende typen.</li><li>Schaduwmodus: alarmen loggen, niets uitsluizen.</li><li>Continu: wekelijks gemarkeerde testcellen meesturen.<span class="ref">[33]</span></li></ul></div>
+  </div>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Een automatische klep maakt valse alarmen goedkoop. Laat het systeem dus liever iets te vaak uitsluizen dan mensen te vaak lastigvallen.</p></div></div>
+  <aside class="notes"><p>De grens voor valse alarmen is een aanname: er zijn geen gepubliceerde studies over alarmmoeheid bij afvalverwerkers gevonden. Analogie uit de zorg en procesindustrie: als een groot deel van de alarmen onterecht is, reageren operators trager of schakelen het uit. Kalibratiemethode: (1) labset met ontladen of geïnertiseerde cellen per type (18650/21700, pouch, vape, powerbank, gereedschapsaccu, knoopcel) in echte restafvalzakken; (2) ROC-curve opstellen en drempel kiezen; (3) schaduwmodus in de praktijk met steekproeven van zowel gemarkeerde als niet-gemarkeerde segmenten om missers te schatten; (4) wekelijks 'blinde' testcellen met een herkenbaar label meesturen om recall over tijd te volgen en drift (nieuwe batterijtypen) te signaleren. Veiligheid: nooit geladen cellen als testobject gebruiken; röntgensignatuur van ontladen cellen is vrijwel gelijk.</p></aside>
+  <div class="foot"><span>Agent 3 · Signaal &amp; betrouwbaarheid</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== SECTIE AGENT 4 -->
+<section class="slide section-slide" data-title="Agent 4">
+  <div class="eyebrow">Agent 4</div>
+  <h2>Haalbaarheid &amp; wet- en regelgeving</h2>
+  <p>Welke regels bepalen of en hoe een systeem mag worden gebouwd en gebruikt?</p>
+  <div class="foot"><span>Agent 4 · Haalbaarheid &amp; regelgeving</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A4.1 HAALBAARHEID -->
+<section class="slide" data-title="Haalbaarheid">
+  <div class="eyebrow">Agent 4 · Haalbaarheid &amp; regelgeving</div>
+  <h2>Technisch haalbaar op een band; op voertuigen voorlopig niet</h2>
+  <table>
+    <thead><tr><th>Combinatie</th><th>Techniek</th><th>Praktijk</th><th>Regels</th><th>Oordeel</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Röntgen + AI op doseerband</td><td><span class="cell g">bewezen</span></td><td><span class="cell o">ruimte, doorvoer</span></td><td><span class="cell o">ANVS-registratie</span></td><td><span class="cell g">haalbaar</span></td></tr>
+      <tr><td class="k">Thermisch IR in bunker</td><td><span class="cell g">bewezen</span></td><td><span class="cell g">eenvoudig</span></td><td><span class="cell g">licht</span></td><td><span class="cell g">haalbaar</span></td></tr>
+      <tr><td class="k">Camera + AI op afvalwagen</td><td><span class="cell o">alleen oppervlak</span></td><td><span class="cell o">hele vloot</span></td><td><span class="cell o">AVG</span></td><td><span class="cell o">beperkt</span></td></tr>
+      <tr><td class="k">Röntgenportaal bij ingang</td><td><span class="cell r">kleine cellen onzeker</span></td><td><span class="cell o">grote bouw</span></td><td><span class="cell r">vergunning</span></td><td><span class="cell r">niet nu</span></td></tr>
+      <tr><td class="k">Röntgen op afvalwagen</td><td><span class="cell r">experimenteel</span></td><td><span class="cell r">gewicht, trilling</span></td><td><span class="cell r">straling openbaar</span></td><td><span class="cell r">niet nu</span></td></tr>
+    </tbody>
+  </table>
+  <p class="xs muted" style="margin-top:12px">Gebaseerd op [1][5][8][19][29]; oordelen zijn een team-inschatting.</p>
+  <aside class="notes"><p>Het röntgenportaal bij de ingang (zoals vrachtscanners bij douane) scant een hele wagen zonder te lossen. Visia biedt truckscanners naast bandsystemen (bron 8), maar er is geen openbare informatie over detectie van kleine cellen in een geperste lading. Hoge-energie vrachtscanners (MeV-versnellers) vallen bovendien in een zwaardere vergunningsklasse, met een groot gecontroleerd gebied. Röntgen op de wagen zelf (Battery Detection Solutions experimenteert hiermee, bron 5) vraagt afscherming in openbare ruimte en dosisbewaking voor omstanders.</p></aside>
+  <div class="foot"><span>Agent 4 · Haalbaarheid &amp; regelgeving</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A4.2 REGELGEVING -->
+<section class="slide" data-title="Regelgeving">
+  <div class="eyebrow">Agent 4 · Haalbaarheid &amp; regelgeving</div>
+  <h2>Zes regelkaders, waarvan stralingsbescherming het zwaarst weegt</h2>
+  <table>
+    <thead><tr><th style="width:24%">Kader</th><th>Wat het vraagt</th><th style="width:15%">Impact</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Kernenergiewet / Bbs</td><td>ANVS-registratie (bagagescanners) of vergunning; stralingsdeskundige.<span class="ref">[29]</span></td><td><span class="cell o">midden</span></td></tr>
+      <tr><td class="k">Machineverordening</td><td>CE voor hele lijn; vanaf 20-01-2027 strengere regels voor AI-veiligheidsfuncties.<span class="ref">[30]</span></td><td><span class="cell o">midden</span></td></tr>
+      <tr><td class="k">EMC-richtlijn</td><td>geen storing door hoogspanning en motoren.<span class="ref">[40]</span></td><td><span class="cell g">laag</span></td></tr>
+      <tr><td class="k">ATEX</td><td>stofzones rond shredder; geschikte apparatuur.<span class="ref">[41]</span></td><td><span class="cell o">midden</span></td></tr>
+      <tr><td class="k">AVG / Arbo</td><td>DPIA bij camera's; veilig werken met uitgesluisd afval.<span class="ref">[42]</span></td><td><span class="cell o">midden</span></td></tr>
+      <tr><td class="k">RDW</td><td>alleen bij aanpassingen aan de afvalwagen.<span class="ref">[43]</span></td><td><span class="cell g">laag</span></td></tr>
+    </tbody>
+  </table>
+  <aside class="notes"><p>Kernenergiewet en Besluit basisveiligheidsnormen stralingsbescherming (Bbs): wie handelingen verricht met een röntgentoestel heeft een registratie of vergunning van de ANVS nodig. Bagagescanners zijn volgens Bbs art. 3.10 lid 2h registratieplichtig (bron 29). Een volledig afgeschermde industriële röntgentunnel valt waarschijnlijk in dezelfde lichte categorie, maar dat is niet bevestigd: vraag een vooroverleg aan bij de ANVS. Machineverordening (EU) 2023/1230 vervangt de Machinerichtlijn per 20 januari 2027; een detectiesysteem dat de shredder stopt of een klep stuurt kan als veiligheidscomponent worden gezien, en een AI-veiligheidsfunctie kan een beoordeling door een derde partij vragen (bron 30, en koppeling met de AI-verordening, bron 39). Laat de classificatie vroeg toetsen. ATEX: richtlijn 2014/34/EU (producten) en 1999/92/EG (werkplek, explosieveiligheidsdocument). AVG: camera's op voertuigen filmen burgers op straat; een DPIA en minimalisatie (geen opslag van personen, blurring) zijn nodig; bij camera's op de werkvloer heeft de OR instemmingsrecht. Opslag van uitgesluiste batterijen: PGS 37-1. Transport van ingezamelde batterijen valt onder ADR.</p></aside>
+  <div class="foot"><span>Agent 4 · Haalbaarheid &amp; regelgeving</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A4.3 UITSLUITERS -->
+<section class="slide" data-title="Wat regels uitsluiten">
+  <div class="eyebrow">Agent 4 · Haalbaarheid &amp; regelgeving</div>
+  <h2>Regels sluiten röntgen op straat vrijwel uit, niet röntgen in de hal</h2>
+  <div class="cols c2">
+    <div class="card"><div class="kicker">Sterk bemoeilijkt</div>
+      <ul><li>Röntgen op afvalwagens in de openbare ruimte.<span class="ref">[29]</span></li><li>Hoge-energie truckscanners: zware vergunning.</li><li>Camera's op straat zonder DPIA.<span class="ref">[42]</span></li></ul></div>
+    <div class="card"><div class="kicker">Goed te regelen</div>
+      <ul><li>Afgeschermde röntgentunnel: registratie bij ANVS.<span class="ref">[29]</span></li><li>CE voor de lijn via de integrator.<span class="ref">[30]</span></li><li>Thermische camera's in de bunker.</li></ul></div>
+  </div>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Een afgeschermde röntgentunnel in de hal is juridisch vergelijkbaar met een bagagescanner. Plan wel 3–6 maanden voor registratie en CE-documentatie <span class="tag est">schatting</span>.</p></div></div>
+  <aside class="notes"><p>Doorlooptijden zijn schattingen. Een ANVS-registratie verloopt via het digitale loket met eHerkenning. Bij twijfel over registratie versus vergunning beslist de ANVS. Nodig: stralingsdeskundige (intern of ingehuurd), risicoanalyse, dosimetrie, instructie van medewerkers, en lekstralingsmetingen na installatie. De Machineverordening is per 20-01-2027 van toepassing; een pilot die eerder start, valt nog onder de Machinerichtlijn, maar plan de definitieve installatie al volgens de nieuwe regels.</p></aside>
+  <div class="foot"><span>Agent 4 · Haalbaarheid &amp; regelgeving</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== SECTIE AGENT 5 -->
+<section class="slide section-slide" data-title="Agent 5">
+  <div class="eyebrow">Agent 5</div>
+  <h2>Bestaande aanbieders &amp; ombouwmogelijkheden</h2>
+  <p>Wie levert al iets bruikbaars, en hoeveel werk is het om dat aan te passen?</p>
+  <div class="foot"><span>Agent 5 · Aanbieders</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A5.1 SORTERING -->
+<section class="slide" data-title="Aanbieders sortering">
+  <div class="eyebrow">Agent 5 · Aanbieders · groep b: sortering &amp; AI</div>
+  <h2>Vijf partijen detecteren nu al batterijen in gemengd afval</h2>
+  <table>
+    <thead><tr><th>Aanbieder</th><th>Techniek</th><th>Status</th><th>Ombouw</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Fraunhofer IIS (DE)</td><td>röntgen + AI, 30 t/u<span class="ref">[1][3]</span></td><td>in bedrijf bij Lobbe</td><td><span class="cell g">licentie/samenwerking</span></td></tr>
+      <tr><td class="k">WeSort.AI / Sesotec (DE/AT)</td><td>röntgen + AI, X.Sort<span class="ref">[9][10]</span></td><td>wereldwijd verkocht</td><td><span class="cell g">vrijwel kant-en-klaar</span></td></tr>
+      <tr><td class="k">Visia (VS)</td><td>röntgen + camera + truck<span class="ref">[6][8]</span></td><td>25 locaties VS</td><td><span class="cell o">geen EU-service</span> <span class="tag unv">n.g.</span></td></tr>
+      <tr><td class="k">PFU / Ricoh (JP)</td><td>dual-energy, zakken<span class="ref">[4]</span></td><td>product + prototype</td><td><span class="cell o">EU-levering onzeker</span></td></tr>
+      <tr><td class="k">Steinert (DE)</td><td>röntgen + inductie + 3D<span class="ref">[11]</span></td><td>sorteerlijnen</td><td><span class="cell g">integrator</span></td></tr>
+    </tbody>
+  </table>
+  <p class="xs muted" style="margin-top:10px">Ook relevant: Lion Vision (UK, camera)<span class="ref">[12]</span>, AMP Robotics (VS)<span class="ref">[14]</span>, Battery Detection Solutions (VS)<span class="ref">[5]</span>. Greyparrot en Tomra: batterijdetectie <span class="tag unv">niet geverifieerd</span>.</p>
+  <aside class="notes"><p>Fraunhofer DangerSort: industrieel prototype eind 2024, praktijktest sinds voorjaar 2025 bij Lobbe in Iserlohn; Lobbe meldt een 'yield' boven 90% en betrouwbare uitsortering van grotere gereedschapsaccu's (bron 3). WeSort.AI: klanten o.a. Remondis, PreZero, Veolia, KORN Recycling (Dealroom-profiel); bij Lobbe RSW zou sinds juni 2024 ca. 12,4 kg gevaarlijk materiaal per uur uit ca. 20 t/u zijn gehaald (secundaire bron, niet geverifieerd, bron 10). Sesotec verkoopt X.Sort wereldwijd (bron 9). Visia (voorheen BinIt): Rumpke Cincinnati sinds 2023, ook Casella (bron 6); geen Europese vestiging gevonden. PFU Raptor VISION BATTERY: 94% detectie volgens fabrikant, gebouwd met IHI Inspection &amp; Instrumentation (bron 4). Steinert: geïntegreerd systeem met röntgentransmissie, kleur, 3D en inductie en luchtuitblazing (bron 11). Ombouw-inschatting: voor een doseerband voor restafval met zakken is een systeem van Fraunhofer/WeSort het dichtst bij; aanpassing zit vooral in het uitsluismechanisme (klep in plaats van luchtstoot, want zakken zijn zwaar) en training op Nederlands restafval.</p></aside>
+  <div class="foot"><span>Agent 5 · Aanbieders</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A5.2 BEVEILIGING + BRAND -->
+<section class="slide" data-title="Beveiliging en brandpreventie">
+  <div class="eyebrow">Agent 5 · Aanbieders · groepen a en c</div>
+  <h2>Vliegveldleveranciers hebben de algoritmes; brandleveranciers het vangnet</h2>
+  <div class="cols c2">
+    <div class="card"><div class="kicker">a · Beveiliging (röntgen, CT)</div>
+      <ul><li><b>Smiths Detection</b>: lithium-algoritme op CT; nu ook batterijsortering met VITO/Sortbat.<span class="ref">[15][16]</span></li><li><b>Rapiscan</b>: patent op lithiumdetectie in vracht.<span class="ref">[17]</span></li><li>Ombouw: <span class="cell o">groot</span> (stof, doorvoer, mechanica)</li></ul></div>
+    <div class="card"><div class="kicker">c · Brandpreventie</div>
+      <ul><li><b>Fire Rover</b> (Fike): IR + vlam + blus op afstand.<span class="ref">[18]</span></li><li><b>Orglmeister + FireDos</b>, <b>InfraTec</b>: IR-bunkerbewaking met blusmonitor.<span class="ref">[19][20]</span></li><li><b>Honeywell Li-ion Tamer</b>: gasdetectie.<span class="ref">[21]</span></li></ul></div>
+  </div>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Smiths Detection zet de stap van vliegveld naar recycling al zelf. Voor een pilot is een recyclingleverancier sneller; Smiths is interessant als tweede gesprekspartner.</p></div></div>
+  <aside class="notes"><p>Smiths Detection: iCMORE-algoritmes voor lithiumbatterijen op HI-SCAN 10080 XCT (CT) en EDX-2is (bron 15). Partnerschap met VITO en Sortbat (joint venture Xbat.ai), sinds 2025 als CIRQURA for Batteries op de markt; claim &gt;98% nauwkeurigheid voor packs tot 5 kg en 2,4 t/u, operationeel in Tienen (bron 16). Dat is een batterijsorteerlijn, geen restafval. Ombouw van een bagagescanner is veel werk: tunnelmaat, stof, bandslijtage en een doorvoer die 10–50 keer te laag is. Brandpreventie: Fire Rover claimt dat batterijbranden de Noord-Amerikaanse sector $1,2 mrd per jaar kosten (bedrijfsclaim, bron 35). Andere namen in de markt (Nuctech, Leidos, FLIR/Teledyne) zijn niet specifiek onderzocht.</p></aside>
+  <div class="foot"><span>Agent 5 · Aanbieders</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A5.3 NL PILOTS -->
+<section class="slide" data-title="Pilots in Nederland">
+  <div class="eyebrow">Agent 5 · Aanbieders · bestaande pilots</div>
+  <h2>In Nederland is geen röntgenpilot in restafval gevonden</h2>
+  <ul>
+    <li><b>TU/e-team CORE</b>: AI-installatie TEMNOS, pilot bij Huiskes Metaal (Waalwijk).<span class="ref">[31]</span></li>
+    <li><b>Taskforce Batterijbranden</b> (VA, Brandweer NL, St. OPEN): vooral voorlichting en inzameling.<span class="ref">[24][25]</span></li>
+    <li><b>inSystem.io</b> (NL): AI-sorteerder voor batterijen <span class="tag unv">niet geverifieerd</span>.</li>
+    <li><b>België</b>: Xbat.ai in Tienen; onderzoek naar röntgen bij AEEA.<span class="ref">[16][32]</span></li>
+    <li><b>VK</b>: Viridor zocht partners voor detectie in wagen, band en bunker.<span class="ref">[13]</span></li>
+  </ul>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Er is ruimte voor een eerste Nederlandse pilot. Wel is het verstandig om bestaande Duitse technologie te gebruiken in plaats van zelf een sensor te ontwikkelen.</p></div></div>
+  <aside class="notes"><p>Gezocht op HVC, Renewi, AVR, Attero en Omrin in combinatie met batterijdetectie en röntgen: geen openbare pilots gevonden. Dat betekent niet dat er geen proeven zijn; navraag via de Vereniging Afvalbedrijven wordt aangeraden. De Taskforce Batterijbranden vond bij controles gemiddeld circa twintig vapes per vuilniswagen (via jaaroverzicht 2024, niet volledig ingezien). Viridor noemde expliciet vier uitdagingen: detectie in inzamelvoertuigen, op banden, het onderscheid tussen batterijen en ander metaalschroot, en detectie van hitte of dampen in bunkers. Dat sluit aan op de bevindingen van dit onderzoek.</p></aside>
+  <div class="foot"><span>Agent 5 · Aanbieders</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== SECTIE AGENT 6 -->
+<section class="slide section-slide" data-title="Agent 6">
+  <div class="eyebrow">Agent 6</div>
+  <h2>Vergelijking &amp; advies</h2>
+  <p>Technologie × locatie, de top 3 en een concreet pilotplan.</p>
+  <div class="foot"><span>Agent 6 · Vergelijking &amp; advies</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A6.1 MATRIX -->
+<section class="slide" data-title="Matrix technologie × locatie">
+  <div class="eyebrow">Agent 6 · Vergelijkingsmatrix</div>
+  <h2 style="margin-bottom:20px">Technologie × locatie: alleen de doseerband kleurt groen</h2>
+  <table class="matrix">
+    <thead><tr><th style="width:23%">Techniek</th><th>a · Afvalwagen</th><th>b · Stortvloer / bunker</th><th>c · Shovel / pusher</th><th>d · Doseerband</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Röntgen DE/ME + AI</td><td><div class="cell r">straling op straat</div></td><td><div class="cell r">te dik</div></td><td><div class="cell r">te dik, trilling</div></td><td><div class="cell g">bewezen, 20–30 t/u</div></td></tr>
+      <tr><td class="k">CT</td><td><div class="cell r">onhaalbaar</div></td><td><div class="cell r">onhaalbaar</div></td><td><div class="cell r">onhaalbaar</div></td><td><div class="cell o">te traag, duur</div></td></tr>
+      <tr><td class="k">Backscatter</td><td><div class="cell o">alleen bovenlaag</div></td><td><div class="cell r">te dik</div></td><td><div class="cell r">nee</div></td><td><div class="cell o">zwakker dan transmissie</div></td></tr>
+      <tr><td class="k">Metaal / inductie</td><td><div class="cell o">veel vals alarm</div></td><td><div class="cell r">bereik te klein</div></td><td><div class="cell o">grof signaal</div></td><td><div class="cell g">goede aanvulling</div></td></tr>
+      <tr><td class="k">Magnetisch</td><td><div class="cell r">nee</div></td><td><div class="cell r">nee</div></td><td><div class="cell r">nee</div></td><td><div class="cell o">beperkt</div></td></tr>
+      <tr><td class="k">Thermisch IR</td><td><div class="cell o">brand in laadbak</div></td><td><div class="cell g">bewezen vangnet</div></td><td><div class="cell o">mobiele check</div></td><td><div class="cell g">aanvulling</div></td></tr>
+      <tr><td class="k">NIR / hyperspectraal</td><td><div class="cell r">nee</div></td><td><div class="cell r">oppervlak</div></td><td><div class="cell r">nee</div></td><td><div class="cell o">alleen losse items</div></td></tr>
+      <tr><td class="k">Camera + AI</td><td><div class="cell o">kiepmoment, AVG</div></td><td><div class="cell o">oppervlak</div></td><td><div class="cell r">stof, trilling</div></td><td><div class="cell o">losse items</div></td></tr>
+      <tr><td class="k">Gas / damp</td><td><div class="cell o">gesloten laadbak</div></td><td><div class="cell o">verdunning</div></td><td><div class="cell r">nee</div></td><td><div class="cell o">in behuizing</div></td></tr>
+      <tr><td class="k">Radar / mm-golf</td><td><div class="cell r">TRL laag</div></td><td><div class="cell r">TRL laag</div></td><td><div class="cell r">TRL laag</div></td><td><div class="cell r">onderzoek</div></td></tr>
+    </tbody>
+  </table>
+  <div class="legend"><span><span class="sw" style="background:var(--good-bg);border:2px solid var(--good)"></span>kansrijk</span><span><span class="sw" style="background:var(--mid-bg);border:2px solid var(--mid)"></span>mogelijk met aanpassingen</span><span><span class="sw" style="background:var(--bad-bg);border:2px solid var(--bad)"></span>niet geschikt</span><span>Team-oordeel op basis van agents 1–5 <span class="tag est">schatting</span></span></div>
+  <aside class="notes"><p>De matrix combineert het oordeel per techniek (agent 1) met de omgevingseisen per locatie (agent 2), de regeldruk (agent 4) en de beschikbaarheid van producten (agent 5). Kolom d (doseerband) is toegevoegd omdat geen van de drie gevraagde locaties voor röntgen geschikt is. Op de afvalwagen zijn thermisch en gas zinvol tegen branden in de wagen zelf, niet om de shredder te beschermen.</p></aside>
+  <div class="foot"><span>Agent 6 · Vergelijking &amp; advies</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A6.2 CRITERIA -->
+<section class="slide" data-title="Criteriascore">
+  <div class="eyebrow">Agent 6 · Vergelijking op criteria</div>
+  <h2>Vijf kandidaten gescoord op zeven criteria</h2>
+  <table>
+    <thead><tr><th style="width:25%">Kandidaat</th><th>Detectie</th><th>Vals alarm</th><th>Robuust</th><th>Kosten</th><th>Regels</th><th>Ombouw</th><th>Tijd pilot</th></tr></thead>
+    <tbody>
+      <tr><td class="k">1 · Röntgen-band</td><td class="dots" style="color:var(--good)">●●●●○</td><td class="dots" style="color:var(--mid)">●●●○○</td><td class="dots" style="color:var(--mid)">●●●○○</td><td class="dots" style="color:var(--mid)">●●○○○</td><td class="dots" style="color:var(--mid)">●●●○○</td><td class="dots" style="color:var(--good)">●●●●○</td><td class="dots" style="color:var(--mid)">6–9 mnd</td></tr>
+      <tr><td class="k">2 · IR in bunker</td><td class="dots" style="color:var(--bad)">●●○○○</td><td class="dots" style="color:var(--good)">●●●●○</td><td class="dots" style="color:var(--good)">●●●●○</td><td class="dots" style="color:var(--good)">●●●●○</td><td class="dots" style="color:var(--good)">●●●●●</td><td class="dots" style="color:var(--good)">●●●●●</td><td class="dots" style="color:var(--good)">2–4 mnd</td></tr>
+      <tr><td class="k">3 · Camera op wagen</td><td class="dots" style="color:var(--bad)">●●○○○</td><td class="dots" style="color:var(--mid)">●●●○○</td><td class="dots" style="color:var(--mid)">●●○○○</td><td class="dots" style="color:var(--mid)">●●●○○</td><td class="dots" style="color:var(--mid)">●●●○○</td><td class="dots" style="color:var(--mid)">●●●○○</td><td class="dots" style="color:var(--mid)">4–6 mnd</td></tr>
+      <tr><td class="k">4 · Röntgenportaal</td><td class="dots" style="color:var(--bad)">●●○○○</td><td class="dots" style="color:var(--mid)">●●○○○</td><td class="dots" style="color:var(--mid)">●●●○○</td><td class="dots" style="color:var(--bad)">●○○○○</td><td class="dots" style="color:var(--bad)">●○○○○</td><td class="dots" style="color:var(--mid)">●●○○○</td><td class="dots" style="color:var(--bad)">&gt; 12 mnd</td></tr>
+      <tr><td class="k">5 · Röntgen op wagen</td><td class="dots" style="color:var(--bad)">●●○○○</td><td class="dots" style="color:var(--bad)">●●○○○</td><td class="dots" style="color:var(--bad)">●○○○○</td><td class="dots" style="color:var(--bad)">●○○○○</td><td class="dots" style="color:var(--bad)">●○○○○</td><td class="dots" style="color:var(--bad)">●○○○○</td><td class="dots" style="color:var(--bad)">&gt; 18 mnd</td></tr>
+    </tbody>
+  </table>
+  <p class="xs muted" style="margin-top:12px">Meer bolletjes = gunstiger (dus ook: lagere kosten, minder regeldruk). Alle scores en doorlooptijden zijn team-inschattingen <span class="tag est">schatting</span>.</p>
+  <aside class="notes"><p>Detectie verwijst naar de kans om een intacte batterij te vinden vóór de shredder. IR in de bunker scoort daar laag, omdat het alleen batterijen ziet die al opwarmen. Kostenindicaties: röntgenband € 0,5–1,5 mln inclusief band en klep; IR-bunkerbewaking € 50–250k inclusief blusmonitor; camera op wagen € 3–10k per wagen plus software (vloot van 30 wagens: € 0,1–0,3 mln); röntgenportaal € 1,5–4 mln; röntgen op wagen &gt; € 150k per wagen. Alle bedragen zijn schattingen; leveranciers publiceren geen prijzen.</p></aside>
+  <div class="foot"><span>Agent 6 · Vergelijking &amp; advies</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A6.3 TOP 3 -->
+<section class="slide" data-title="Top 3">
+  <div class="eyebrow">Agent 6 · Top 3</div>
+  <h2>Top 3: één preventiesysteem en twee aanvullingen</h2>
+  <div class="cols c3">
+    <div class="card" style="border:2px solid var(--accent)"><div class="kicker" style="color:var(--accent)">1 · Hoofdoplossing</div><h3>Röntgen + AI + inductie op doseerband</h3>
+      <p><b>+</b> ziet cellen in zakken; bewezen in DE.<span class="ref">[1][10]</span><br><b>−</b> ruimte en investering; ANVS-registratie.</p></div>
+    <div class="card"><div class="kicker">2 · Vangnet</div><h3>Thermisch IR + blus in bunker en op band</h3>
+      <p><b>+</b> goedkoop, snel te plaatsen.<span class="ref">[19][20]</span><br><b>−</b> ziet geen intacte batterijen.</p></div>
+    <div class="card"><div class="kicker">3 · Bron en data</div><h3>Camera + AI bij het kiepen van de wagen</h3>
+      <p><b>+</b> herkent losse accu's; data voor voorlichting per wijk.<br><b>−</b> alleen bovenlaag; AVG.<span class="ref">[42]</span></p></div>
+  </div>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Begin met 1 en 2 samen: de röntgenband haalt de meeste batterijen eruit, de warmtecamera vangt wat er toch doorheen glipt.</p></div></div>
+  <aside class="notes"><p>Oplossing 3 levert vooral preventie aan de bron: data per route of wijk maakt gerichte voorlichting mogelijk, en een wagen kan een container met een zichtbare accu bovenop laten staan. Er bestaan camerasystemen op afvalwagens voor contaminatiedetectie, maar specifieke batterijdetectie op wagens is in dit onderzoek niet geverifieerd. Combinatie 1+2 vormt een gelaagde verdediging: detectie, uitsluizen, en daarna snelle detectie en blussing als er toch iets misgaat.</p></aside>
+  <div class="foot"><span>Agent 6 · Vergelijking &amp; advies</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A6.4 PILOTPLAN -->
+<section class="slide" data-title="Pilotplan">
+  <div class="eyebrow">Agent 6 · Pilotplan</div>
+  <h2>Pilot van 6–9 maanden in drie fasen bij één verwerker</h2>
+  <svg viewBox="0 0 1680 150" width="100%" role="img" aria-label="Tijdlijn: lab 2 maanden, schaduwmodus 2 tot 3 maanden, actief 3 tot 4 maanden">
+    <g font-family="Segoe UI, Arial, sans-serif" fill="#1c2330">
+      <rect x="0" y="20" width="380" height="64" rx="6" fill="#eceff3"/><text x="20" y="62" font-size="24" font-weight="700">0 · Lab · 1–2 mnd</text>
+      <rect x="390" y="20" width="560" height="64" rx="6" fill="#fbeed2"/><text x="410" y="62" font-size="24" font-weight="700">1 · Schaduwmodus · 2–3 mnd</text>
+      <rect x="960" y="20" width="720" height="64" rx="6" fill="#fdf0e8" stroke="#cf4a12" stroke-width="2"/><text x="980" y="62" font-size="24" font-weight="700" fill="#cf4a12">2 · Actief uitsluizen · 3–4 mnd</text>
+      <text x="0" y="122" font-size="20" fill="#5a6473">testcellen, drempels</text>
+      <text x="390" y="122" font-size="20" fill="#5a6473">alleen loggen + steekproeven</text>
+      <text x="960" y="122" font-size="20" fill="#5a6473">klep naar quarantaine, meten branden</text>
+    </g>
+  </svg>
+  <div class="cols c2" style="gap:40px;margin-top:10px">
+    <div class="card"><div class="kicker">Opstelling en partners</div><p>Gehuurde röntgenunit (bijv. WeSort.AI/Sesotec of Fraunhofer) op een doseerband vóór één restafvalshredder, plus IR-camera. Partners: verwerker, leverancier, stralingsdeskundige, verzekeraar, veiligheidsregio.</p></div>
+    <div class="card"><div class="kicker">Succescriteria <span class="tag ass">aanname</span></div><p>≥ 85% van testcellen gevonden · ≤ 2 handmatige alarmen per uur · ≤ 3% massa apart · ≤ 2% extra stilstand · minder hotspots na de shredder dan in de nulmeting.</p></div>
+  </div>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Huur eerst een bestaand systeem en meet in schaduwmodus. Pas als de cijfers op de eigen afvalstroom kloppen, volgt een investeringsbesluit.</p></div></div>
+  <aside class="notes"><p>Meetplan. Nulmeting (vóór installatie, minimaal 8 weken): aantal hotspots en branden na de shredder via IR-logging en incidentregistratie, stilstand, en een handmatige sortering van steekproeven om het aantal batterijen per ton te bepalen. Fase 0, lab: set van ontladen testcellen (minimaal 10 typen, 20 stuks per type) in echte zakken; ROC-curve en eerste drempel. Fase 1, schaduwmodus: alle scores loggen; dagelijks 5 gemarkeerde en 5 niet-gemarkeerde segmenten handmatig controleren; wekelijks gelabelde testcellen meesturen. Fase 2, actief: klep stuurt boven de drempel naar quarantaine; meten van recall (testcellen), valse alarmen, uitgesluisde massa, stilstand en hotspots na de shredder. Statistische kanttekening: branden zijn zeldzaam, dus een daling in branden is in 3–4 maanden nauwelijks significant aan te tonen; gebruik hotspots (warmtecamera na de shredder) als tussenmaat. Vooraf regelen: ANVS-registratie, CE/risicobeoordeling van de tijdelijke opstelling, PGS 37-1-conforme quarantaine, instructie personeel, en afspraken met de verzekeraar over het delen van data.</p></aside>
+  <div class="foot"><span>Agent 6 · Vergelijking &amp; advies</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== A6.5 KOSTEN-BATEN -->
+<section class="slide" data-title="Kosten en baten">
+  <div class="eyebrow">Agent 6 · Globale kosten en baten</div>
+  <h2>Eén voorkomen grote brand betaalt het systeem waarschijnlijk terug</h2>
+  <div class="cols c3">
+    <div class="card"><div class="kicker">Kosten per lijn <span class="tag est">schatting</span></div><h3 class="num">€ 0,5–1,5 mln</h3><p>investering, plus € 50–150k per jaar voor onderhoud, straling en software.</p></div>
+    <div class="card"><div class="kicker">Kleine brand <span class="tag est">schatting</span></div><h3 class="num">€ 10–250k</h3><p>blussen, schade aan band of shredder en een paar dagen stilstand.</p></div>
+    <div class="card"><div class="kicker">Grote hallenbrand <span class="tag est">schatting</span></div><h3 class="num">€ 5–50 mln</h3><p>herbouw, maanden stilstand, hogere premie. Ter vergelijking: VK &gt; £ 1 mrd/jaar sectorbreed.<span class="ref">[27]</span></p></div>
+  </div>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Bij circa één grote brand per 10–20 jaar en een paar kleine per jaar is de terugverdientijd naar schatting 3–8 jaar <span class="tag est">schatting</span>. Verzekeraars zijn daarom een logische medefinancier.</p></div></div>
+  <aside class="notes"><p>Dit is geen businesscase. De schadebedragen zijn team-schattingen op basis van openbare berichten over grote afvalbranden; Nederlandse schadecijfers per bedrijf zijn niet openbaar gevonden. Ter illustratie: de Vereniging Afvalbedrijven meldde 65 miljoen euro schade in één jaar door ontploffende lachgascilinders (ander risico, wel indicatief voor de orde van grootte van sectorschade). Verdere baten die niet zijn meegerekend: lagere verzekeringspremie of eigen risico, minder stilstand, veiligheid van personeel, en data voor beleid en voorlichting. Kosten die niet zijn meegerekend: verbouwing van de hal voor de doseerband, die sterk per locatie verschilt.</p></aside>
+  <div class="foot"><span>Agent 6 · Vergelijking &amp; advies</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== COÖRDINATOR: TEGENSTRIJDIGHEDEN -->
+<section class="slide" data-title="Tegenstrijdigheden">
+  <div class="eyebrow">Coördinator · Combineren van bevindingen</div>
+  <h2>Vier tegenstrijdigheden tussen de agents en hoe die zijn opgelost</h2>
+  <table>
+    <thead><tr><th style="width:36%">Tegenstrijdigheid</th><th>Oplossing</th></tr></thead>
+    <tbody>
+      <tr><td class="k" style="white-space:normal">Agent 1: thermisch is 'volwassen' ↔ agent 2: 'niet geschikt'</td><td>Volwassen voor brand, niet voor detectie van intacte cellen. Beide waar.</td></tr>
+      <tr><td class="k" style="white-space:normal">Visia: 'nul shredderbranden' ↔ 50–60 branden op dezelfde locatie</td><td>Andere brandtypes of plekken; claim niet als bewijs gebruikt.<span class="ref">[6][7]</span></td></tr>
+      <tr><td class="k" style="white-space:normal">Sector: 38% door batterijen ↔ overheid: geen telling</td><td>Onzeker; eigen nulmeting in de pilot.<span class="ref">[24]</span></td></tr>
+      <tr><td class="k" style="white-space:normal">Opdracht: wagen, bunker, shovel ↔ techniek: dunne laag nodig</td><td>Extra locatie d (doseerband) toegevoegd.</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes"><p>Daarnaast: agent 5 noemt Smiths Detection met &gt;98% nauwkeurigheid, terwijl agent 3 80–95% verwacht. Het verschil zit in de stroom: Smiths/Xbat sorteert een al gescheiden batterijstroom; in restafval is het lastiger. Ook verschilt de definitie van 'detectie' tussen leveranciers (detectie, recall, 'yield'), wat agent 3 expliciet heeft gemarkeerd.</p></aside>
+  <div class="foot"><span>Coördinator</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== RED TEAM -->
+<section class="slide" data-title="Red team">
+  <div class="eyebrow">Coördinator · Kritische toets (red team)</div>
+  <h2>Waarom detectie vóór de shredder toch kan falen</h2>
+  <div class="cols c3">
+    <div class="card"><div class="kicker">Technisch</div><ul><li>Schade ontstaat al eerder: in de pers van de wagen of door de kraangrijper.</li><li>Kleine vapes en knoopcellen vallen weg tussen metaal.</li><li>Nieuwe typen (natrium-ion) geven een ander beeld.</li></ul></div>
+    <div class="card"><div class="kicker">Juridisch</div><ul><li>ANVS-traject of CE-classificatie duurt langer dan gepland.</li><li>Aansprakelijkheid bij een gemiste batterij.</li><li>Quarantaineopslag moet aan PGS 37-1 voldoen.</li></ul></div>
+    <div class="card"><div class="kicker">Operationeel</div><ul><li>Band wordt een knelpunt in de doorvoer.</li><li>Alarmmoeheid: ploeg zet het systeem uit.</li><li>Schijnveiligheid: blussing wordt verwaarloosd.</li></ul></div>
+  </div>
+  <div class="insight"><svg aria-hidden="true"><use href="#i-bat"/></svg><div><div class="lbl">Belangrijk inzicht</div><p>Het grootste risico is dat batterijen al beschadigd zijn vóór de scan. Detectie werkt daarom alleen samen met warmtebewaking op de band en in de bunker.</p></div></div>
+  <aside class="notes"><p>Verdere risico's: (1) leveranciersclaims zijn niet onafhankelijk getoetst, dus vooraf een acceptatietest met eigen testcellen in het contract opnemen; (2) de doseerband zelf is een nieuwe brandlocatie, dus IR-bewaking en blusvoorziening op de band; (3) natte, compacte zakken (bijvoorbeeld na regen) verlagen de detectie; (4) uitgesluisd materiaal moet door mensen worden gecontroleerd, wat zelf risico op brand en letsel geeft; (5) cybersecurity van een netwerkverbonden AI-systeem (Machineverordening stelt eisen); (6) model drift en vendor lock-in van trainingsdata, dus eigendom van data contractueel regelen; (7) beperkte ruimte in bestaande hallen; (8) een daling van het aantal branden is in een korte pilot statistisch moeilijk aan te tonen.</p></aside>
+  <div class="foot"><span>Coördinator</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== VERVOLGSTAPPEN -->
+<section class="slide" data-title="Vervolgstappen">
+  <div class="eyebrow">Coördinator · Vervolgstappen</div>
+  <h2>Vervolgstappen en partijen om te benaderen</h2>
+  <div class="cols c3" style="gap:36px">
+    <div class="card"><div class="kicker">Binnen 3 maanden</div><ul><li>Nulmeting branden en hotspots.</li><li>Bezoek Lobbe (DangerSort, WeSort.AI).</li><li>Vooroverleg ANVS en verzekeraar.</li><li>Pilotlocatie en ruimte vastleggen.</li></ul></div>
+    <div class="card"><div class="kicker">Binnen 12 maanden</div><ul><li>Lab en schaduwmodus afgerond.</li><li>Actief uitsluizen gestart.</li><li>Go/no-go op succescriteria.</li><li>Opschalingsplan per lijn.</li></ul></div>
+    <div class="card"><div class="kicker">Partijen</div><p>Fraunhofer IIS, WeSort.AI/Sesotec, Steinert, Smiths Detection; Vereniging Afvalbedrijven en Taskforce Batterijbranden; NVRD; ANVS; veiligheidsregio; TU/e, TNO; verzekeraars.</p></div>
+  </div>
+  <aside class="notes"><p>Aanbevolen volgorde: eerst de nulmeting en het bezoek in Duitsland, omdat die bepalen of een Nederlandse pilot een bestaand systeem kan huren. Vraag leveranciers naar onafhankelijke testdata, referenties, huur- of pilotconstructies, eigendom van data en het uitsluismechanisme voor zware zakken. Vraag de ANVS schriftelijk om bevestiging van registratie versus vergunning voor het gekozen toestel. Betrek de OR vroeg vanwege camera's en nieuwe werkprocedures.</p></aside>
+  <div class="foot"><span>Coördinator</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== AFKORTINGEN -->
+<section class="slide" data-title="Afkortingen en jargon">
+  <div class="eyebrow">Bijlage</div>
+  <h2 style="margin-bottom:24px">Afkortingen en jargon</h2>
+  <dl class="gl">
+    <dt>ADR</dt><dd>Europese regels voor vervoer van gevaarlijke stoffen over de weg.</dd>
+    <dt>AEEA</dt><dd>Afgedankte elektrische en elektronische apparatuur (Engels: WEEE).</dd>
+    <dt>AI</dt><dd>Kunstmatige intelligentie; hier: software die patronen in beelden herkent.</dd>
+    <dt>ANVS</dt><dd>Autoriteit Nucleaire Veiligheid en Stralingsbescherming.</dd>
+    <dt>ATEX</dt><dd>EU-regels voor apparatuur en werk in explosiegevaarlijke (stof)omgevingen.</dd>
+    <dt>AVG</dt><dd>Algemene verordening gegevensbescherming (privacy).</dd>
+    <dt>Bbs</dt><dd>Besluit basisveiligheidsnormen stralingsbescherming.</dd>
+    <dt>CE-markering</dt><dd>Verklaring dat een product aan EU-veiligheidseisen voldoet.</dd>
+    <dt>CT</dt><dd>Computertomografie: röntgenbeelden uit vele hoeken, samengevoegd tot 3D.</dd>
+    <dt>Dual-/multi-energy</dt><dd>Röntgen met twee of meer energieniveaus om materialen te onderscheiden.</dd>
+    <dt>DPIA</dt><dd>Gegevensbeschermingseffectbeoordeling (privacyrisicoanalyse).</dd>
+    <dt>Doseerband</dt><dd>Transportband die afval gelijkmatig en in een dunne laag aanvoert.</dd>
+    <dt>EMC</dt><dd>Elektromagnetische compatibiliteit: apparaten storen elkaar niet.</dd>
+    <dt>Inductie / wervelstroom</dt><dd>Detectie van metaal via een wisselend magnetisch veld.</dd>
+    <dt>IR / thermisch</dt><dd>Infrarood; camera's die temperatuur meten.</dd>
+    <dt>NIR / hyperspectraal</dt><dd>Camera's die licht buiten het zichtbare spectrum meten (oppervlak).</dd>
+    <dt>PGS 37-1</dt><dd>Richtlijn voor veilige opslag van lithiumbatterijen.</dd>
+    <dt>RDW</dt><dd>Rijksdienst voor het Wegverkeer (toelating voertuigen).</dd>
+    <dt>Recall / precisie</dt><dd>Deel van de batterijen dat gevonden wordt / deel van de alarmen dat terecht is.</dd>
+    <dt>ROC-curve</dt><dd>Grafiek die detectie afzet tegen valse alarmen bij elke drempel.</dd>
+    <dt>Schaduwmodus</dt><dd>Systeem meet en logt, maar grijpt nog niet in.</dd>
+    <dt>Sensorfusie</dt><dd>Combineren van meerdere sensoren tot één oordeel.</dd>
+    <dt>Thermal runaway</dt><dd>Kettingreactie waarbij een cel zichzelf verhit, gas afgeeft en brandt.</dd>
+    <dt>TRL</dt><dd>Technology Readiness Level, 1 (idee) tot 9 (bewezen in praktijk).</dd>
+    <dt>t/u</dt><dd>Ton per uur: doorvoercapaciteit.</dd>
+    <dt>Valse positief / negatief</dt><dd>Alarm zonder batterij / batterij zonder alarm.</dd>
+    <dt>Z-eff</dt><dd>Effectief atoomnummer: maat voor hoe 'zwaar' een materiaal is voor röntgen.</dd>
+    <dt>Vape</dt><dd>Elektronische sigaret met kleine lithiumcel, vaak in restafval.</dd>
+  </dl>
+  <div class="foot"><span>Bijlage</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== AANNAMES -->
+<section class="slide" data-title="Aannames">
+  <div class="eyebrow">Bijlage</div>
+  <h2 style="margin-bottom:22px">Aannames</h2>
+  <table style="font-size:19px">
+    <thead><tr><th style="width:30%">Aanname</th><th style="width:35%">Waarom gemaakt</th><th>Impact als die niet klopt</th></tr></thead>
+    <tbody>
+      <tr><td class="k" style="white-space:normal">Röntgen werkt tot ca. 10–40 cm laagdikte</td><td>Alle praktijksystemen werken op banden; geen dieptedata openbaar.</td><td>Dikker mogelijk: minder spreiden nodig. Dunner: lagere doorvoer, meer banden.</td></tr>
+      <tr><td class="k" style="white-space:normal">Detectie 80–95% haalbaar in NL restafval</td><td>Leveranciers- en onderzoekscijfers uit DE, JP, BE.</td><td>Lager: minder schadereductie, businesscase zwakker.</td></tr>
+      <tr><td class="k" style="white-space:normal">Ruimte van 15–30 m vóór de shredder</td><td>Typische lengte band + scanner + klep.</td><td>Geen ruimte: verbouwing of alternatieve locatie, hogere kosten.</td></tr>
+      <tr><td class="k" style="white-space:normal">Afgeschermde tunnel = registratie (geen vergunning)</td><td>Bagagescanners zijn registratieplichtig (Bbs).</td><td>Vergunning: 3–6 maanden extra en meer eisen.</td></tr>
+      <tr><td class="k" style="white-space:normal">Max. 1–3 handmatige alarmen per uur acceptabel</td><td>Ervaring uit andere sectoren; geen afvalstudie gevonden.</td><td>Lager: drempel hoger, minder detectie.</td></tr>
+      <tr><td class="k" style="white-space:normal">Kosten € 0,5–1,5 mln per lijn; grote brand € 5–50 mln</td><td>Marktbeeld; geen openbare prijzen of NL-schadecijfers.</td><td>Andere verhouding: terugverdientijd verschuift sterk.</td></tr>
+      <tr><td class="k" style="white-space:normal">Bestaande DE-systemen zijn te huren voor een pilot</td><td>Leveranciers zoeken referenties; niet bevestigd.</td><td>Aankoop nodig: hogere drempel, langere doorlooptijd.</td></tr>
+      <tr><td class="k" style="white-space:normal">Batterijen zijn bij de scan nog intact</td><td>Nodig om 'preventie vóór de shredder' te laten werken.</td><td>Al beschadigd: meer branden op band of in bunker; IR extra belangrijk.</td></tr>
+    </tbody>
+  </table>
+  <div class="foot"><span>Bijlage</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== BRONNEN 1 -->
+<section class="slide" data-title="Bronnen 1">
+  <div class="eyebrow">Bijlage · Bronnen (1/2)</div>
+  <h2 style="margin-bottom:20px">Bronnenlijst</h2>
+  <ol class="src">
+    <li>Fraunhofer IIS, <i>DangerSort: Intelligent AI sorting for the early detection of lithium-ion batteries</i>, productpagina, 2025. <span class="u">https://www.iis.fraunhofer.de/en/ff/zfp/products/DangerSort.html</span></li>
+    <li>Fraunhofer, <i>Sensor-based waste sorting reduces number of battery fires in recycling plants</i>, persbericht, mei 2025. <span class="u">https://www.fraunhofer.de/en/press/research-news/2025/may-2025/sensor-based-waste-sorting-reduces-number-of-battery-fires-in-recycling-plants.html</span></li>
+    <li>Lobbe, <i>Fraunhofer IIS and Lobbe develop innovative AI X-ray sorting system</i>, 2025. <span class="u">https://www.lobbe.de/en/mehr-sicherheit-in-recyclinganlagen/</span></li>
+    <li>PFU/Ricoh, <i>Raptor VISION BATTERY</i>, productpagina, en Ricoh-artikel, feb. 2026. <span class="u">https://www.pfu.ricoh.com/global/raptor-vision/battery/ · https://www.ricoh.com/news/stories/articles/pfu-raptor-vision-battery</span></li>
+    <li>Resource Recycling, <i>X-ray tech identifies batteries and more</i>, nov. 2024. <span class="u">https://resource-recycling.com/e-scrap/2024/11/21/x-ray-tech-identifies-batteries-and-more/</span></li>
+    <li>Waste Dive, <i>Visia AI sorting systems, battery fires, Casella, Rumpke</i>, 2024. <span class="u">https://www.wastedive.com/news/visia-ai-sorting-systems-battery-fires-casella-rumpke-operations/805933/</span></li>
+    <li>Waste360, <i>Rumpke's Cincinnati recycling facility uses AI to spot lithium-ion batteries</i>. <span class="u">https://www.waste360.com/waste-recycling/rumpke-s-cincinnati-recycling-facility-uses-ai-to-spot-lithium-ion-batteries</span></li>
+    <li>Resource Recycling, <i>Visia X-ray tech helps prevent MRF battery fires</i>, aug. 2025. <span class="u">https://resource-recycling.com/recycling/2025/08/26/visia-x-ray-tech-helps-prevent-mrf-battery-fires/</span></li>
+    <li>Sesotec, <i>Engineering meets AI: Sesotec × WeSort.AI</i>; Recycling Product News, distributie X.Sort. <span class="u">https://www.sesotec.com/en/blog/blog-detail/engineering-meets-ai-sesotec-wesortai · https://www.recyclingproductnews.com/article/44483/</span></li>
+    <li>KI-Syndikat, use case WeSort.AI bij Lobbe RSW (secundaire bron, niet geverifieerd). <span class="u">https://www.ki-syndikat.de/usecases/entsorgung/01-sortierfehler-erkennung-bildanalyse/</span></li>
+    <li>Recycling Today, <i>Steinert lithium battery detection and removal from waste streams</i>. <span class="u">https://recyclingtoday.com/media/steinert-lithium-battery-detection-and-removal-from-waste-streams</span></li>
+    <li>Waste360, <i>Lion Vision develops new AI system to detect lithium-ion batteries</i>, 2024. <span class="u">https://www.waste360.com/waste-recycling/lion-vision-develops-new-ai-system-to-detect-lithium-ion-batteries-in-waste-streams</span></li>
+    <li>Circular Online, <i>Viridor calls for collaboration on lithium battery detection</i>. <span class="u">https://www.circularonline.co.uk/?p=28023</span></li>
+    <li>Resource Recycling, AMP Robotics traint AI op batterijen en gastanks. <span class="u">https://resource-recycling.com/recycling/?p=22015</span></li>
+    <li>Smiths Detection, <i>iCMORE algorithms for lithium batteries for HI-SCAN 10080 XCT</i>. <span class="u">https://www.smithsdetection.com/press-releases/smiths-detection-launches-icmore-algorithms-for-lithium-batteries-and-dangerous-goods-for-hi-scan-10080-xct/</span></li>
+    <li>Smiths Detection, partnerschap met VITO en Sortbat (Xbat.ai / CIRQURA), 2025–2026. <span class="u">https://www.smithsdetection.com/press-releases/smiths-detection-forms-strategic-partnership-with-vito-and-sortbat-to-support-sustainability-strategy/</span></li>
+    <li>Rapiscan, patent US10598812, automatische detectie van lithiumbatterijen in vracht en bagage. <span class="u">https://patents.google.com/patent/US10598812</span></li>
+    <li>Fike, <i>Fire Rover remote firefighting for waste management</i>. <span class="u">https://www.fike.com/knowledge-center/fire-rover-remote-firefighting-waste-management/</span></li>
+    <li>Waste360 (gesponsord door FireDos), <i>IR detection with autonomous suppression</i> (Orglmeister). <span class="u">https://www.waste360.com/industry-insights/ir-detection-with-autonomous-suppression</span></li>
+    <li>InfraTec, <i>Early fire detection in the power plant</i> (WASTE-SCAN). <span class="u">https://www.infratec.eu/thermography/early-fire-detection-in-the-power-plant/</span></li>
+    <li>Honeywell, <i>Li-ion Tamer GEN3 datasheet</i>; FM-testresultaat off-gas detectie. <span class="u">https://www.honeywell.com/us/en/insights/articles/off-gas-detection-system-receives-favorable-test-result</span></li>
+  </ol>
+  <div class="foot"><span>Bijlage</span><span class="pg"></span></div>
+</section>
+
+<!-- ===================================================== BRONNEN 2 -->
+<section class="slide" data-title="Bronnen 2">
+  <div class="eyebrow">Bijlage · Bronnen (2/2)</div>
+  <h2 style="margin-bottom:20px">Bronnenlijst (vervolg)</h2>
+  <ol class="src" start="22">
+    <li>Brandveilig.com, <i>Batterijen vormen brandrisico in afvalstroom</i> (VA: ± 120 branden/jaar); NOS, <i>Jaarlijks tientallen branden in vuilniswagens</i>. <span class="u">https://www.brandveilig.com/artikel/batterijen-vormen-brandrisico-in-afvalstroom-70932 · https://nos.nl/l/2485439</span></li>
+    <li>NIPV, <i>Brandveiligheid bij afvalbedrijven in Nederland</i>. <span class="u">https://nipv.nl/documenten/brandveiligheid-bij-afvalbedrijven-in-nederland</span></li>
+    <li>Tweede Kamer, document 2026D41104 (Kamervragen branden Alkmaar en Rotterdam-Charlois, 2026). Alleen via zoekresultaat, niet volledig ingezien. <span class="u">https://www.tweedekamer.nl/downloads/document?id=2026D41104</span></li>
+    <li>Vereniging Afvalbedrijven, <i>Taskforce Batterijbranden – Jaaroverzicht 2024</i>. Niet volledig ingezien. <span class="u">https://verenigingafvalbedrijven.nl/userfiles/files/Taskforce%20Batterijbranden%20-%20Jaaroverzicht%202024.pdf</span></li>
+    <li>Stichting OPEN, <i>Batterijen in huishoudelijk restafval 2025</i>. Niet volledig ingezien. <span class="u">https://www.stichting-open.org/wp-content/uploads/2026/06/St.OPEN-Batterijen-in-huish.-restafval-2025.pdf</span></li>
+    <li>North London Waste Authority (Eunomia/ESA: &gt; £ 1 mrd/jaar); Resource Media (Eunomia 2021: £ 158 mln). <span class="u">https://www.nlwa.gov.uk/latest/london-waste-authorities-join-forces-urge-government-intervention-ps1-billion-waste-problem · https://resourcemedia.eco/article/lithium-ion-battery-fires-costing-uk-economy-158-million-annually</span></li>
+    <li>US EPA, <i>Labeling research and engagement white paper</i> (245 branden 2013–2020), jan. 2025. <span class="u">https://www.epa.gov/system/files/documents/2025-01/epa-labeling-research-and-engagement-white-paper.pdf</span></li>
+    <li>Internetconsultatie ANVS vergunningenbeleid 2025, reactie (bagagescanners registratieplichtig, Bbs art. 3.10 lid 2h); Bbs op wetten.overheid.nl. <span class="u">https://www.internetconsultatie.nl/anvs_vergunningenbeleid_2025/reactie/251901/bestand · https://wetten.overheid.nl/BWBR0040179</span></li>
+    <li>Verordening (EU) 2023/1230 (Machineverordening), EUR-Lex; BAuA-toelichting. <span class="u">https://eur-lex.europa.eu/eli/reg/2023/1230/oj · https://www.baua.de/EN/Topics/Work-design/Machine-and-operational-safety/Machinery/Machinery-Directive-Revision</span></li>
+    <li>IO+, <i>Studenten TU Eindhoven detecteren met AI batterijen in afvalstromen</i>. <span class="u">https://ioplus.nl/archive/nl/selected/studenten-tu-eindhoven-detecteren-met-ai-batterijen-in-afvalstromen/</span></li>
+    <li>Researchportal België, deep learning op röntgenbeelden van AEEA (precisie 89%, recall 81%). <span class="u">https://www.researchportal.be/nl/node/7419326</span></li>
+    <li>CORDIS, EU-project GRINNER (101070321), rapportage. <span class="u">https://cordis.europa.eu/project/id/101070321</span></li>
+    <li>arXiv 2512.05599, lithiumbatterijen in stedelijke afvalstromen, 2025. <span class="u">https://arxiv.org/html/2512.05599v1</span></li>
+    <li>Waste360, <i>Li-ion battery fires cost operators over $1.2 billion annually</i> (claim Fire Rover). <span class="u">https://www.waste360.com/business/li-ion-battery-fires-unfairly-cost-waste-recycling-and-scrap-operators-over-12-billion</span></li>
+    <li>WEEE Forum, <i>Industry guide for collecting, handling and treating lithium batteries</i>, 2025. <span class="u">https://weee-forum.org/wp-content/uploads/2025/02/IndustryGuideforcollectinghandlingandtreatingLithiumBatteries2025.pdf</span></li>
+    <li>Recycling Magazine, <i>AI sorting for battery detection</i>, apr. 2026. <span class="u">https://www.recycling-magazine.com/2026/04/09/ai-battery-detection-recycling/</span></li>
+    <li>inSystem.io, AI-sorteerder voor batterijen (Gravity Sorter): alleen via zoekresultaat bekend, niet geverifieerd.</li>
+    <li>AI-verordening, artikel 6 (hoog-risico-AI). <span class="u">https://artificialintelligenceact.eu/nl/article/6/</span></li>
+    <li>EMC-richtlijn 2014/30/EU, EUR-Lex (algemene wettekst). <span class="u">https://eur-lex.europa.eu/eli/dir/2014/30/oj</span></li>
+    <li>ATEX-richtlijnen 2014/34/EU en 1999/92/EG, EUR-Lex (algemene wettekst). <span class="u">https://eur-lex.europa.eu/eli/dir/2014/34/oj · https://eur-lex.europa.eu/eli/dir/1999/92/oj</span></li>
+    <li>AVG (EU) 2016/679, EUR-Lex; Autoriteit Persoonsgegevens over camera's. <span class="u">https://eur-lex.europa.eu/eli/reg/2016/679/oj · https://www.autoriteitpersoonsgegevens.nl/themas/camera-s</span></li>
+    <li>RDW, informatie over wijzigingen aan voertuigen (algemeen, niet op deze toepassing getoetst). <span class="u">https://www.rdw.nl</span></li>
+  </ol>
+  <p class="xs muted" style="margin-top:8px">Bronnen 40–43 zijn algemene wetteksten, niet specifiek op deze toepassing getoetst. Bronnen 24–26 waren in deze sessie niet bereikbaar en zijn alleen via zoekresultaten bekend.</p>
+  <div class="foot"><span>Bijlage</span><span class="pg"></span></div>
+</section>
+
+</div></div>
+
+<div id="notesPanel" hidden><h4>Sprekersnotities</h4><div id="notesBody"></div></div>
+
+<nav id="nav" aria-label="Dianavigatie">
+  <button id="prev" type="button" aria-label="Vorige dia">← Vorige</button>
+  <span id="counter" aria-live="polite">1/1</span>
+  <button id="next" type="button" aria-label="Volgende dia">Volgende →</button>
+  <button id="notesBtn" type="button" class="hide-sm" aria-pressed="false">Notities (N)</button>
+  <button id="pdfBtn" type="button" class="primary">Download als PDF</button>
+</nav>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var total=slides.length, idx=0;
+  var stage=document.getElementById('stage'), vp=document.getElementById('viewport');
+  var counter=document.getElementById('counter');
+  var panel=document.getElementById('notesPanel'), body=document.getElementById('notesBody');
+  var notesBtn=document.getElementById('notesBtn');
+
+  slides.forEach(function(s,i){
+    var pg=s.querySelector('.pg'); if(pg) pg.textContent=(i+1)+'/'+total;
+  });
+
+  function fit(){
+    var w=vp.clientWidth, h=vp.clientHeight;
+    var sc=Math.min(w/1920,h/1080)*0.97;
+    stage.style.transform='scale('+sc+')';
+  }
+  function show(n){
+    idx=Math.max(0,Math.min(total-1,n));
+    slides.forEach(function(s,i){s.classList.toggle('active',i===idx);});
+    counter.textContent=(idx+1)+'/'+total;
+    var nt=slides[idx].querySelector('.notes');
+    body.innerHTML=nt?nt.innerHTML:'<p>Geen notities bij deze dia.</p>';
+    try{history.replaceState(null,'','#'+(idx+1));}catch(e){}
+  }
+  function toggleNotes(){
+    panel.hidden=!panel.hidden;
+    notesBtn.setAttribute('aria-pressed',String(!panel.hidden));
+    vp.style.bottom=panel.hidden?'64px':(panel.offsetHeight+64)+'px';
+    fit();
+  }
+  document.getElementById('prev').addEventListener('click',function(){show(idx-1);});
+  document.getElementById('next').addEventListener('click',function(){show(idx+1);});
+  notesBtn.addEventListener('click',toggleNotes);
+  document.getElementById('pdfBtn').addEventListener('click',function(){window.print();});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();show(idx+1);}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();show(idx-1);}
+    else if(e.key==='Home'){show(0);}
+    else if(e.key==='End'){show(total-1);}
+    else if(e.key==='n'||e.key==='N'){toggleNotes();}
+  });
+  window.addEventListener('resize',fit);
+  var start=parseInt((location.hash||'').replace('#',''),10);
+  show(isNaN(start)?0:start-1);
+  fit();
+})();
+</script>
+</body>
+</html>
