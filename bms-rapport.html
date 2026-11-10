@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BMS-onderzoek fietsaccu's</title>
+<style>
+:root {
+  --bg: #fbfaf8;
+  --surface: #ffffff;
+  --surface-2: #f2f0ec;
+  --text: #1f2328;
+  --muted: #5b6168;
+  --border: #dcd8d0;
+  --link: #1d5fa8;
+  --accent: #2c4a6e;
+  --ok-bg: #dff3e4; --ok-fg: #17602d;
+  --mid-bg: #fdebd3; --mid-fg: #8a4b00;
+  --no-bg: #fbe0e0; --no-fg: #9b1c1c;
+  --unk-bg: #e8e8e8; --unk-fg: #4a4a4a;
+  --note-bg: #eef3f9; --warn-bg: #fff4e5; --warn-border: #e2a14a;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15171a;
+    --surface: #1c1f23;
+    --surface-2: #24282d;
+    --text: #e6e8eb;
+    --muted: #a3a9b1;
+    --border: #353b42;
+    --link: #8ab8ee;
+    --accent: #9fbbe0;
+    --ok-bg: #173a22; --ok-fg: #8fdca5;
+    --mid-bg: #45300f; --mid-fg: #f5c27a;
+    --no-bg: #4a1c1c; --no-fg: #f5a3a3;
+    --unk-bg: #33363a; --unk-fg: #c9cbce;
+    --note-bg: #1d2834; --warn-bg: #33270f; --warn-border: #a8762f;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+main { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 1.9rem; line-height: 1.25; margin: 0 0 8px; color: var(--accent); }
+h2 { font-size: 1.45rem; line-height: 1.3; margin: 48px 0 12px; padding-top: 12px; border-top: 2px solid var(--border); color: var(--accent); }
+h3 { font-size: 1.15rem; margin: 30px 0 8px; }
+h4 { font-size: 1.02rem; margin: 20px 0 6px; }
+p, li { overflow-wrap: break-word; }
+a { color: var(--link); }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.95em; background: var(--surface-2); padding: 1px 4px; border-radius: 4px; overflow-wrap: anywhere; }
+.lead { color: var(--muted); margin: 0 0 16px; }
+.ref { font-size: 16px; line-height: 0; white-space: nowrap; }
+.ref a { text-decoration: none; }
+.ref a:hover { text-decoration: underline; }
+nav.toc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 18px; margin: 20px 0; }
+nav.toc h2 { border: 0; margin: 0 0 4px; padding: 0; font-size: 1.1rem; }
+nav.toc ol { margin: 0; padding-left: 22px; }
+nav.toc ol ol { padding-left: 18px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; }
+.tag { display: inline-block; font-size: 16px; font-weight: 600; line-height: 1.3; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.tag.ok { background: var(--ok-bg); color: var(--ok-fg); }
+.tag.mid { background: var(--mid-bg); color: var(--mid-fg); }
+.tag.no { background: var(--no-bg); color: var(--no-fg); }
+.tag.unk { background: var(--unk-bg); color: var(--unk-fg); }
+.tag.weak { background: var(--unk-bg); color: var(--unk-fg); font-weight: 500; white-space: normal; }
+.tw { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 12px 0 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 16px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+th { background: var(--surface-2); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+.box { background: var(--note-bg); border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+.box.warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); }
+.box > :first-child { margin-top: 0; }
+.box > :last-child { margin-bottom: 0; }
+ol.steps { padding-left: 0; list-style: none; counter-reset: stap; }
+ol.steps > li { counter-increment: stap; position: relative; padding: 12px 14px 12px 56px; margin: 0 0 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+ol.steps > li::before { content: counter(stap); position: absolute; left: 14px; top: 12px; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--bg); font-weight: 700; text-align: center; line-height: 30px; }
+ol.steps > li > strong:first-child { display: block; }
+ol.steps ul { margin: 6px 0 0; padding-left: 20px; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.col { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; min-width: 0; }
+.col h3 { margin-top: 4px; }
+small { font-size: 16px; font-weight: 400; color: var(--muted); }
+.col ol { padding-left: 22px; margin: 0; }
+.col li { margin-bottom: 10px; }
+@media (max-width: 700px) { .cols { grid-template-columns: 1fr; } h1 { font-size: 1.6rem; } }
+ol.bronnen { padding-left: 34px; }
+ol.bronnen li { margin-bottom: 10px; }
+ol.bronnen a { overflow-wrap: anywhere; word-break: break-word; }
+.btitle { font-weight: 600; }
+.also { color: var(--muted); }
+footer { margin-top: 48px; padding-top: 16px; border-top: 2px solid var(--border); color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>BMS-onderzoek fietsaccu's</h1>
+<p class="lead">Kun je de elektronica (het BMS) van een e-bike-accu van buitenaf uitlezen, zonder de accu te openen? En wat betekent dat voor de keuze tussen hergebruiken, repareren en recyclen? Dit rapport bundelt zes deelonderzoeken. De kritische toets (rapport 6) is leidend: waar die een eerder rapport corrigeert, staat hier de correctie.</p>
+<div class="legend" aria-label="Legenda oordelen">
+<span class="tag ok">Haalbaar</span>
+<span class="tag mid">Beperkt</span>
+<span class="tag no">Niet doen</span>
+<span class="tag unk">Onbevestigd</span>
+</div>
+</header>
+
+<nav class="toc" aria-label="Inhoudsopgave">
+<h2>Inhoud</h2>
+<ol>
+<li><a href="#samenvatting">Samenvatting</a></li>
+<li><a href="#per-merk">Uitlezen per merk</a>
+ <ol>
+ <li><a href="#methoden">Overzicht uitleesmethoden</a></li>
+ <li><a href="#bosch">Bosch (per generatie)</a></li>
+ <li><a href="#bafang">Bafang</a></li>
+ <li><a href="#generiek">Generieke smart-BMS'en (JBD, Daly, JK, ANT)</a></li>
+ <li><a href="#zonder-datalijn">Aftermarket-accu's zonder datalijn</a></li>
+ <li><a href="#wekken">Een "geblokkeerd" BMS weer wekken</a></li>
+ </ol>
+</li>
+<li><a href="#stappenplan">Stappenplan voor een leek</a></li>
+<li><a href="#inkoop">Inkooplijst en startbudget</a></li>
+<li><a href="#kansen-risicos">Kansen en risico's</a>
+ <ol><li><a href="#juridisch">Juridische aandachtspunten</a></li></ol>
+</li>
+<li><a href="#bronnen">Bronnenlijst</a></li>
+<li><a href="#colofon">Colofon</a></li>
+</ol>
+</nav>
+
+<!-- ============ 1 ============ -->
+<section id="samenvatting">
+<h2>1. Samenvatting</h2>
+<p>Een fietsaccu van buitenaf uitlezen lukt alleen bij een minderheid: accu's met een datalijn op de connector en een bekend protocol. De meeste aftermarket-accu's (Hailong, Shark, Reention) hebben geen datalijn; dan meet je alleen de totale spanning, en die kan een dode celgroep verbergen<sup class="ref">[<a href="#bron-18">18</a>, <a href="#bron-49">49</a>]</sup>. Bosch-accu's van het nieuwste systeem (smart system) zijn alleen betrouwbaar uit te lezen via een Bosch-dealer; bij oudere Bosch-accu's lees je zelf hooguit laadniveau, spanning en temperatuur mee<sup class="ref">[<a href="#bron-6">6</a>, <a href="#bron-8">8</a>, <a href="#bron-34">34</a>]</sup>. Bij Bafang-accu's met CAN is uitlezen deels mogelijk, maar of je gegevens per cel krijgt, is onbevestigd<sup class="ref">[<a href="#bron-45">45</a>, <a href="#bron-48">48</a>]</sup>. Losse smart-BMS'en (JBD, Daly, JK, ANT) zijn goed uit te lezen, maar zitten zelden in een fietsaccu met een bereikbare poort<sup class="ref">[<a href="#bron-54">54</a>, <a href="#bron-56">56</a>, <a href="#bron-61">61</a>]</sup>. Beschermingsgrenzen of firmware aanpassen raden we af: het haalt de laatste beveiliging weg en maakt je juridisch fabrikant<sup class="ref">[<a href="#bron-108">108</a>, <a href="#bron-119">119</a>]</sup>. De betrouwbaarste test die je zelf kunt doen is een volledige capaciteitstest via de ontlaadpoort (ongeveer 3 uur, onder toezicht), samen met een zelfontladingstest van 48–72 uur<sup class="ref">[<a href="#bron-71">71</a>, <a href="#bron-112">112</a>]</sup>. Een snelle intaketest van 10–15 minuten is een interessante kans, maar is nog niet bewezen en vraagt eerst een pilot. Een accu met een defecte celgroep repareren kan alleen door hem te openen, en dat valt buiten dit onderzoek. Juridisch vragen vooral afvalstatus, transport (ADR) en opslag (PGS 37-2) aandacht<sup class="ref">[<a href="#bron-108">108</a>, <a href="#bron-116">116</a>, <a href="#bron-117">117</a>]</sup>.</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="per-merk">
+<h2>2. Uitlezen per merk</h2>
+<p>Of je een accu van buitenaf kunt uitlezen, hangt vooral af van één vraag: zit er een datalijn op de connector<sup class="ref">[<a href="#bron-2">2</a>, <a href="#bron-49">49</a>]</sup>? Hieronder eerst de methoden, daarna per merk wat kan en wat niet.</p>
+
+<h3 id="methoden">2.1 Overzicht uitleesmethoden</h3>
+<div class="tw"><table>
+<thead><tr><th>Methode</th><th>Wat je nodig hebt</th><th>Wat je ziet</th><th>Beperkingen</th><th>Oordeel</th></tr></thead>
+<tbody>
+<tr><td><strong>UART</strong> (communicatiepin)</td><td>USB-TTL-adapter (3,3/5 V), soms een 5 V-wekdraad</td><td>Bij JBD-protocol: packspanning, stroom, laadniveau, cycli, beveiligingsstatus en spanning per cel<sup class="ref">[<a href="#bron-3">3</a>, <a href="#bron-4">4</a>]</sup>. Bij Bafang-UART volgens één blog alleen laadniveau en spanning<sup class="ref">[<a href="#bron-1">1</a>]</sup></td><td>Protocol verschilt per fabrikant; Bafang-BMS-protocol is niet officieel gedocumenteerd<sup class="ref">[<a href="#bron-5">5</a>]</sup></td><td><span class="tag mid">Beperkt</span><br><span class="tag unk">Bafang-UART onbevestigd</span></td></tr>
+<tr><td><strong>CAN-bus</strong></td><td>CAN-USB-adapter (bv. CANable) of ESP32 met SN65HVD230</td><td>Bosch (oud): laadniveau, spanning, stroom, vermogen, temperatuur<sup class="ref">[<a href="#bron-6">6</a>, <a href="#bron-8">8</a>]</sup>. Bafang: celblokken deels in kaart gebracht<sup class="ref">[<a href="#bron-7">7</a>]</sup></td><td>Snelheid verschilt (Bosch Classic 125 kbit/s, Bafang 250 kbit/s); accu moet met 5 V gewekt worden<sup class="ref">[<a href="#bron-6">6</a>, <a href="#bron-9">9</a>]</sup></td><td><span class="tag mid">Beperkt</span></td></tr>
+<tr><td><strong>SMBus / I²C (SBS)</strong></td><td>SMBus-adapter</td><td>Gestandaardiseerde waarden (spanning, stroom, cycli, celspanningen)<sup class="ref">[<a href="#bron-11">11</a>, <a href="#bron-12">12</a>, <a href="#bron-13">13</a>]</sup></td><td>Geen enkele bron dat dit op een e-bike-connector zit</td><td><span class="tag unk">Niet op rekenen</span></td></tr>
+<tr><td><strong>Bluetooth</strong></td><td>Smartphone met app (bv. Xiaoxiang)</td><td>Celspanningen, stroom, capaciteit, alarmen, temperatuur; cycli afhankelijk van model<sup class="ref">[<a href="#bron-14">14</a>, <a href="#bron-15">15</a>]</sup></td><td>Alleen bij een (aftermarket) smart-BMS met Bluetooth; bij gewone merkaccu's niet aangetoond</td><td><span class="tag mid">Beperkt</span></td></tr>
+<tr><td><strong>Laadconnector</strong> (3e pin)</td><td>Multimeter of scope</td><td>Soms temperatuursensor of aanwezigheidssignaal, vaak niets<sup class="ref">[<a href="#bron-16">16</a>, <a href="#bron-17">17</a>]</sup></td><td>Niet gestandaardiseerd; geen data-uitlezing gedocumenteerd</td><td><span class="tag unk">Geen data</span></td></tr>
+<tr><td><strong>Ontlaadconnector</strong> (fietsaansluiting)</td><td>Multimeter; daarna UART- of CAN-adapter als er datapinnen zijn; elektronische last voor capaciteitstest</td><td>Bij 2 pinnen alleen spanning; bij 4–6 pinnen mogelijk wek-, data- of temperatuurpin<sup class="ref">[<a href="#bron-2">2</a>, <a href="#bron-18">18</a>]</sup></td><td>Pinvolgorde verschilt per fabrikant; één pin voert de volle accuspanning<sup class="ref">[<a href="#bron-2">2</a>, <a href="#bron-9">9</a>]</sup></td><td><span class="tag ok">Haalbaar</span> voor spanning en capaciteitstest</td></tr>
+<tr><td><strong>Dealer-diagnose</strong></td><td>Merkgebonden tool (alleen dealer), bv. Bosch DiagnosticTool</td><td>Laadcycli, restcapaciteit, laadniveau, foutcodes<sup class="ref">[<a href="#bron-21">21</a>, <a href="#bron-30">30</a>]</sup></td><td>Niet voor eindgebruikers; dealers weigeren soms</td><td><span class="tag ok">Haalbaar</span> tegen betaling</td></tr>
+</tbody>
+</table></div>
+
+<!-- Bosch -->
+<h3 id="bosch">2.2 Bosch (per generatie)</h3>
+<div class="tw"><table>
+<thead><tr><th>Generatie</th><th>Hoe uitlezen</th><th>Wat nodig</th><th>Wat je (niet) ziet</th><th>Oordeel</th></tr></thead>
+<tbody>
+<tr><td><strong>Classic(+) Line</strong><br>(PowerPack frame/rack, ca. 2011–2015)</td><td>Dealer: DiagnosticTool en CapacityTester BCT100 met adapter<sup class="ref">[<a href="#bron-21">21</a>, <a href="#bron-29">29</a>]</sup>. Hobby: passief meelezen op CAN met 5 V op de wekpin<sup class="ref">[<a href="#bron-6">6</a>]</sup></td><td>Dealer, of ESP32 met CAN-transceiver op 125 kbit/s<sup class="ref">[<a href="#bron-6">6</a>]</sup></td><td>Laadniveau, spanning, temperatuur. Geen celspanningen, cycli of gezondheid (SoH). Pinout komt uit één forumbron<sup class="ref">[<a href="#bron-6">6</a>]</sup></td><td><span class="tag mid">Beperkt</span></td></tr>
+<tr><td><strong>Active/Performance Gen2–Gen4 (BES2)</strong><br>PowerPack 300/400/500, PowerTube 400/500/625</td><td>Dealer: DiagnosticTool-rapport (cycli, restcapaciteit) en BCT100<sup class="ref">[<a href="#bron-29">29</a>, <a href="#bron-30">30</a>]</sup>. Hobby: CAN deels gedecodeerd<sup class="ref">[<a href="#bron-8">8</a>]</sup></td><td>Dealer, of CAN-adapter met 5 V-wekvoeding<sup class="ref">[<a href="#bron-8">8</a>]</sup></td><td>Laadniveau, resterende Wh, spanning, stroom, temperatuur<sup class="ref">[<a href="#bron-8">8</a>]</sup>. Celspanningen en cycli niet via CAN gedecodeerd</td><td><span class="tag mid">Beperkt</span> zelf<br><span class="tag ok">Haalbaar</span> via dealer</td></tr>
+<tr><td><strong>Smart system (BES3)</strong><br>PowerTube 400–800, PowerPack 400–800, PowerMore 250</td><td>Alleen dealer: DiagnosticTool 3, CapacityTester BCT3990, of het certificaat "Certified by Bosch"<sup class="ref">[<a href="#bron-30">30</a>, <a href="#bron-31">31</a>, <a href="#bron-32">32</a>, <a href="#bron-33">33</a>]</sup></td><td>Dealer- of partnerstatus (Rebike vanaf juli 2026, vakhandel vanaf begin 2027)<sup class="ref">[<a href="#bron-32">32</a>]</sup></td><td>Uitgebreid rapport (zie onder). Zelf: niets betrouwbaars; bus is CAN-FD met vermoedelijk beveiliging (MAC)<sup class="ref">[<a href="#bron-34">34</a>]</sup></td><td><span class="tag ok">Haalbaar</span> alleen via dealer</td></tr>
+</tbody>
+</table></div>
+
+<h4>Wat de dealertool laat zien</h4>
+<p>Een rapport van DiagnosticTool 3 (PowerTube 625) toont onder meer: serienummer, hard- en softwareversie, "Component locked", spanning en laadniveau, huidige/maximale/minimale temperatuur, tijd in thermische bescherming, totaal geleverde kWh en Ah, aantal volle laadcycli, zelfontladingssnelheid, berekende restcapaciteit en foutcodes. <strong>Celspanningen staan er niet in</strong><sup class="ref">[<a href="#bron-30">30</a>]</sup>. Het certificaat "Certified by Bosch" noemt bijvoorbeeld "Ladezyklen 5, Gesundheitszustand 98%"<sup class="ref">[<a href="#bron-33">33</a>]</sup>. De CapacityTester meet de energie-inhoud door de accu leeg te trekken, maar test volgens de handleiding "not … the functionality or the technical condition"<sup class="ref">[<a href="#bron-29">29</a>]</sup>. Een forumgebruiker noemt £20–40 per dealerdiagnose (<span class="tag unk">onbevestigd</span>)<sup class="ref">[<a href="#bron-91">91</a>]</sup>.</p>
+
+<div class="box warn">
+<p><strong>Tegenstrijdige bronnen over CAN-id's.</strong> Rapport 1 koppelt de CAN-berichten 0x101 (spanning/stroom), 0x111 (laadniveau) en 0x2aa (temperatuur) aan de <strong>Classic</strong>-accu; rapport 2 koppelt dezelfde tabel uit dezelfde wiki aan <strong>BES2</strong><sup class="ref">[<a href="#bron-8">8</a>]</sup>. Dit moet op één echte accu gecontroleerd worden. Een ouder forumdraadje beschrijft bij een 36V/4Ah-accu bovendien geen CAN maar een "1-wire"-achtig signaal<sup class="ref">[<a href="#bron-36">36</a>]</sup> (<span class="tag unk">onbevestigd</span>).</p>
+</div>
+
+<h4>Wat is aanpasbaar?</h4>
+<ul>
+<li><span class="tag no">Niet doen</span> <strong>Battery Lock of "Component locked" omzeilen.</strong> Battery Lock zet een vergrendelde accu in een andere fiets op "geen ondersteuning"<sup class="ref">[<a href="#bron-35">35</a>]</sup>. Een vergrendelde accu kan gestolen zijn (risico op heling); een lock kraken valt niet onder toegestane reverse-engineering (juridische inschatting rapport 6, <span class="tag unk">onbevestigd</span>).</li>
+<li><span class="tag no">Niet doen</span> <strong>Diep ontladen of geblokkeerde accu "herstellen".</strong> Bosch zegt: niet openen, niet repareren, niet "refreshen", maar recyclen<sup class="ref">[<a href="#bron-38">38</a>, <a href="#bron-114">114</a>]</sup>. Er is geen bron voor herstel van buitenaf; herstel vergt openen<sup class="ref">[<a href="#bron-41">41</a>]</sup>. Oordeel kritische toets: accepteren.</li>
+<li>De eBike Flow-app toont laadstatus en bereik; geen bron voor gezondheid of cycli in de app<sup class="ref">[<a href="#bron-37">37</a>]</sup>. Dat diepontlading als misbruik geldt en niet te "jumpen" is, komt van een dealerpagina die nu een 404 geeft (<span class="tag unk">onbevestigd</span>)<sup class="ref">[<a href="#bron-39">39</a>]</sup>. Bosch noemt de lader als manier om een systeem te activeren, maar alleen in de COBI-context<sup class="ref">[<a href="#bron-40">40</a>]</sup>.</li>
+<li><span class="tag unk">Onbevestigd</span> Een challenge-response tussen motor en accu bij BES2 (forumclaims)<sup class="ref">[<a href="#bron-27">27</a>, <a href="#bron-28">28</a>]</sup>. Passief meelezen lijkt zonder die handshake te kunnen<sup class="ref">[<a href="#bron-6">6</a>, <a href="#bron-8">8</a>]</sup>.</li>
+</ul>
+
+<h4>Wat is realistisch zonder dealerstatus?</h4>
+<ol>
+<li>Laat Bosch-accu's tegen betaling uitlezen bij een dealer: cycli, restcapaciteit, foutcodes en lockstatus<sup class="ref">[<a href="#bron-30">30</a>]</sup>.</li>
+<li>Bij Classic en BES2 kun je zelf "levend of dood", laadniveau, spanning en temperatuur zien met een 5 V-wekvoeding en een CAN-sniffer. Dit gaat in tegen het advies van Bosch<sup class="ref">[<a href="#bron-38">38</a>]</sup>.</li>
+<li>Smart system: zonder dealer is van buitenaf praktisch niets betrouwbaars uit te lezen<sup class="ref">[<a href="#bron-34">34</a>, <a href="#bron-35">35</a>]</sup>.</li>
+<li>Revisiebedrijven (bv. Liofit) wisselen cellen, maar openen daarvoor de accu<sup class="ref">[<a href="#bron-42">42</a>, <a href="#bron-43">43</a>, <a href="#bron-44">44</a>]</sup>. Claims over uitlezen "zonder openen met eigen software" zijn marketing en niet geverifieerd (een gecontroleerde pagina gaf een 404).</li>
+</ol>
+
+<!-- Bafang -->
+<h3 id="bafang">2.3 Bafang</h3>
+<div class="tw"><table>
+<thead><tr><th>Type</th><th>Hoe uitlezen</th><th>Wat nodig</th><th>Aanpasbaar</th><th>Oordeel</th></tr></thead>
+<tbody>
+<tr><td><strong>CAN-accu</strong> (M-serie: M400/M500/M510/M600/M620)</td><td>CAN-bus via display- of systeemconnector, 250 kbit/s; accu heeft bron-ID 0x04<sup class="ref">[<a href="#bron-9">9</a>]</sup>. BESST Pro toont serienummer, model en versie; "Battery Diagnosis" vraagt een aparte batterytester<sup class="ref">[<a href="#bron-45">45</a>]</sup></td><td>BESST-tool (account of toestemming via merk/dealer nodig)<sup class="ref">[<a href="#bron-85">85</a>]</sup>, of OpenBafangTool (CAN-deel is alpha)<sup class="ref">[<a href="#bron-47">47</a>]</sup>, of CANable met eigen software<sup class="ref">[<a href="#bron-9">9</a>]</sup></td><td>Alleen firmware-update via BESST is gedocumenteerd<sup class="ref">[<a href="#bron-45">45</a>]</sup>. Grenzen schrijven via CAN: geen bron</td><td><span class="tag mid">Beperkt</span></td></tr>
+<tr><td><strong>Accu bij BBS01/02/HD</strong> (UART-motor)</td><td>Meestal niet: geen datalijn. Voor accu-info op het display is een BMS met "communicatiefunctie" nodig<sup class="ref">[<a href="#bron-49">49</a>]</sup>. OpenBafangTool leest de motor, niet de accu<sup class="ref">[<a href="#bron-47">47</a>]</sup></td><td>–</td><td>Geen</td><td><span class="tag unk">Onbevestigd</span> (forum)</td></tr>
+</tbody>
+</table></div>
+<ul>
+<li>Het CAN-protocol is grotendeels door hobbyisten ontrafeld<sup class="ref">[<a href="#bron-9">9</a>, <a href="#bron-10">10</a>]</sup>. In een log van een 10-cellige accu werden maar 8 cellen gevonden<sup class="ref">[<a href="#bron-7">7</a>]</sup>.</li>
+<li>De claim dat digitale Bafang-accu's gezondheid (SoH) en spanning per cel via CAN geven, komt uit een geblokkeerde forumpost<sup class="ref">[<a href="#bron-48">48</a>]</sup>. Een openbare, geverifieerde opbouw van cyclusteller of celspanningen is niet gevonden. Bafang zou het protocol per firmware gewijzigd hebben (<span class="tag unk">onbevestigd</span>)<sup class="ref">[<a href="#bron-48">48</a>]</sup>.</li>
+<li>Displays tonen accu-info zoals cyclusaantal alleen als de accu communiceert (<span class="tag unk">onbevestigd</span>, zoekfragment)<sup class="ref">[<a href="#bron-46">46</a>]</sup>.</li>
+<li><span class="tag no">Niet doen</span> BMS-grenzen of accu-firmware wijzigen (zie <a href="#juridisch">juridisch</a>).</li>
+</ul>
+
+<!-- Generiek -->
+<h3 id="generiek">2.4 Generieke smart-BMS'en (JBD, Daly, JK, ANT)</h3>
+<p>Deze losse BMS'en zijn technisch goed uit te lezen, met open-source code en fabriekshandleidingen. Maar ze zitten zelden in een fabrieks-e-bike-accu, en ook als ze erin zitten, komt de poort vaak niet naar buiten. Bluetooth werkt wel door een gesloten behuizing heen, als er een Bluetooth-module in zit<sup class="ref">[<a href="#bron-56">56</a>]</sup>. Oordeel kritische toets: <span class="tag mid">Beperkt</span> voor uitlezen, <span class="tag no">Niet doen</span> voor aanpassen.</p>
+<div class="tw"><table>
+<thead><tr><th>BMS</th><th>Hoe uitlezen</th><th>Wat je ziet</th><th>Wat aanpasbaar zou zijn</th><th>Oordeel aanpassen</th></tr></thead>
+<tbody>
+<tr><td><strong>JBD / Xiaoxiang / LLT / Overkill</strong></td><td>UART (vaak 4-pins JST, 9600 baud), RS485 of Bluetooth; apps Xiaoxiang, Overkill Solar; pc-tools<sup class="ref">[<a href="#bron-54">54</a>, <a href="#bron-58">58</a>]</sup></td><td>Spanning, stroom, laadniveau, cycli, beveiligingsstatus, laad/ontlaad-schakelaar, celspanningen<sup class="ref">[<a href="#bron-3">3</a>, <a href="#bron-4">4</a>]</sup></td><td>Beschermingsgrenzen via een "fabrieksmodus"; foutreset<sup class="ref">[<a href="#bron-53">53</a>]</sup>. Een instelfout kan een "MOSFET software lock" geven<sup class="ref">[<a href="#bron-54">54</a>, <a href="#bron-58">58</a>]</sup></td><td><span class="tag no">Niet doen</span></td></tr>
+<tr><td><strong>Daly</strong></td><td>UART, RS485 of CAN (per model), Bluetooth-module op de UART-poort, "Smart BMS"-app<sup class="ref">[<a href="#bron-56">56</a>, <a href="#bron-57">57</a>, <a href="#bron-59">59</a>]</sup></td><td>Spanningen, stroom, status; via ESPHome alleen-lezen<sup class="ref">[<a href="#bron-60">60</a>]</sup></td><td>Capaciteit, beschermings- en temperatuurgrenzen, slaaptijd; app-wachtwoord standaard 123456<sup class="ref">[<a href="#bron-56">56</a>]</sup></td><td><span class="tag no">Niet doen</span></td></tr>
+<tr><td><strong>JK</strong></td><td>UART (4-pins JST), Bluetooth; nieuwere modellen ook RS485/CAN<sup class="ref">[<a href="#bron-61">61</a>]</sup></td><td>Celspanningen, cycli, cycluscapaciteit<sup class="ref">[<a href="#bron-62">62</a>]</sup></td><td>Over- en onderspanningsgrenzen, stroom- en temperatuurgrenzen, balanceren; wachtwoord standaard 1234 / 123456<sup class="ref">[<a href="#bron-62">62</a>]</sup></td><td><span class="tag no">Niet doen</span></td></tr>
+<tr><td><strong>ANT</strong></td><td>UART (VCC moet aangesloten zijn) of Bluetooth<sup class="ref">[<a href="#bron-63">63</a>]</sup></td><td>Status, schakelaars</td><td>Schakelaars laden/ontladen/balancer, "isn't reliable"<sup class="ref">[<a href="#bron-63">63</a>]</sup>; parametertabel onbevestigd</td><td><span class="tag no">Niet doen</span></td></tr>
+</tbody>
+</table></div>
+<div class="box warn">
+<p><strong>Waarom grenzen wijzigen "niet doen" is.</strong> Een hogere overspanningsgrens of lagere onderspanningsgrens haalt de laatste beveiliging tegen overladen en diepontladen weg. Je wordt juridisch fabrikant, CE en UN38.3 vervallen feitelijk, en een fout kan het BMS blokkeren<sup class="ref">[<a href="#bron-53">53</a>, <a href="#bron-54">54</a>, <a href="#bron-108">108</a>, <a href="#bron-111">111</a>]</sup>.</p>
+</div>
+<p><em>Bronkanttekening:</em> een veelgeciteerde pagina over het "JBD"-protocol gaat eigenlijk over het JK-protocol<sup class="ref">[<a href="#bron-52">52</a>]</sup>, en één bron over de fabrieksmodus is onduidelijk<sup class="ref">[<a href="#bron-55">55</a>]</sup>.</p>
+
+<!-- zonder datalijn -->
+<h3 id="zonder-datalijn">2.5 Aftermarket-accu's zonder datalijn (Hailong, Shark, Reention e.d.)</h3>
+<p>Bij aftermarket-accu's is een "dom" beveiligings-BMS zonder datalijn de norm; vaak zijn alleen + en − aangesloten, ook bij 4- of 5-pins connectoren<sup class="ref">[<a href="#bron-18">18</a>, <a href="#bron-49">49</a>]</sup>. Oordeel kritische toets: <strong>klopt, en dit beperkt alles</strong>. Hoe groot dit deel van de instroom is, is nergens gemeten.</p>
+<ul>
+<li><strong>Wat je wel kunt:</strong> de packspanning meten en het laadgedrag bekijken (laadt hij, hoeveel stroom), plus een volledige capaciteitstest via de ontlaadpoort<sup class="ref">[<a href="#bron-49">49</a>]</sup> <span class="tag ok">Haalbaar</span>.</li>
+<li><strong>Wat je niet kunt:</strong> celspanningen, cycli, gezondheid en foutcodes zien zonder de accu te openen.</li>
+<li><strong>Het verborgen gevaar:</strong> een celgroep die op 0–2 V staat, kan verborgen zitten in een packspanning die er normaal uitziet. Bij een 10S-accu scheelt 3,6 V op 36 V maar 10%.</li>
+<li>Sommige Reention-accu's hebben 2 extra draden met een onbekend signaal; de motor draait niet zonder (<span class="tag unk">onbevestigd</span>, forum)<sup class="ref">[<a href="#bron-50">50</a>]</sup>. Reention levert ook CAN-varianten<sup class="ref">[<a href="#bron-51">51</a>]</sup>. Er bestaan "communicerende" en "simpele" Dorado-accu's<sup class="ref">[<a href="#bron-23">23</a>, <a href="#bron-24">24</a>]</sup>.</li>
+<li>Hailong-connectoren bestaan in 4-, 5- en 6-pins varianten<sup class="ref">[<a href="#bron-19">19</a>, <a href="#bron-20">20</a>]</sup>; een extra "communicatie + 5 V"-connector bij Bafang M225 was een gok (<span class="tag unk">onbevestigd</span>)<sup class="ref">[<a href="#bron-19">19</a>]</sup>. Van de Shark-frameplug "2P 6pins" is de pinfunctie niet gevonden<sup class="ref">[<a href="#bron-25">25</a>]</sup>. Shimano STEPS stuurt data over de voedingsspanning zelf, zonder aparte datapin (onofficiële bron)<sup class="ref">[<a href="#bron-26">26</a>]</sup>.</li>
+</ul>
+
+<h3 id="wekken">2.6 Een "geblokkeerd" BMS weer wekken</h3>
+<p><span class="tag mid">Beperkt; alleen met de veiligheidsregels</span> Een BMS dat zichzelf heeft uitgeschakeld (lockout) is soms softwarematig te herstellen, maar een lege of defecte celgroep niet. Van buitenaf onderscheid je die twee alleen met celdata, en die ontbreekt meestal<sup class="ref">[<a href="#bron-112">112</a>, <a href="#bron-113">113</a>]</sup>.</p>
+<ul>
+<li>JK heeft een "laad-activeringsmodus" waarbij een lader aangesloten moet worden<sup class="ref">[<a href="#bron-62">62</a>]</sup>; Daly activeert bij aansluiten<sup class="ref">[<a href="#bron-56">56</a>]</sup>.</li>
+<li>Laadspanning aanbieden "will sometimes wake it up" (forum)<sup class="ref">[<a href="#bron-64">64</a>]</sup>; merk-BMS'en (Specialized/Shimano) vergrendelen na diepontlading en vragen dealerapparatuur (<span class="tag unk">onbevestigd</span>)<sup class="ref">[<a href="#bron-65">65</a>]</sup>.</li>
+<li><span class="tag no">Niet doen</span> Een labvoeding gebruiken om het BMS te "wekken", of laden via de ontlaadpoort: daar ontbreekt de overlaadbeveiliging<sup class="ref">[<a href="#bron-64">64</a>]</sup>. Alleen de <strong>originele lader via de laadpoort</strong> (zie stap 7).</li>
+</ul>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="stappenplan">
+<h2>3. Stappenplan voor een leek</h2>
+<p>Van accu binnenkrijgen tot de beslissing <strong>hergebruiken, repareren of recyclen</strong>. Stappen 1–5 en 7–12 zijn voor elke accu gelijk; stap 6 verschilt per accutype (zie de tabel na het stappenplan).</p>
+
+<div class="box warn">
+<p><strong>Noodplan, vóór je begint.</strong> Ga ervan uit dat een handblusser een brandende accu niet dooft. Het gaat om scheiding, afstand en koelen. Zorg voor een vrije vluchtroute en een plek buiten, bel 112 en houd de accu zo mogelijk koel<sup class="ref">[<a href="#bron-115">115</a>]</sup>.</p>
+</div>
+
+<ol class="steps">
+<li><strong>Herkomst en juridische check</strong>
+ <ul>
+ <li>Komt de accu via OPEN/Wecycle, een milieustraat of een inzamelbak bij de dealer? Dan is het <strong>afval</strong>, met extra regels (vergunning/melding en transportregistratie; <span class="tag unk">onbevestigd</span>, navragen bij de omgevingsdienst)<sup class="ref">[<a href="#bron-108">108</a>]</sup>.</li>
+ <li>Rechtstreeks van de eigenaar gekocht en geen afval? Dat is juridisch de schonere route<sup class="ref">[<a href="#bron-108">108</a>]</sup>.</li>
+ <li>Leg herkomst vast. Is een Bosch-accu vergrendeld (Battery Lock / "Component locked") of is de herkomst onduidelijk? Niet aannemen of niet verder verwerken: risico op heling<sup class="ref">[<a href="#bron-35">35</a>]</sup>.</li>
+ </ul>
+</li>
+<li><strong>Uiterlijk keuren (afkeurcriteria)</strong>
+ <ul>
+ <li>Afgekeurd bij: zwelling, deuken, vocht of corrosie, geur, lekkage, warmte in rust, of een val zonder inspectie.</li>
+ <li>Zo'n accu geldt als beschadigd of defect: apart opslaan in quarantaine (metalen bak met zand of vermiculiet) en vervoeren onder ADR SP376 → <strong>recyclen</strong><sup class="ref">[<a href="#bron-116">116</a>]</sup>.</li>
+ </ul>
+</li>
+<li><strong>Accutype bepalen</strong>
+ <ul>
+ <li>Merk, model en connector noteren. Kies één van vier routes: <em>Bosch</em>, <em>Bafang CAN</em>, <em>generiek met datalijn</em> (JBD/Daly/JK/ANT met bereikbare poort of Bluetooth), of <em>zonder datalijn</em>.</li>
+ </ul>
+</li>
+<li><strong>Pinout eerst meten</strong>
+ <ul>
+ <li>Meet met de multimeter welke pin wat is, voordat je iets aansluit: één pin voert de volle packspanning<sup class="ref">[<a href="#bron-2">2</a>, <a href="#bron-9">9</a>]</sup>.</li>
+ <li>Gebruik bij datapinnen een galvanisch geïsoleerde CAN/RS485-adapter.</li>
+ </ul>
+</li>
+<li><strong>Rustspanning meten: onder 2,5 V per cel = niet laden</strong>
+ <ul>
+ <li>Grens gemiddeld over het pack: bij 10S onder 25 V, bij 13S onder 32,5 V. Zo'n accu gaat in quarantaine en naar <strong>recycling</strong>.</li>
+ <li>Reden: na diepe ontlading kunnen koperafzettingen interne kortsluiting geven<sup class="ref">[<a href="#bron-112">112</a>, <a href="#bron-113">113</a>]</sup>. De 2,5 V is een bewust strenge keuze; de literatuur legt de schadegrens lager, maar een gemiddelde verbergt een dode celgroep<sup class="ref">[<a href="#bron-112">112</a>]</sup>.</li>
+ </ul>
+</li>
+<li><strong>Uitlezen (verschilt per type, zie tabel)</strong>
+ <ul>
+ <li>Alleen <strong>lezen</strong>, nooit grenzen of firmware wijzigen of het BMS resetten: dat legt de aansprakelijkheid bij jou<sup class="ref">[<a href="#bron-108">108</a>]</sup>.</li>
+ </ul>
+</li>
+<li><strong>Geblokkeerd BMS? Alleen originele lader via de laadpoort</strong>
+ <ul>
+ <li>Bosch en andere merk-BMS'en: niet zelf proberen; via dealer, anders recyclen<sup class="ref">[<a href="#bron-38">38</a>]</sup>.</li>
+ <li>Overige: alleen de originele lader via de laadpoort, onder toezicht. Nooit een labvoeding, nooit via de ontlaadpoort<sup class="ref">[<a href="#bron-64">64</a>]</sup>.</li>
+ </ul>
+</li>
+<li><strong>Opladen onder toezicht</strong>
+ <ul>
+ <li>Originele lader, onbrandbare ondergrond, temperatuur bewaken met IR-thermometer of thermokoppel.</li>
+ <li>Stoppen boven ongeveer 45 °C behuizingstemperatuur (eigen grens, <span class="tag unk">onbevestigd</span>). Nooit 's nachts onbeheerd.</li>
+ </ul>
+</li>
+<li><strong>Zelfontladingstest (48–72 uur)</strong>
+ <ul>
+ <li>Meet de spanning direct na het laden en opnieuw na 48–72 uur rust. Duidelijke daling wijst op interne kortsluiting → <strong>recyclen</strong><sup class="ref">[<a href="#bron-112">112</a>]</sup>.</li>
+ <li>Hoeveel daling "duidelijk" is, moet uit een pilot komen (<span class="tag unk">onbevestigd</span>).</li>
+ </ul>
+</li>
+<li><strong>Capaciteitstest via de ontlaadpoort</strong> <span class="tag ok">Haalbaar</span>
+ <ul>
+ <li>Volledig ontladen met een elektronische last (bv. Atorch DL24P of Owon OEL1530). De enige externe test die echt zegt hoeveel energie erin zit. Duur ongeveer 3 uur voor 48 V/500 Wh met de DL24P; goed koelen en stroomgrens instellen<sup class="ref">[<a href="#bron-71">71</a>, <a href="#bron-79">79</a>]</sup>.</li>
+ <li>Alleen onder toezicht, met temperatuurbewaking.</li>
+ </ul>
+</li>
+<li><strong>Beslissen: hergebruiken, repareren of recyclen</strong>
+ <ul>
+ <li><strong>Hergebruiken:</strong> slaagt voor stap 2, 5, 9 en 10, en (waar uitleesbaar) geen foutcodes of celafwijkingen. De drempels voor "goed genoeg" zijn nog niet vastgesteld (pilot nodig).</li>
+ <li><strong>Repareren:</strong> een defecte celgroep vervangen kan alleen door de accu te <strong>openen</strong>. Dat valt buiten de scope "zonder openen". Bosch raadt repareren af<sup class="ref">[<a href="#bron-38">38</a>]</sup>, en wie dit doet en de accu verkoopt, wordt juridisch fabrikant<sup class="ref">[<a href="#bron-108">108</a>]</sup>. Wel kun je doorverwijzen naar een revisiebedrijf.</li>
+ <li><strong>Recyclen:</strong> al het andere, via OPEN/Wecycle of een verwerker zoals Zhero<sup class="ref">[<a href="#bron-93">93</a>, <a href="#bron-97">97</a>]</sup>.</li>
+ </ul>
+</li>
+<li><strong>Opslaan en vervoeren</strong>
+ <ul>
+ <li>Laadniveau rond 30–60%, contacten afplakken, koel en droog<sup class="ref">[<a href="#bron-114">114</a>]</sup>. Beschadigde accu's apart, liefst buiten of in een apart brandcompartiment; toets aan <strong>PGS 37-2</strong><sup class="ref">[<a href="#bron-117">117</a>]</sup>.</li>
+ <li>Vervoer valt onder ADR (UN3480; beschadigd SP376, afval SP377). Laat een veiligheidsadviseur gevaarlijke stoffen meekijken<sup class="ref">[<a href="#bron-116">116</a>]</sup>.</li>
+ </ul>
+</li>
+</ol>
+
+<h3>Wat verschilt per accutype</h3>
+<div class="tw"><table>
+<thead><tr><th>Stap</th><th>Bosch</th><th>Bafang CAN</th><th>Generiek met datalijn</th><th>Zonder datalijn</th></tr></thead>
+<tbody>
+<tr><td><strong>1. Juridisch</strong></td><td>Lockstatus laten checken (Battery Lock / "Component locked")<sup class="ref">[<a href="#bron-30">30</a>, <a href="#bron-35">35</a>]</sup></td><td>Herkomst</td><td>Herkomst</td><td>Herkomst</td></tr>
+<tr><td><strong>6. Uitlezen</strong></td><td>Smart system: dealer. Classic/BES2: dealer, of zelf passief CAN met 5 V-wek (alleen laadniveau, spanning, temperatuur)<sup class="ref">[<a href="#bron-6">6</a>, <a href="#bron-8">8</a>, <a href="#bron-30">30</a>]</sup></td><td>BESST (account nodig), OpenBafangTool (alpha) of CANable; celdata onbevestigd<sup class="ref">[<a href="#bron-45">45</a>, <a href="#bron-47">47</a>, <a href="#bron-48">48</a>]</sup></td><td>App of UART: celspanningen, cycli, beveiligingsstatus<sup class="ref">[<a href="#bron-54">54</a>, <a href="#bron-56">56</a>, <a href="#bron-62">62</a>]</sup></td><td>Niets; alleen packspanning</td></tr>
+<tr><td><strong>7. Lockout</strong></td><td>Accepteren: dealer of recyclen<sup class="ref">[<a href="#bron-38">38</a>]</sup></td><td>Originele lader via laadpoort</td><td>Originele lader via laadpoort; geen reset via app</td><td>Originele lader via laadpoort</td></tr>
+<tr><td><strong>Wat je weet bij stap 11</strong></td><td>Via dealer: cycli, restcapaciteit, foutcodes (geen celspanningen)<sup class="ref">[<a href="#bron-30">30</a>]</sup></td><td>Spanning, capaciteitstest; mogelijk meer</td><td>Celspanningen, cycli plus capaciteitstest</td><td>Alleen spanning, zelfontlading en capaciteit; een zwakke celgroep blijft mogelijk verborgen</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="inkoop">
+<h2>4. Inkooplijst en startbudget</h2>
+<p>Al aanwezig: multimeter, laadapparaat, laptop. Prijzen zijn <strong>indicatief</strong> (webshop-momentopnamen november 2026, incl. btw tenzij "excl."). "Schatting" betekent: geen bron voor de prijs. De kolom prioriteit bevat de correcties van de kritische toets.</p>
+<div class="tw"><table>
+<thead><tr><th>#</th><th>Item</th><th>Indicatieprijs</th><th>Waarvoor</th><th>Prioriteit</th><th>Bron</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>USB-UART CH340 (3,3/5 V)</td><td>€2,50</td><td>UART-BMS'en (JBD/Daly), Bafang-displaylijn</td><td>must</td><td><sup class="ref">[<a href="#bron-66">66</a>]</sup></td></tr>
+<tr><td>2</td><td>USB-RS485-converter</td><td>€5,00</td><td>Daly/JBD via RS485</td><td>must</td><td><sup class="ref">[<a href="#bron-67">67</a>]</sup></td></tr>
+<tr><td>3</td><td>USB-CAN: CANable 2.0 (kloon)</td><td>ca. $11–35 (≈ €10–32)</td><td>CAN meelezen bij Bafang M-serie en Bosch Classic/BES2. <em>Correctie:</em> nutteloos voor Bosch smart system (vraagt CAN-FD en is beveiligd)</td><td>must</td><td><sup class="ref">[<a href="#bron-68">68</a>, <a href="#bron-69">69</a>]</sup></td></tr>
+<tr><td>3b</td><td>Galvanisch geïsoleerde CAN/RS485-adapter (bv. CANable Pro)</td><td>ca. $64–84</td><td>Beschermt de laptop bij aardingsfouten</td><td>aanbevolen (rapport 4: nice; kritische toets: gebruiken)</td><td>rapport 4, geen URL</td></tr>
+<tr><td>4</td><td>Logic analyzer 8 kanalen, 24 MHz</td><td>€9,75</td><td>Onbekend protocol of baudrate bepalen</td><td>must</td><td><sup class="ref">[<a href="#bron-70">70</a>]</sup></td></tr>
+<tr><td>5</td><td>Elektronische last Atorch DL24P (180 W)</td><td>€77,63</td><td>Capaciteitstest 36/48 V (langzaam, ~3,5 A bij 48 V)</td><td>must <span class="tag ok">Haalbaar</span></td><td><sup class="ref">[<a href="#bron-71">71</a>]</sup></td></tr>
+<tr><td>6</td><td>Interne-weerstandsmeter YR1035+ of RC3563</td><td>YR1035+ ca. $74–179; RC3563 €59–133 + verzending</td><td>Losse cellen of trendmeting. <em>Correctie:</em> weinig zeggend als oordeel over een heel pack; meet niets als de ontlaad-FET uit staat</td><td><s>must</s> → geen must <span class="tag mid">Beperkt</span></td><td><sup class="ref">[<a href="#bron-72">72</a>, <a href="#bron-73">73</a>]</sup></td></tr>
+<tr><td>7</td><td>Connectoren en kabels (XT60/XT90, Anderson, DC, XLR, snoeren, zekeringhouder)</td><td>€40–80 (schatting)</td><td>Adapterkabels lader/last ↔ accu</td><td>must</td><td>schatting</td></tr>
+<tr><td>8</td><td>Lithium-brandblusser (schuim, 6 L)</td><td>€199,95</td><td>Eerste blusmiddel. <em>Correctie:</em> dooft een pack-brand nauwelijks; noodplan is belangrijker</td><td>must <span class="tag mid">Beperkt</span></td><td><sup class="ref">[<a href="#bron-74">74</a>]</sup></td></tr>
+<tr><td>9</td><td>Blusdeken voor Li-ion (bv. VLITEX)</td><td>€50–150 (schatting)</td><td>Afdekken; zelfde kanttekening als #8</td><td>must <span class="tag mid">Beperkt</span></td><td><sup class="ref">[<a href="#bron-75">75</a>]</sup></td></tr>
+<tr><td>10</td><td>Quarantaine: metalen kist met deksel, zand/vermiculiet, LiPo-bag</td><td>€40–70 (schatting)</td><td>Opslag verdachte en beschadigde accu's</td><td>must</td><td><sup class="ref">[<a href="#bron-76">76</a>]</sup></td></tr>
+<tr><td>11</td><td>IR-thermometer of thermokoppelmeter</td><td>€20–30 (schatting)</td><td>Temperatuur bewaken bij laden/ontladen</td><td>must</td><td>schatting</td></tr>
+<tr><td>12</td><td>Isolatiehandschoenen klasse 00</td><td>€40–70 (schatting)</td><td>Werken aan open contacten</td><td>must</td><td><sup class="ref">[<a href="#bron-77">77</a>]</sup></td></tr>
+<tr><td>13</td><td>Labvoeding Owon SPE6103 (60 V/10 A)</td><td>€103,31 excl. (≈ €125)</td><td><em>Correctie:</em> "BMS wekken" en begrensd laden van packs geschrapt als werkwijze (zie stap 7)</td><td><span class="tag no">Niet doen</span> als werkwijze</td><td><sup class="ref">[<a href="#bron-78">78</a>]</sup></td></tr>
+<tr><td>14</td><td>Programmeerbare last Owon OEL1530 (300 W)</td><td>€150 excl. (≈ €182)</td><td>Snellere, reproduceerbare capaciteitstests met logging</td><td>nice</td><td><sup class="ref">[<a href="#bron-79">79</a>]</sup></td></tr>
+<tr><td>15</td><td>ZKETECH EBC-A40L</td><td>€294,87</td><td>Alleen celniveau (max 5 V), niet voor packs. Alleen nuttig als je opent (buiten scope)</td><td>nice</td><td><sup class="ref">[<a href="#bron-80">80</a>]</sup></td></tr>
+<tr><td>16</td><td>Warmtecamera InfiRay P2 Pro of Topdon TC001</td><td>P2 Pro €195 excl. (≈ €236); TC001 €219–269</td><td>Hotspots bij belasting</td><td>nice</td><td><sup class="ref">[<a href="#bron-81">81</a>, <a href="#bron-82">82</a>]</sup></td></tr>
+<tr><td>17</td><td>Bafang BESST-tool</td><td>€149,99–204; Ozo €169</td><td>Bafang uitlezen; account of toestemming nodig</td><td>nice</td><td><sup class="ref">[<a href="#bron-83">83</a>, <a href="#bron-84">84</a>, <a href="#bron-85">85</a>]</sup></td></tr>
+<tr><td>18</td><td>Innomaker USB2CAN</td><td>€47,33–84,22</td><td>Robuustere CAN-adapter</td><td>nice</td><td><sup class="ref">[<a href="#bron-86">86</a>]</sup></td></tr>
+<tr><td>19</td><td>PEAK PCAN-USB</td><td>ca. $235–239 (≈ €220, schatting)</td><td>Professionele CAN-tool</td><td>nice</td><td><sup class="ref">[<a href="#bron-87">87</a>]</sup></td></tr>
+<tr><td>20</td><td>AVD-blusser 6 L (Sea-Fire)</td><td>€614,25</td><td>Extra blusmiddel voor Li-ion; zelfde kanttekening als #8</td><td>nice</td><td><sup class="ref">[<a href="#bron-88">88</a>]</sup></td></tr>
+<tr><td>21</td><td>BLE-dongle</td><td>€10–15 (schatting)</td><td>Alleen als de laptop geen Bluetooth LE heeft</td><td>nice</td><td>schatting</td></tr>
+<tr><td>22</td><td>Brandwerende accukast (90 min, EN 14470-1; <em>toets aan PGS 37-2</em>)</td><td>vanaf ca. €5.600</td><td>Professionele opslag bij opschaling</td><td>later</td><td><sup class="ref">[<a href="#bron-89">89</a>, <a href="#bron-117">117</a>]</sup></td></tr>
+</tbody>
+</table></div>
+
+<h3>Niet zelf aan te schaffen: Bosch</h3>
+<ul>
+<li>Bosch DiagnosticTool 3 is alleen voor dealers; prijs niet openbaar (<span class="tag unk">onbevestigd</span>)<sup class="ref">[<a href="#bron-90">90</a>, <a href="#bron-91">91</a>]</sup>.</li>
+<li>Bosch CapacityTester BCT3990: €599,90, alleen voor de vakhandel en alleen met DiagnosticTool 3<sup class="ref">[<a href="#bron-22">22</a>]</sup>.</li>
+<li>Losse Bosch-connectoren zijn niet gevonden; een tweedehands Bosch-laadkabel of -houder als donor kost naar schatting €20–50.</li>
+</ul>
+
+<h3>Software</h3>
+<p>Gratis: Sigrok/PulseView, SavvyCAN, cangaroo, python-can, can-utils, de JBD- en Daly-apps, en de software van Atorch en ZKETECH. Saleae Logic 2 met klonen is <span class="tag unk">onbevestigd</span> en licentietechnisch grijs. Afgeschermd: BESST (account), Bosch DiagnosticTool (dealerlicentie)<sup class="ref">[<a href="#bron-85">85</a>, <a href="#bron-90">90</a>]</sup>.</p>
+
+<h3>Startbudget (indicatief)</h3>
+<div class="box">
+<p><strong>Minimaal (alleen "must", items 1–12): ca. €600–750.</strong></p>
+<p><strong>Uitgebreid (items 1–21, zonder Bosch-dealertools en accukast): ca. €2.400–2.700.</strong> Besparingsvariant zonder PCAN-USB en EBC-A40L: ca. €1.900–2.200.</p>
+<p><em>Kanttekening:</em> dit zijn de oorspronkelijke bedragen uit rapport 4. Ze zijn <strong>niet herberekend</strong> na de correcties hierboven (Ri-meter geen must meer, labvoeding geschrapt als werkwijze, geïsoleerde adapter aanbevolen). De werkelijke budgetten kunnen daardoor afwijken.</p>
+</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="kansen-risicos">
+<h2>5. Kansen en risico's</h2>
+<p><strong>Markt in het kort.</strong> De bronnen spreken elkaar tegen over het ingezamelde volume: Stichting OPEN zamelde in 2024 ongeveer <strong>400 ton</strong> e-bike-accu's in volgens TNO<sup class="ref">[<a href="#bron-92">92</a>]</sup>, terwijl Change Inc. <strong>ongeveer 300 ton per jaar</strong> noemt, waarvan Zhero circa 150 ton verwerkt<sup class="ref">[<a href="#bron-93">93</a>]</sup>. Aantallen accu's zijn niet gepubliceerd; 100.000–160.000 per jaar is een schatting. 63% van de afgedankte accu's loopt via de fietsenmaker<sup class="ref">[<a href="#bron-96">96</a>]</sup>. Een nieuwe accu kost €400–750, revisie €330–550<sup class="ref">[<a href="#bron-98">98</a>]</sup>. In 2024 werden 858.000 nieuwe fietsen verkocht (bijna de helft elektrisch); in 2025 daalde de e-bikeverkoop met 4%<sup class="ref">[<a href="#bron-94">94</a>, <a href="#bron-95">95</a>]</sup>. De claim "vaak is maar ~10% van de cellen defect" is <span class="tag unk">onbevestigd</span>; forumbronnen waarschuwen dat de overige cellen ook verouderd zijn<sup class="ref">[<a href="#bron-93">93</a>, <a href="#bron-103">103</a>]</sup>.</p>
+
+<div class="cols">
+<div class="col">
+<h3>Top 5 kansen <small>(Kansen-agent)</small></h3>
+<ol>
+<li><strong>Snelle intaketest als "triage-poort" bij de dealer.</strong> Bestaande tests duren ca. 2 uur en zijn merkgebonden<sup class="ref">[<a href="#bron-99">99</a>, <a href="#bron-102">102</a>]</sup>. Sorteren in drie stromen: terug in de fiets/revisie, second life, recycling. <br><span class="tag no">Onbewezen</span> volgens de kritische toets: geen validatie, en voor de meeste accu's zijn celdata van buitenaf niet beschikbaar. Eerst een pilot met referentie-ontladingen.</li>
+<li><strong>Fietsenwinkels als intakeknooppunt.</strong> 63% van de accu's loopt al via de fietsenmaker en Wecycle heeft inzamelpunten bij dealers<sup class="ref">[<a href="#bron-96">96</a>, <a href="#bron-97">97</a>]</sup>. Direct advies "revisie loont of niet" (geschat €100–270 verschil per accu)<sup class="ref">[<a href="#bron-98">98</a>]</sup>. Businessmodel <span class="tag unk">onbevestigd</span>.</li>
+<li><strong>Dataplatform en voorbereiding op het batterijpaspoort</strong> (vanaf februari 2027 voor nieuwe LMT-accu's)<sup class="ref">[<a href="#bron-105">105</a>, <a href="#bron-109">109</a>]</sup>. Oudere accu's hebben geen paspoort. Uitstel van die datum is <span class="tag unk">onbevestigd</span><sup class="ref">[<a href="#bron-107">107</a>]</sup>.</li>
+<li><strong>Ketenpartnerschap met Zhero en OPEN:</strong> voorgesorteerde accu's met gegevens aanleveren<sup class="ref">[<a href="#bron-93">93</a>, <a href="#bron-100">100</a>, <a href="#bron-101">101</a>]</sup>. <span class="tag ok">Haalbaar</span> volgens de kritische toets, maar ingezamelde accu's zijn afval.</li>
+<li><strong>Revisievriendelijkheid en onafhankelijke operators</strong> via de Batterijverordening<sup class="ref">[<a href="#bron-104">104</a>, <a href="#bron-106">106</a>, <a href="#bron-108">108</a>, <a href="#bron-110">110</a>]</sup>. <span class="tag mid">Overschat</span>: art. 11 gaat over het verwijderen van de accu uit het voertuig, niet over cellen of BMS; art. 14 dekt geen oude accu's.</li>
+</ol>
+</div>
+<div class="col">
+<h3>Top 5 risico's <small>(Kritische agent)</small></h3>
+<ol>
+<li><strong>Brand door het opladen van een verborgen dode celgroep.</strong> Zonder celdata zie je die niet, en dat geldt voor bijna alle aftermarket-accu's.</li>
+<li><strong>Fabrikantstatus en aansprakelijkheid</strong> bij wijzigen of doorverkopen van "voorbereide" accu's: CE, documentatie, productaansprakelijkheid<sup class="ref">[<a href="#bron-108">108</a>, <a href="#bron-119">119</a>]</sup>.</li>
+<li><strong>Afvalrecht:</strong> werken met ingezamelde accu's zonder vergunning, en transport onder ADR SP376/377<sup class="ref">[<a href="#bron-108">108</a>, <a href="#bron-116">116</a>]</sup>.</li>
+<li><strong>Lage dekking:</strong> uitlezen lukt misschien maar bij een minderheid (Bosch via dealer, Bafang deels, generiek vrijwel nooit). Daarmee valt de businesscase van de snelle test weg.</li>
+<li><strong>Een snelle test die niet voorspelt:</strong> foutpositieven gaan als "goed" de markt op (reputatie- en claimrisico). Daarbij: gestolen of vergrendelde accu's (heling)<sup class="ref">[<a href="#bron-35">35</a>]</sup>.</li>
+</ol>
+</div>
+</div>
+
+<h3 id="juridisch">5.1 Juridische aandachtspunten</h3>
+<p>Dit is geen juridisch advies. De verordeningstekst is gelezen via een samenvatting; controleer de exacte tekst op EUR-Lex<sup class="ref">[<a href="#bron-108">108</a>]</sup>.</p>
+<ul>
+<li><strong>Fabrikantstatus.</strong> Wie een accu voorbereidt voor hergebruik, repurposet of remanufacturet en verkoopt, telt als fabrikant (art. 38 lid 11) en moet zorgen voor technische documentatie, conformiteitsbeoordeling, EU-conformiteitsverklaring en CE<sup class="ref">[<a href="#bron-108">108</a>]</sup>.</li>
+<li><strong>Remanufacturing vereist openen.</strong> Het begrip vraagt demontage en evaluatie van alle cellen (art. 3 punt 32). Zonder openen is het hooguit tweedehands doorverkopen of "voorbereiding voor hergebruik" van afval<sup class="ref">[<a href="#bron-108">108</a>]</sup>.</li>
+<li><strong>Afvalstatus.</strong> Ingezamelde accu's zijn afval. Voor het beëindigen daarvan moet je o.a. een SoH-evaluatie kunnen aantonen (art. 73); detailregels volgen nog. Vergunning/melding en VIHB-registratie: <span class="tag unk">onbevestigd</span>, navragen bij de omgevingsdienst<sup class="ref">[<a href="#bron-108">108</a>]</sup>.</li>
+<li><strong>Art. 14 is smal.</strong> Alleen voor accu's die vanaf 18-08-2024 in de handel kwamen, alleen-lezen, voor de rechtmatige koper (of namens die persoon), met respect voor intellectueel eigendom. Geen recht op een open protocol of een externe poort, en geen recht om grenzen te wijzigen<sup class="ref">[<a href="#bron-106">106</a>, <a href="#bron-108">108</a>]</sup>.</li>
+<li><strong>Productaansprakelijkheid.</strong> Onder Richtlijn 2024/2853 (omzetting uiterlijk 9-12-2026) is wie een product ingrijpend wijzigt, voor die wijziging zelf fabrikant. Grenzen of firmware aanpassen is vrijwel zeker zo'n wijziging; alleen uitlezen en testen niet (inschatting)<sup class="ref">[<a href="#bron-119">119</a>]</sup>. Overgangsrecht <span class="tag unk">onbevestigd</span>.</li>
+<li><strong>Garantie en conformiteit.</strong> Bij verkoop aan consumenten geldt art. 7:17 BW, ook bij tweedehands. Bosch: openen laat de garantie vervallen<sup class="ref">[<a href="#bron-114">114</a>]</sup>. Of een fiets met een gewijzigde accu nog aan EN 15194 voldoet: <span class="tag unk">onbevestigd</span>.</li>
+<li><strong>Transport (ADR).</strong> Losse accu's: UN3480; boven 100 Wh niet onder SP188. Beschadigd/defect: SP376 (P908/LP904, of P911/LP906 bij kritiek). Afval: SP377 (P909)<sup class="ref">[<a href="#bron-116">116</a>]</sup>. Voertuigen vallen sinds ADR 2025 onder <strong>UN3556</strong> (niet meer UN3171)<sup class="ref">[<a href="#bron-120">120</a>]</sup>. Schakel een veiligheidsadviseur gevaarlijke stoffen (VGS/DGSA) in.</li>
+<li><strong>Opslag: PGS 37-2</strong> (niet 37-1, die gaat over energieopslagsystemen). Nog niet in het Bal verankerd (verwacht 2028), maar de gemeente kan PGS 37-2 nu al opleggen<sup class="ref">[<a href="#bron-117">117</a>]</sup>. Drempels van 333 kg en 30 kg (beschadigd) zijn <span class="tag unk">onbevestigd</span><sup class="ref">[<a href="#bron-118">118</a>]</sup>.</li>
+</ul>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="bronnen">
+<h2>6. Bronnenlijst</h2>
+<p>Gegroepeerd per deelrapport; dezelfde URL staat er één keer in, met een verwijzing naar het andere rapport. Bronnen met een grijs label "zwak" zijn forums, blogs, alleen zoekfragmenten, geblokkeerde pagina's of gaven een 404. Kernclaims als de Bosch Classic-pinout, Bafang-SoH per cel en "wekken" met laadspanning hebben geen primaire bron.</p>
+<h3 id="bronnen-protocol">Rapport 1 – Protocol-onderzoek (uitleesmethoden)</h3>
+<ol class="bronnen">
+<li id="bron-1" value="1"><span class="btitle">Industrial Monitor Direct – blog Bafang M400 UART vs CAN</span> <span class="tag weak">zwak: blog, lage betrouwbaarheid</span><br><a href="https://industrialmonitordirect.com/blogs/knowledgebase/bafang-m400-battery-replacement-uart-vs-can-36v-to-48v" target="_blank" rel="noopener">https://industrialmonitordirect.com/blogs/knowledgebase/bafang-m400-battery-replacement-uart-vs-can-36v-to-48v</a></li>
+<li id="bron-2" value="2"><span class="btitle">Letrigo – e-bike connector pinout explained</span><br><a href="https://letrigo.com/blogs/knowledge/ebike-connector-pinout-explained" target="_blank" rel="noopener">https://letrigo.com/blogs/knowledge/ebike-connector-pinout-explained</a></li>
+<li id="bron-3" value="3"><span class="btitle">JBD-protocol: George Smart; Scribd &#x27;Protocol English Version&#x27;; mypower.cz-bijlage</span> <span class="tag weak">zwak: deels forum</span><br><a href="https://www.george-smart.co.uk/?p=18756" target="_blank" rel="noopener">https://www.george-smart.co.uk/?p=18756</a> · <a href="https://www.scribd.com/document/478923198/Protocol-English-Version" target="_blank" rel="noopener">https://www.scribd.com/document/478923198/Protocol-English-Version</a> · <a href="https://forum.mypower.cz/download/file.php?id=27163" target="_blank" rel="noopener">https://forum.mypower.cz/download/file.php?id=27163</a></li>
+<li id="bron-4" value="4"><span class="btitle">python-jbdtool-bms (GitHub)</span> <span class="also">(ook als rapport 3 [24])</span><br><a href="https://github.com/fkressmann/python-jbdtool-bms" target="_blank" rel="noopener">https://github.com/fkressmann/python-jbdtool-bms</a></li>
+<li id="bron-5" value="5"><span class="btitle">Endless-Sphere – Bafang battery BMS (vrijwilliger gezocht)</span> <span class="tag weak">zwak: forum</span><br><a href="https://endless-sphere.com/sphere/threads/help-volunteer-needed-with-bafang-battery-bms.99137/latest" target="_blank" rel="noopener">https://endless-sphere.com/sphere/threads/help-volunteer-needed-with-bafang-battery-bms.99137/latest</a></li>
+<li id="bron-6" value="6"><span class="btitle">Endless-Sphere – Bosch Classic Line PowerPack over CAN 125 kbit/s</span> <span class="tag weak">zwak: forum; alleen zoekfragment, fetch geblokkeerd</span> <span class="also">(ook als rapport 2 [1])</span><br><a href="https://endless-sphere.com/sphere/threads/reading-a-bosch-classic-line-powerpack-frame-battery-over-can-125-kbit-s-full-status-frame-decoded-no-motor-no-handshake.130973/" target="_blank" rel="noopener">https://endless-sphere.com/sphere/threads/reading-a-bosch-classic-line-powerpack-frame-battery-over-can-125-kbit-s-full-status-frame-decoded-no-motor-no-handshake.130973/</a></li>
+<li id="bron-7" value="7"><span class="btitle">Endless-Sphere – Bafang M500/M600-draad</span> <span class="tag weak">zwak: forum</span><br><a href="https://endless-sphere.com/sphere/threads/bafang-m500-m600-thread.100777/latest" target="_blank" rel="noopener">https://endless-sphere.com/sphere/threads/bafang-m500-m600-thread.100777/latest</a></li>
+<li id="bron-8" value="8"><span class="btitle">Apollo open-resource wiki – Bosch</span> <span class="tag weak">zwak: hobby-wiki</span> <span class="also">(ook als rapport 2 [2])</span><br><a href="https://apollo.open-resource.org/lab:wip:bosch" target="_blank" rel="noopener">https://apollo.open-resource.org/lab:wip:bosch</a></li>
+<li id="bron-9" value="9"><span class="btitle">Kaspars – Bafang CAN-bus</span> <span class="also">(ook als rapport 3 [1])</span><br><a href="https://kaspars.net/blog/bafang-canbus" target="_blank" rel="noopener">https://kaspars.net/blog/bafang-canbus</a></li>
+<li id="bron-10" value="10"><span class="btitle">OpenSourceEBike – Bafang_M500_M600 (GitHub)</span> <span class="also">(ook als rapport 3 [5])</span><br><a href="https://github.com/OpenSourceEBike/Bafang_M500_M600" target="_blank" rel="noopener">https://github.com/OpenSourceEBike/Bafang_M500_M600</a></li>
+<li id="bron-11" value="11"><span class="btitle">Smart Battery Data Specification (SBS-forum)</span><br><a href="https://sbs-forum.org/specs/specs_main.htm" target="_blank" rel="noopener">https://sbs-forum.org/specs/specs_main.htm</a> · <a href="https://www.sbs-forum.org/specs/sbsel110.pdf" target="_blank" rel="noopener">https://www.sbs-forum.org/specs/sbsel110.pdf</a></li>
+<li id="bron-12" value="12"><span class="btitle">Texas Instruments – SBS-commando&#x27;s via SMBus (SLAA476B)</span><br><a href="https://www.ti.com/document-viewer/lit/html/SLAA476B/sbs-supported-commands-using-smbus-protocol-slaa4763684" target="_blank" rel="noopener">https://www.ti.com/document-viewer/lit/html/SLAA476B/sbs-supported-commands-using-smbus-protocol-slaa4763684</a></li>
+<li id="bron-13" value="13"><span class="btitle">Texas Instruments – bq27Z746 (SLUUCA6)</span><br><a href="https://ti.com/document-viewer/lit/html/SLUUCA6/GUID-7C9D0D65-BA1B-4BE1-9E95-6A3BDDD840A3" target="_blank" rel="noopener">https://ti.com/document-viewer/lit/html/SLUUCA6/GUID-7C9D0D65-BA1B-4BE1-9E95-6A3BDDD840A3</a></li>
+<li id="bron-14" value="14"><span class="btitle">Xiaoxiang-app (App Store)</span><br><a href="https://apps.apple.com/app/id1375405426" target="_blank" rel="noopener">https://apps.apple.com/app/id1375405426</a></li>
+<li id="bron-15" value="15"><span class="btitle">mypower.cz – bijlage over cycluscount</span> <span class="tag weak">zwak: forum</span><br><a href="https://forum.mypower.cz/download/file.php?id=31963" target="_blank" rel="noopener">https://forum.mypower.cz/download/file.php?id=31963</a></li>
+<li id="bron-16" value="16"><span class="btitle">Three-pin connector (Endless-Sphere); Bafang&#x27;s proprietary battery port (EBR)</span> <span class="tag weak">zwak: forum</span><br><a href="https://endless-sphere.com/sphere/threads/three-pin-small-connector.113050/" target="_blank" rel="noopener">https://endless-sphere.com/sphere/threads/three-pin-small-connector.113050/</a> · <a href="https://forums.electricbikereview.com/threads/bafangs-proprietary-battery-port.54932" target="_blank" rel="noopener">https://forums.electricbikereview.com/threads/bafangs-proprietary-battery-port.54932</a></li>
+<li id="bron-17" value="17"><span class="btitle">Pedelecs-forum, post 743579</span> <span class="tag weak">zwak: forum</span><br><a href="https://www.pedelecs.co.uk/forum/posts/743579" target="_blank" rel="noopener">https://www.pedelecs.co.uk/forum/posts/743579</a></li>
+<li id="bron-18" value="18"><span class="btitle">Pedelecs – 2-pin vs 5-pin battery connectors; BMS woes</span> <span class="tag weak">zwak: forum</span><br><a href="https://www.pedelecs.co.uk/topic/43593-2-pin-vs-5-pin-battery-connectors/" target="_blank" rel="noopener">https://www.pedelecs.co.uk/topic/43593-2-pin-vs-5-pin-battery-connectors/</a> · <a href="https://pedelecs.co.uk/forum/threads/bms-woes.41070/post-615390" target="_blank" rel="noopener">https://pedelecs.co.uk/forum/threads/bms-woes.41070/post-615390</a></li>
+<li id="bron-19" value="19"><span class="btitle">Endless-Sphere – Bafang M225 en Hailong-accu</span> <span class="tag weak">zwak: forum</span><br><a href="https://endless-sphere.com/sphere/threads/connecting-bafang-m225-and-hailong-battery.128377/" target="_blank" rel="noopener">https://endless-sphere.com/sphere/threads/connecting-bafang-m225-and-hailong-battery.128377/</a></li>
+<li id="bron-20" value="20"><span class="btitle">Hailong-connectoren: eBay-listing; ebikesforum</span> <span class="tag weak">zwak: webshop/forum</span><br><a href="https://www.ebay.de/itm/235715207797" target="_blank" rel="noopener">https://www.ebay.de/itm/235715207797</a> · <a href="https://ebikesforum.com/threads/hailong-battery-change-5-pin-to-4-pin-connector.4227/" target="_blank" rel="noopener">https://ebikesforum.com/threads/hailong-battery-change-5-pin-to-4-pin-connector.4227/</a></li>
+<li id="bron-21" value="21"><span class="btitle">Bosch dealer-service; Pedelecs-forum over laadcycli</span> <span class="also">(ook als rapport 2 [5])</span><br><a href="https://bosch-ebike.com/en/service/dealer-service" target="_blank" rel="noopener">https://bosch-ebike.com/en/service/dealer-service</a> · <a href="https://www.pedelecs.co.uk/forum/threads/bosch-battery-recharge-cycles.32825/post-462919" target="_blank" rel="noopener">https://www.pedelecs.co.uk/forum/threads/bosch-battery-recharge-cycles.32825/post-462919</a></li>
+<li id="bron-22" value="22"><span class="btitle">Bike-Mailorder – Bosch CapacityTester BCT3990</span> <span class="also">(ook als rapport 4 [27])</span><br><a href="https://www.bike-mailorder.com/en/products/bosch-capacitytester-kit-bct3990" target="_blank" rel="noopener">https://www.bike-mailorder.com/en/products/bosch-capacitytester-kit-bct3990</a></li>
+<li id="bron-23" value="23"><span class="btitle">Reention/Dorado-pluggen: EBR-forum; eBay-listing</span> <span class="tag weak">zwak: forum/webshop</span><br><a href="https://forums.electricbikereview.com/goto/post?id=581790" target="_blank" rel="noopener">https://forums.electricbikereview.com/goto/post?id=581790</a> · <a href="https://www.ebay.de/itm/203762497973" target="_blank" rel="noopener">https://www.ebay.de/itm/203762497973</a></li>
+<li id="bron-24" value="24"><span class="btitle">Doctibike – Dorado battery tester cable</span><br><a href="https://doctibike.com/en/cables-and-adapters/1543-dorado-battery-tester-cable.html" target="_blank" rel="noopener">https://doctibike.com/en/cables-and-adapters/1543-dorado-battery-tester-cable.html</a></li>
+<li id="bron-25" value="25"><span class="btitle">Greenbikekit – TigerShark frame battery plug 2P 6pins</span><br><a href="https://www.greenbikekit.com/e-bike-tigershark-frame-battery-plug-2p-6pins.html" target="_blank" rel="noopener">https://www.greenbikekit.com/e-bike-tigershark-frame-battery-plug-2p-6pins.html</a></li>
+<li id="bron-26" value="26"><span class="btitle">Shimano E-steps – onofficiële repo (README)</span> <span class="tag weak">zwak: onofficieel</span><br><a href="https://forge.k3s.fr/github-mirrors/shimano-e-steps/raw/branch/master/README.md" target="_blank" rel="noopener">https://forge.k3s.fr/github-mirrors/shimano-e-steps/raw/branch/master/README.md</a></li>
+</ol>
+<h3 id="bronnen-bosch">Rapport 2 – Bosch</h3>
+<ol class="bronnen">
+<li id="bron-27" value="27"><span class="btitle">mikrocontroller.net – topic 458371</span> <span class="tag weak">zwak: forum</span><br><a href="https://www.mikrocontroller.net/topic/458371" target="_blank" rel="noopener">https://www.mikrocontroller.net/topic/458371</a></li>
+<li id="bron-28" value="28"><span class="btitle">EBR – Bosch power pack pin-out diagram</span> <span class="tag weak">zwak: forum</span><br><a href="https://forums.electricbikereview.com/threads/bosch-power-pack-pin-out-diagram.15691" target="_blank" rel="noopener">https://forums.electricbikereview.com/threads/bosch-power-pack-pin-out-diagram.15691</a></li>
+<li id="bron-29" value="29"><span class="btitle">Bosch BCT100-handleiding (manualslib.es)</span><br><a href="https://manualslib.es/manual/81325/Bosch-Bct-100.html?page=8" target="_blank" rel="noopener">https://manualslib.es/manual/81325/Bosch-Bct-100.html?page=8</a></li>
+<li id="bron-30" value="30"><span class="btitle">DiagnosticTool-rapporten (forumbijlagen EBR en eMTB)</span> <span class="tag weak">zwak: forumbijlage</span> <span class="also">(ook als rapport 2 [8])</span><br><a href="https://forums.electricbikereview.com/attachments/crystal-kovacs-diagnostic-report-may-29-2025-pdf.194732/" target="_blank" rel="noopener">https://forums.electricbikereview.com/attachments/crystal-kovacs-diagnostic-report-may-29-2025-pdf.194732/</a> · <a href="https://www.emtbforums.com/attachments/cannondale-moterra-service-report-may-2022-pdf.164706/" target="_blank" rel="noopener">https://www.emtbforums.com/attachments/cannondale-moterra-service-report-may-2022-pdf.164706/</a></li>
+<li id="bron-31" value="31"><span class="btitle">Velofactory – Bosch CapacityTester BCT3990</span><br><a href="https://www.velofactory.ch/Bosch-CapacityTester-BCT3990-black" target="_blank" rel="noopener">https://www.velofactory.ch/Bosch-CapacityTester-BCT3990-black</a></li>
+<li id="bron-32" value="32"><span class="btitle">Certified by Bosch: GPS-Radler; Biketips</span><br><a href="https://gpsradler.de/news/certified-by-bosch-gebrauchtkauf/" target="_blank" rel="noopener">https://gpsradler.de/news/certified-by-bosch-gebrauchtkauf/</a> · <a href="https://biketips.com/bosch-certified-used-ebikes-2026/" target="_blank" rel="noopener">https://biketips.com/bosch-certified-used-ebikes-2026/</a></li>
+<li id="bron-33" value="33"><span class="btitle">Voorbeeldcertificaat &#x27;Certified by Bosch&#x27;</span><br><a href="https://certified.bosch-ebike.com/certificates/42e8a68d-9ac2-474b-9238-812ff716f9c1/certificate_de.pdf" target="_blank" rel="noopener">https://certified.bosch-ebike.com/certificates/42e8a68d-9ac2-474b-9238-812ff716f9c1/certificate_de.pdf</a></li>
+<li id="bron-34" value="34"><span class="btitle">Hackaday.io – custom e-bike dash compatible met BES3</span> <span class="tag weak">zwak: hobbyproject</span><br><a href="https://hackaday.io/project/205620-custom-e-bike-dash-compatible-with-bes3" target="_blank" rel="noopener">https://hackaday.io/project/205620-custom-e-bike-dash-compatible-with-bes3</a></li>
+<li id="bron-35" value="35"><span class="btitle">Bosch Battery Lock: TechSpot; Heise</span> <span class="also">(ook als rapport 6 [11])</span><br><a href="https://www.techspot.com/news/106215-bosch-new-e-bike-battery-theft-solution-looks.html" target="_blank" rel="noopener">https://www.techspot.com/news/106215-bosch-new-e-bike-battery-theft-solution-looks.html</a> · <a href="https://heise.de/-10225802" target="_blank" rel="noopener">https://heise.de/-10225802</a></li>
+<li id="bron-36" value="36"><span class="btitle">mikrocontroller.net – topic 407538</span> <span class="tag weak">zwak: forum</span><br><a href="https://www.mikrocontroller.net/topic/407538" target="_blank" rel="noopener">https://www.mikrocontroller.net/topic/407538</a></li>
+<li id="bron-37" value="37"><span class="btitle">eBike Flow-app (App Store)</span><br><a href="https://apps.apple.com/gb/app/ebike-flow/id1559900907" target="_blank" rel="noopener">https://apps.apple.com/gb/app/ebike-flow/id1559900907</a></li>
+<li id="bron-38" value="38"><span class="btitle">Bosch eBike – Battery guide</span><br><a href="https://www.bosch-ebike.com/en/service/battery-guide" target="_blank" rel="noopener">https://www.bosch-ebike.com/en/service/battery-guide</a></li>
+<li id="bron-39" value="39"><span class="btitle">Family Cyclery – running out of charge on Bosch batteries</span> <span class="tag weak">zwak: gaf 404 bij controle</span><br><a href="https://family-cyclery.squarespace.com/blog/running-out-of-charge-on-bosch-batteries" target="_blank" rel="noopener">https://family-cyclery.squarespace.com/blog/running-out-of-charge-on-bosch-batteries</a></li>
+<li id="bron-40" value="40"><span class="btitle">Bosch help-center asset-asf-00151</span><br><a href="https://www.bosch-ebike.com/en/help-center/asset-asf-00151" target="_blank" rel="noopener">https://www.bosch-ebike.com/en/help-center/asset-asf-00151</a></li>
+<li id="bron-41" value="41"><span class="btitle">Akkudoktor – PowerPack 500 BMS-reset na celwissel</span> <span class="tag weak">zwak: forum</span><br><a href="https://akkudoktor.net/t/bosch-powerpack-500-bms-reset-entsperren-oder-neuinitialisieren-nach-einem-zelltausch/34548" target="_blank" rel="noopener">https://akkudoktor.net/t/bosch-powerpack-500-bms-reset-entsperren-oder-neuinitialisieren-nach-einem-zelltausch/34548</a></li>
+<li id="bron-42" value="42"><span class="btitle">Liofit – celwissel Bosch PowerTube (pdf)</span><br><a href="https://www.liofit.com/wp-content/uploads/2025/04/Blog-PDF-zellentausch-bosch-powertube.pdf" target="_blank" rel="noopener">https://www.liofit.com/wp-content/uploads/2025/04/Blog-PDF-zellentausch-bosch-powertube.pdf</a></li>
+<li id="bron-43" value="43"><span class="btitle">ANWB – fietsaccu reviseren</span><br><a href="https://www.anwb.nl/fiets/fietsaccu/fietsaccu-reviseren" target="_blank" rel="noopener">https://www.anwb.nl/fiets/fietsaccu/fietsaccu-reviseren</a></li>
+<li id="bron-44" value="44"><span class="btitle">Handelsgids.be – accurevisietips (pdf)</span><br><a href="https://www.handelsgids.be/data/images/clientPages/300000/306000/306700/306715/Accurevisietips.pdf" target="_blank" rel="noopener">https://www.handelsgids.be/data/images/clientPages/300000/306000/306700/306715/Accurevisietips.pdf</a></li>
+</ol>
+<h3 id="bronnen-bafang">Rapport 3 – Bafang en generieke BMS&#x27;en</h3>
+<ol class="bronnen">
+<li id="bron-45" value="45"><span class="btitle">Bafang – BESST Pro handleiding V1.6 (pdf)</span><br><a href="https://www.bafang-e.com/Uploaded/Labels/BESST%20Pro%20Upper%20Computer%20Software%20Operation%20Manual%20_V1.6(EN).pdf" target="_blank" rel="noopener">https://www.bafang-e.com/Uploaded/Labels/BESST%20Pro%20Upper%20Computer%20Software%20Operation%20Manual%20_V1.6(EN).pdf</a></li>
+<li id="bron-46" value="46"><span class="btitle">Manualshive – Bafang DP C244 CAN, p. 10</span> <span class="tag weak">zwak: geblokkeerd; alleen zoekfragment</span><br><a href="https://manualshive.com/en/manual/bafang/dp-c244-can/3430516?page=10" target="_blank" rel="noopener">https://manualshive.com/en/manual/bafang/dp-c244-can/3430516?page=10</a></li>
+<li id="bron-47" value="47"><span class="btitle">OpenBafangTool (GitHub)</span><br><a href="https://github.com/andrey-pr/OpenBafangTool" target="_blank" rel="noopener">https://github.com/andrey-pr/OpenBafangTool</a></li>
+<li id="bron-48" value="48"><span class="btitle">Endless-Sphere – twee posts over digitale Bafang-accu&#x27;s</span> <span class="tag weak">zwak: forum; geblokkeerd, alleen zoekfragment</span><br><a href="https://endless-sphere.com/sphere/goto/post?id=1836354" target="_blank" rel="noopener">https://endless-sphere.com/sphere/goto/post?id=1836354</a> · <a href="https://endless-sphere.com/sphere/goto/post?id=1845545" target="_blank" rel="noopener">https://endless-sphere.com/sphere/goto/post?id=1845545</a></li>
+<li id="bron-49" value="49"><span class="btitle">Endless-Sphere – UART-BMS op BBS02B / DPC18</span> <span class="tag weak">zwak: forum; geblokkeerd, alleen zoekfragment</span><br><a href="https://endless-sphere.com/sphere/threads/connect-uart-bms-to-bbs02b-to-display-battery-info-on-dpc18.115991/" target="_blank" rel="noopener">https://endless-sphere.com/sphere/threads/connect-uart-bms-to-bbs02b-to-display-battery-info-on-dpc18.115991/</a></li>
+<li id="bron-50" value="50"><span class="btitle">EBR – Reention battery question</span> <span class="tag weak">zwak: forum</span><br><a href="https://forums.electricbikereview.com/threads/reention-battery-question.45256/latest" target="_blank" rel="noopener">https://forums.electricbikereview.com/threads/reention-battery-question.45256/latest</a></li>
+<li id="bron-51" value="51"><span class="btitle">EBR – post 565354</span> <span class="tag weak">zwak: forum</span><br><a href="https://forums.electricbikereview.com/goto/post?id=565354" target="_blank" rel="noopener">https://forums.electricbikereview.com/goto/post?id=565354</a></li>
+<li id="bron-52" value="52"><span class="btitle">powermon – protocoldocs &#x27;jkv4&#x27;</span> <span class="tag weak">zwak: gaat over JK, niet JBD</span><br><a href="https://jblance.github.io/powermon/protocol_docs/jkv4/" target="_blank" rel="noopener">https://jblance.github.io/powermon/protocol_docs/jkv4/</a></li>
+<li id="bron-53" value="53"><span class="btitle">Hackaday.io – JBD-registers (log 196524)</span> <span class="tag weak">zwak: auteur twijfelt aan nauwkeurigheid</span><br><a href="https://hackaday.io/project/162806/log/196524" target="_blank" rel="noopener">https://hackaday.io/project/162806/log/196524</a></li>
+<li id="bron-54" value="54"><span class="btitle">esphome-jbd-bms (GitHub)</span><br><a href="https://github.com/syssi/esphome-jbd-bms" target="_blank" rel="noopener">https://github.com/syssi/esphome-jbd-bms</a></li>
+<li id="bron-55" value="55"><span class="btitle">C3MA – berger-ble-commands</span> <span class="tag weak">zwak: onduidelijke bron; alleen zoekfragment</span><br><a href="https://git.mannheim.ccc.de/C3MA/berger-ble-commands/src/branch/main/docs/command-catalog.md" target="_blank" rel="noopener">https://git.mannheim.ccc.de/C3MA/berger-ble-commands/src/branch/main/docs/command-catalog.md</a></li>
+<li id="bron-56" value="56"><span class="btitle">Daly HKMS smart BMS-handleiding (pdf)</span><br><a href="https://dalybms.com/uploads/HKMS-Series-Smart-BMS-manual.pdf" target="_blank" rel="noopener">https://dalybms.com/uploads/HKMS-Series-Smart-BMS-manual.pdf</a></li>
+<li id="bron-57" value="57"><span class="btitle">daly-bms-uart (GitHub); dalybms (docs.rs)</span><br><a href="https://github.com/jrventer/daly-bms-uart" target="_blank" rel="noopener">https://github.com/jrventer/daly-bms-uart</a> · <a href="https://docs.rs/crate/dalybms/latest" target="_blank" rel="noopener">https://docs.rs/crate/dalybms/latest</a></li>
+<li id="bron-58" value="58"><span class="btitle">LLT/Overkill: esk8-forum; Overkill Solar-app; bms-tools</span> <span class="tag weak">zwak: deels forum</span><br><a href="https://forum.esk8.news/t/llt-bms-end-user-configuration/82657" target="_blank" rel="noopener">https://forum.esk8.news/t/llt-bms-end-user-configuration/82657</a> · <a href="https://apps.apple.com/us/app/overkill-solar/id6444233824" target="_blank" rel="noopener">https://apps.apple.com/us/app/overkill-solar/id6444233824</a> · <a href="https://gitlab.com/bms-tools/bms-tools" target="_blank" rel="noopener">https://gitlab.com/bms-tools/bms-tools</a></li>
+<li id="bron-59" value="59"><span class="btitle">Daly CAN-protocol V1.0 (pdf)</span><br><a href="https://aws.robu.in/wp-content/uploads/2022/02/Daly-CAN-Communications-Protocol-V1.0-1.pdf" target="_blank" rel="noopener">https://aws.robu.in/wp-content/uploads/2022/02/Daly-CAN-Communications-Protocol-V1.0-1.pdf</a></li>
+<li id="bron-60" value="60"><span class="btitle">esphome-daly-bms (GitHub)</span><br><a href="https://github.com/syssi/esphome-daly-bms" target="_blank" rel="noopener">https://github.com/syssi/esphome-daly-bms</a></li>
+<li id="bron-61" value="61"><span class="btitle">esphome-jk-bms (GitHub)</span><br><a href="https://github.com/syssi/esphome-jk-bms" target="_blank" rel="noopener">https://github.com/syssi/esphome-jk-bms</a></li>
+<li id="bron-62" value="62"><span class="btitle">JK BMS-handleiding (pdf)</span><br><a href="https://cdn.shopify.com/s/files/1/0559/0830/2937/files/JK_BMS_Active-Bluetooth-BMS-Manual.pdf" target="_blank" rel="noopener">https://cdn.shopify.com/s/files/1/0559/0830/2937/files/JK_BMS_Active-Bluetooth-BMS-Manual.pdf</a></li>
+<li id="bron-63" value="63"><span class="btitle">esphome-ant-bms (GitHub)</span><br><a href="https://github.com/syssi/esphome-ant-bms" target="_blank" rel="noopener">https://github.com/syssi/esphome-ant-bms</a></li>
+<li id="bron-64" value="64"><span class="btitle">Endless-Sphere – BMS not charging (S-8254 reset)</span> <span class="tag weak">zwak: forum; alleen zoekfragment</span><br><a href="https://endless-sphere.com/sphere/threads/bms-not-charging-s-8254-reset.128255/" target="_blank" rel="noopener">https://endless-sphere.com/sphere/threads/bms-not-charging-s-8254-reset.128255/</a></li>
+<li id="bron-65" value="65"><span class="btitle">eMTB-forums – Levo BMS na diepontlading</span> <span class="tag weak">zwak: forum; alleen zoekfragment</span><br><a href="https://www.emtbforums.com/threads/2019-specialized-turbo-levo-frs-bms-not-working-after-deep-discharge-%E2%80%94-how-to-reset.47308/" target="_blank" rel="noopener">https://www.emtbforums.com/threads/2019-specialized-turbo-levo-frs-bms-not-working-after-deep-discharge-%E2%80%94-how-to-reset.47308/</a></li>
+</ol>
+<h3 id="bronnen-inkoop">Rapport 4 – Hardware en inkoop</h3>
+<ol class="bronnen">
+<li id="bron-66" value="66"><span class="btitle">Tinytronics – CH340 USB-TTL-adapter</span><br><a href="https://www.tinytronics.nl/nl/communicatie-en-signalen/serieel/usb/ch340-3.3v-5v-ttl-usb-serial-port-adapter" target="_blank" rel="noopener">https://www.tinytronics.nl/nl/communicatie-en-signalen/serieel/usb/ch340-3.3v-5v-ttl-usb-serial-port-adapter</a></li>
+<li id="bron-67" value="67"><span class="btitle">Tinytronics – serieel / RS485</span><br><a href="https://www.tinytronics.nl/nl/communicatie-en-signalen/serieel" target="_blank" rel="noopener">https://www.tinytronics.nl/nl/communicatie-en-signalen/serieel</a></li>
+<li id="bron-68" value="68"><span class="btitle">Electronics-lab – CANable 2.0</span><br><a href="https://www.electronics-lab.com/canable-2-0-is-an-open-source-usb-to-can-adapter-with-socketcan-and-slcan-support/" target="_blank" rel="noopener">https://www.electronics-lab.com/canable-2-0-is-an-open-source-usb-to-can-adapter-with-socketcan-and-slcan-support/</a></li>
+<li id="bron-69" value="69"><span class="btitle">p3d.mx – MKS CANable 2.0</span><br><a href="https://p3d.mx/products/mks-canable-2-0-usb-to-can-adapter" target="_blank" rel="noopener">https://p3d.mx/products/mks-canable-2-0-usb-to-can-adapter</a></li>
+<li id="bron-70" value="70"><span class="btitle">Tinytronics – logic analyzer 8 kanalen</span><br><a href="https://www.tinytronics.nl/en/tools-and-mounting/measuring/oscilloscopes-and-logic-analyzers/logic-analyzer-8-channel-usb" target="_blank" rel="noopener">https://www.tinytronics.nl/en/tools-and-mounting/measuring/oscilloscopes-and-logic-analyzers/logic-analyzer-8-channel-usb</a></li>
+<li id="bron-71" value="71"><span class="btitle">LaskaKit – Atorch DL24P</span><br><a href="https://www.laskakit.cz/en/atorch-dl24p-laboratorni-elektronicka-zatez-200v--20a--180w" target="_blank" rel="noopener">https://www.laskakit.cz/en/atorch-dl24p-laboratorni-elektronicka-zatez-200v--20a--180w</a></li>
+<li id="bron-72" value="72"><span class="btitle">Fruugo – YR1035+</span><br><a href="https://www.fruugo.ca/yr1035-4-wire-lithium-battery-internal-resistance-testerb/p-412731860" target="_blank" rel="noopener">https://www.fruugo.ca/yr1035-4-wire-lithium-battery-internal-resistance-testerb/p-412731860</a></li>
+<li id="bron-73" value="73"><span class="btitle">Fruugo – RC3563</span><br><a href="https://www.fruugo.ie/rc3563-battery-internal-resistance-voltage-3-digit-battery-tester-true-four-wire-ac-lithium-battery/p-208396458-443901347" target="_blank" rel="noopener">https://www.fruugo.ie/rc3563-battery-internal-resistance-voltage-3-digit-battery-tester-true-four-wire-ac-lithium-battery/p-208396458-443901347</a></li>
+<li id="bron-74" value="74"><span class="btitle">ANWB webwinkel – Savs lithium-brandblusser 6 L</span><br><a href="https://www.anwb.nl/webwinkel/p/149192/lithium-brandblusser-schuim-6-liter" target="_blank" rel="noopener">https://www.anwb.nl/webwinkel/p/149192/lithium-brandblusser-schuim-6-liter</a></li>
+<li id="bron-75" value="75"><span class="btitle">Udobaer – VLITEX blusdeken</span><br><a href="https://www.udobaer.nl/vlitex-blusdeken-standard-voor-branden-van-lithium-ion-batterijen-289113.html" target="_blank" rel="noopener">https://www.udobaer.nl/vlitex-blusdeken-standard-voor-branden-van-lithium-ion-batterijen-289113.html</a></li>
+<li id="bron-76" value="76"><span class="btitle">Elektronica voor jou – LiPo-bag</span><br><a href="https://elektronicavoorjou.nl/en/product/lipo-battery-bag-200-150-150-mm/" target="_blank" rel="noopener">https://elektronicavoorjou.nl/en/product/lipo-battery-bag-200-150-150-mm/</a></li>
+<li id="bron-77" value="77"><span class="btitle">Hommel-Hercules – isolatiehandschoenen klasse 00</span><br><a href="https://www.hommel-hercules.com/en/Shop/1002626010/Electrician%27s-protective-glove-500V-class-00-length-approx-360-mm-size-8" target="_blank" rel="noopener">https://www.hommel-hercules.com/en/Shop/1002626010/Electrician%27s-protective-glove-500V-class-00-length-approx-360-mm-size-8</a></li>
+<li id="bron-78" value="78"><span class="btitle">Eleshop – Owon SPE6103</span><br><a href="https://eleshop.eu/owon-spe6103-power-supply.html" target="_blank" rel="noopener">https://eleshop.eu/owon-spe6103-power-supply.html</a></li>
+<li id="bron-79" value="79"><span class="btitle">Eleshop – Owon OEL1530</span><br><a href="https://eleshop.eu/owon-oel1530-electronic-load.html" target="_blank" rel="noopener">https://eleshop.eu/owon-oel1530-electronic-load.html</a></li>
+<li id="bron-80" value="80"><span class="btitle">Solartech – ZKETECH EBC-A40L</span><br><a href="https://solartech.eu/products/lifepo4-li-ion-battery-cell-tester-3-2v-5v-40a-ebc-a40l" target="_blank" rel="noopener">https://solartech.eu/products/lifepo4-li-ion-battery-cell-tester-3-2v-5v-40a-ebc-a40l</a></li>
+<li id="bron-81" value="81"><span class="btitle">Eleshop – InfiRay P2 Pro</span><br><a href="https://eleshop.eu/infiray-p2-pro-thermal-camera-for-ios.html" target="_blank" rel="noopener">https://eleshop.eu/infiray-p2-pro-thermal-camera-for-ios.html</a></li>
+<li id="bron-82" value="82"><span class="btitle">Elektor – Topdon TC001</span><br><a href="https://www.elektor.com/products/topdon-tc001-thermal-imaging-camera-for-android-windows-with-usb-c" target="_blank" rel="noopener">https://www.elektor.com/products/topdon-tc001-thermal-imaging-camera-for-android-windows-with-usb-c</a></li>
+<li id="bron-83" value="83"><span class="btitle">Ozo-electric – diagnostic suitcases (BESST)</span><br><a href="https://ozo-electric.com/en/449-diagnostic-suitcases" target="_blank" rel="noopener">https://ozo-electric.com/en/449-diagnostic-suitcases</a></li>
+<li id="bron-84" value="84"><span class="btitle">MTBiker – Bafang BESST UC-303</span><br><a href="https://www.mtbiker.shop/shop/components/batteries-and-accessories-for-e-bikes/e-bike-components/bafang-besst-uc-303-diagnostics-p359270.html" target="_blank" rel="noopener">https://www.mtbiker.shop/shop/components/batteries-and-accessories-for-e-bikes/e-bike-components/bafang-besst-uc-303-diagnostics-p359270.html</a></li>
+<li id="bron-85" value="85"><span class="btitle">Bafang – BESST (OEM-area)</span><br><a href="https://bafang-e.com/en/oem-area/service/besst" target="_blank" rel="noopener">https://bafang-e.com/en/oem-area/service/besst</a></li>
+<li id="bron-86" value="86"><span class="btitle">RS Ierland – Innomaker USB2CAN</span><br><a href="https://ie.rs-online.com/web/p/raspberry-pi-hats-add-ons/2305617" target="_blank" rel="noopener">https://ie.rs-online.com/web/p/raspberry-pi-hats-add-ons/2305617</a></li>
+<li id="bron-87" value="87"><span class="btitle">Grid Connect – PEAK PCAN-USB</span><br><a href="https://gridconnect.com/products/can-usb-adapter-pcan-usb" target="_blank" rel="noopener">https://gridconnect.com/products/can-usb-adapter-pcan-usb</a></li>
+<li id="bron-88" value="88"><span class="btitle">Sea-safe-up – Sea-Fire AVD-blusser</span><br><a href="https://sea-safe-up.com/dutch/catalog/product/view/id/1581" target="_blank" rel="noopener">https://sea-safe-up.com/dutch/catalog/product/view/id/1581</a></li>
+<li id="bron-89" value="89"><span class="btitle">Manutan – Cemo brandwerende kast voor lithium-accu&#x27;s</span><br><a href="https://www.manutan.be/nl/mab/nl-brandwerende-kast-voor-lithium-accu-s-standaard-assortiment-cemo" target="_blank" rel="noopener">https://www.manutan.be/nl/mab/nl-brandwerende-kast-voor-lithium-accu-s-standaard-assortiment-cemo</a></li>
+<li id="bron-90" value="90"><span class="btitle">Bosch eBike – dealerservice (NL)</span><br><a href="https://www.bosch-ebike.com/nl/service/dealerservice" target="_blank" rel="noopener">https://www.bosch-ebike.com/nl/service/dealerservice</a></li>
+<li id="bron-91" value="91"><span class="btitle">EBR-forum – Bosch eBike diagnostic tool</span> <span class="tag weak">zwak: forum</span><br><a href="https://forums.electricbikereview.com/threads/bodch-ebike-diagnostic-tool.55012/latest" target="_blank" rel="noopener">https://forums.electricbikereview.com/threads/bodch-ebike-diagnostic-tool.55012/latest</a></li>
+</ol>
+<h3 id="bronnen-kansen">Rapport 5 – Kansen en markt</h3>
+<ol class="bronnen">
+<li id="bron-92" value="92"><span class="btitle">TNO (2026) – Li-ion battery recycling in NL</span><br><a href="https://www.tno.nl/en/newsroom/2026/07/li-ion-battery-recycling-netherlands/" target="_blank" rel="noopener">https://www.tno.nl/en/newsroom/2026/07/li-ion-battery-recycling-netherlands/</a></li>
+<li id="bron-93" value="93"><span class="btitle">Change Inc. – van fietsaccu naar opslagsysteem (Zhero)</span><br><a href="https://www.change.inc/transities/energie-transitie/van-fietsaccu-naar-opslagsysteem-tegen-netcongestie-batterijen-kunnen-een-veel-langer-leven-hebben" target="_blank" rel="noopener">https://www.change.inc/transities/energie-transitie/van-fietsaccu-naar-opslagsysteem-tegen-netcongestie-batterijen-kunnen-een-veel-langer-leven-hebben</a></li>
+<li id="bron-94" value="94"><span class="btitle">Nieuws.nl – fietsverkoop 2024</span><br><a href="https://nieuws.nl/economie/laagste-aantal-fietsen-verkocht-in-ruim-tien-jaar" target="_blank" rel="noopener">https://nieuws.nl/economie/laagste-aantal-fietsen-verkocht-in-ruim-tien-jaar</a></li>
+<li id="bron-95" value="95"><span class="btitle">Bike Europe – Dutch bike market 2025</span><br><a href="https://onlinemagazine.bike-eu.com/en/edition-march-2026/dutch-bike-market-2025" target="_blank" rel="noopener">https://onlinemagazine.bike-eu.com/en/edition-march-2026/dutch-bike-market-2025</a></li>
+<li id="bron-96" value="96"><span class="btitle">Stichting OPEN/Wecycle – onderzoek verantwoord afdanken fietsaccu&#x27;s (okt. 2025)</span><br><a href="https://www.stichting-open.org/wp-content/uploads/2026/04/Rapportage-Stichting-OPEN-Wecycle-Onderzoek-verantwoord-afdanken-van-fietsaccus-20251024.pdf" target="_blank" rel="noopener">https://www.stichting-open.org/wp-content/uploads/2026/04/Rapportage-Stichting-OPEN-Wecycle-Onderzoek-verantwoord-afdanken-van-fietsaccus-20251024.pdf</a></li>
+<li id="bron-97" value="97"><span class="btitle">Stichting OPEN – tariefbrief 2025 EPAC</span><br><a href="https://stichting-open.org/wp-content/uploads/2024/11/Bijlage-tariefbrief-2025-EPAC-ENG-def.pdf" target="_blank" rel="noopener">https://stichting-open.org/wp-content/uploads/2024/11/Bijlage-tariefbrief-2025-EPAC-ENG-def.pdf</a></li>
+<li id="bron-98" value="98"><span class="btitle">Test-Aankoop – fietsbatterij herstellen</span><br><a href="https://www.test-aankoop.be/mobiliteit/fietsen/nieuws/fietsbatterij-herstellen-refurbished-elektrische-fiets" target="_blank" rel="noopener">https://www.test-aankoop.be/mobiliteit/fietsen/nieuws/fietsbatterij-herstellen-refurbished-elektrische-fiets</a></li>
+<li id="bron-99" value="99"><span class="btitle">ID.nl – fietsaccu revisie</span><br><a href="https://id.nl/mobiliteit/fiets/e-bikes/fietsaccu-revisie" target="_blank" rel="noopener">https://id.nl/mobiliteit/fiets/e-bikes/fietsaccu-revisie</a></li>
+<li id="bron-100" value="100"><span class="btitle">Solar Magazine (26-06-2026) – Zhero thuisbatterij</span><br><a href="https://solarmagazine.nl/nieuws-zonne-energie/i44127/zhero-systems-komt-met-nederlandse-thuisbatterij-van-hergebruikte-fietsaccu-s" target="_blank" rel="noopener">https://solarmagazine.nl/nieuws-zonne-energie/i44127/zhero-systems-komt-met-nederlandse-thuisbatterij-van-hergebruikte-fietsaccu-s</a></li>
+<li id="bron-101" value="101"><span class="btitle">Invest-NL (10-02-2026); Regio Business – naamswijziging Zhero</span><br><a href="https://www.invest-nl.nl/nl/nieuws/greenchoice-en-invest-nl-investeren-in-zhero-systems-om-toegang-tot-circulaire-batterijen-voor-bedrijven-en-consumenten-te-versnellen" target="_blank" rel="noopener">https://www.invest-nl.nl/nl/nieuws/greenchoice-en-invest-nl-investeren-in-zhero-systems-om-toegang-tot-circulaire-batterijen-voor-bedrijven-en-consumenten-te-versnellen</a> · <a href="https://regio-business.nl/nieuws/een-nieuwe-handelsnaam-zhero-systems-voor-het-vertrouwde-refurb-battery/" target="_blank" rel="noopener">https://regio-business.nl/nieuws/een-nieuwe-handelsnaam-zhero-systems-voor-het-vertrouwde-refurb-battery/</a></li>
+<li id="bron-102" value="102"><span class="btitle">Bosch BCT100: handleiding (manualslib.mx); Lecyclo</span><br><a href="https://manualslib.mx/manual/81325/Bosch-Bct-100.html?page=10" target="_blank" rel="noopener">https://manualslib.mx/manual/81325/Bosch-Bct-100.html?page=10</a> · <a href="https://www.lecyclo.com/products/outil-diagnostic-batterie-bosch-capacitytester-bct100" target="_blank" rel="noopener">https://www.lecyclo.com/products/outil-diagnostic-batterie-bosch-capacitytester-bct100</a></li>
+<li id="bron-103" value="103"><span class="btitle">CircuitsOnline-forum</span> <span class="tag weak">zwak: forum, anekdotisch</span><br><a href="https://www.circuitsonline.net/forum/view/162001" target="_blank" rel="noopener">https://www.circuitsonline.net/forum/view/162001</a></li>
+<li id="bron-104" value="104"><span class="btitle">HSF Kramer – EU Batteries Regulation</span><br><a href="https://www.hsfkramer.com/insights/2024-09/EU-Batteries-Regulation--Next-implementation-stage-aims-at-greater-transparency-" target="_blank" rel="noopener">https://www.hsfkramer.com/insights/2024-09/EU-Batteries-Regulation--Next-implementation-stage-aims-at-greater-transparency-</a></li>
+<li id="bron-105" value="105"><span class="btitle">ComplianceGate – tijdlijn Batterijverordening</span><br><a href="https://www.compliancegate.com/eu-batteries-regulation-timeline-and-dates/" target="_blank" rel="noopener">https://www.compliancegate.com/eu-batteries-regulation-timeline-and-dates/</a></li>
+<li id="bron-106" value="106"><span class="btitle">LiveWire – Battery Regulation (citaat art. 14)</span><br><a href="https://www.livewire.com/en-ch/documents/battery-regulation" target="_blank" rel="noopener">https://www.livewire.com/en-ch/documents/battery-regulation</a></li>
+<li id="bron-107" value="107"><span class="btitle">Elevenes – commentaar</span> <span class="tag weak">zwak: commentaar</span><br><a href="https://elevenes.com/?p=3288" target="_blank" rel="noopener">https://elevenes.com/?p=3288</a></li>
+<li id="bron-108" value="108"><span class="btitle">Verordening (EU) 2023/1542: LawPlayer; EUR-Lex (officieel)</span> <span class="also">(ook als rapport 6 [1])</span><br><a href="https://lawplayer.com/eu/act/32023R1542" target="_blank" rel="noopener">https://lawplayer.com/eu/act/32023R1542</a> · <a href="https://eur-lex.europa.eu/eli/reg/2023/1542/oj" target="_blank" rel="noopener">https://eur-lex.europa.eu/eli/reg/2023/1542/oj</a></li>
+<li id="bron-109" value="109"><span class="btitle">BD Emerson – EU battery passport</span><br><a href="https://www.bdemerson.com/article/eu-battery-passport" target="_blank" rel="noopener">https://www.bdemerson.com/article/eu-battery-passport</a></li>
+<li id="bron-110" value="110"><span class="btitle">TÜV SÜD – EU Battery Regulation</span><br><a href="https://www.tuvsud.com/en-us/knowledge-hub/articles/understanding-the-new-eu-battery-regulation" target="_blank" rel="noopener">https://www.tuvsud.com/en-us/knowledge-hub/articles/understanding-the-new-eu-battery-regulation</a></li>
+</ol>
+<h3 id="bronnen-kritisch">Rapport 6 – Kritische toets</h3>
+<ol class="bronnen">
+<li id="bron-111" value="111"><span class="btitle">Bird &amp; Bird – overzicht Batterijverordening (pdf)</span> <span class="tag weak">zwak: alleen zoekfragment</span><br><a href="https://www.twobirds.com/-/media/new-website-content/pdfs/2023/germany/bird-and-bird---new-battery-regulation_en.pdf" target="_blank" rel="noopener">https://www.twobirds.com/-/media/new-website-content/pdfs/2023/germany/bird-and-bird---new-battery-regulation_en.pdf</a></li>
+<li id="bron-112" value="112"><span class="btitle">Scientific Reports – overontlading en Cu-kortsluiting</span><br><a href="https://www.nature.com/articles/srep30248" target="_blank" rel="noopener">https://www.nature.com/articles/srep30248</a></li>
+<li id="bron-113" value="113"><span class="btitle">CALCE/JES 2020 – koperoplossing</span><br><a href="https://web.calce.umd.edu/articles/abstracts/2020/20_Copper_dissolution_in.html" target="_blank" rel="noopener">https://web.calce.umd.edu/articles/abstracts/2020/20_Copper_dissolution_in.html</a></li>
+<li id="bron-114" value="114"><span class="btitle">Bosch eBike – accuverzorging; battery guide</span><br><a href="https://www.bosch-ebike.com/us/help-center/asset-ast-00046" target="_blank" rel="noopener">https://www.bosch-ebike.com/us/help-center/asset-ast-00046</a> · <a href="https://www.bosch-ebike.com/en/service/general-information/battery-guide" target="_blank" rel="noopener">https://www.bosch-ebike.com/en/service/general-information/battery-guide</a></li>
+<li id="bron-115" value="115"><span class="btitle">NIPV – explosieveiligheid Li-ion-energieopslagsystemen</span> <span class="tag weak">zwak: alleen titel gezien</span><br><a href="https://nipv.nl/documenten/explosieveiligheid-lithium-ion-energieopslagsystemen" target="_blank" rel="noopener">https://nipv.nl/documenten/explosieveiligheid-lithium-ion-energieopslagsystemen</a></li>
+<li id="bron-116" value="116"><span class="btitle">ZVEI-merkblad verzending lithiumbatterijen; The Compliance Center</span> <span class="tag weak">zwak: deels zoeksamenvatting</span><br><a href="https://www.zvei.org/fileadmin/user_upload/Verband/Fachverbaende/Batterien/Merkblaetter/Alle_Merkblaetter/MB_36_Shipping_Lithiumb__20250409.pdf" target="_blank" rel="noopener">https://www.zvei.org/fileadmin/user_upload/Verband/Fachverbaende/Batterien/Merkblaetter/Alle_Merkblaetter/MB_36_Shipping_Lithiumb__20250409.pdf</a> · <a href="https://www.thecompliancecenter.com/how-to-ship-damaged-or-defective-lithium-batteries/" target="_blank" rel="noopener">https://www.thecompliancecenter.com/how-to-ship-damaged-or-defective-lithium-batteries/</a></li>
+<li id="bron-117" value="117"><span class="btitle">IPLO – PGS 37-1 en 37-2</span><br><a href="https://iplo.nl/thema/externe-veiligheid/pgs-37-1-37-2/" target="_blank" rel="noopener">https://iplo.nl/thema/externe-veiligheid/pgs-37-1-37-2/</a></li>
+<li id="bron-118" value="118"><span class="btitle">STL – cursusmateriaal PGS 37-2 (pdf)</span> <span class="tag weak">zwak: alleen zoekfragment</span><br><a href="https://stl.nl/STL/media/STLMedia/Werkgevers/5-Lithium-batterijen-PGS-37-2-Masterclass.pdf" target="_blank" rel="noopener">https://stl.nl/STL/media/STLMedia/Werkgevers/5-Lithium-batterijen-PGS-37-2-Masterclass.pdf</a></li>
+<li id="bron-119" value="119"><span class="btitle">Stibbe – nieuwe richtlijn productaansprakelijkheid; internetconsultatie wetsvoorstel</span><br><a href="https://www.stibbe.com/nl/publications-and-insights/nieuwe-eu-regels-inzake-aansprakelijkheid-voor-gebrekkige-producten" target="_blank" rel="noopener">https://www.stibbe.com/nl/publications-and-insights/nieuwe-eu-regels-inzake-aansprakelijkheid-voor-gebrekkige-producten</a> · <a href="https://internetconsultatie.nl/implementatierichtlijnherzieningproductaansprakelijkheid/document/13989" target="_blank" rel="noopener">https://internetconsultatie.nl/implementatierichtlijnherzieningproductaansprakelijkheid/document/13989</a></li>
+<li id="bron-120" value="120"><span class="btitle">ASTRA – toelichting ADR-wijzigingen 2025 (UN3556)</span> <span class="tag weak">zwak: alleen zoekfragment</span><br><a href="https://www.astra.admin.ch/dam/astra/de/dokumente/gefahrgut/erlaeuterungen_adr_aenderungen_2025.pdf.download.pdf/1.2_Erl%C3%A4uterungen_zu_den_ADR-%C3%84nderungen_2025.pdf" target="_blank" rel="noopener">https://www.astra.admin.ch/dam/astra/de/dokumente/gefahrgut/erlaeuterungen_adr_aenderungen_2025.pdf.download.pdf/1.2_Erl%C3%A4uterungen_zu_den_ADR-%C3%84nderungen_2025.pdf</a></li>
+</ol>
+</section>
+
+<footer id="colofon">
+<h2>Colofon</h2>
+<p>Datum: 10 november 2026. Opgesteld met AI-ondersteunde bronnenresearch op basis van zes deelrapporten (protocol, Bosch, Bafang/generiek, inkoop, kansen, kritische toets). Dit document is <strong>geen juridisch advies</strong>. Prijzen zijn indicatief. Verifieer kritieke punten (veiligheid, wetgeving, transport, opslag) zelf of met een deskundige voordat je ernaar handelt.</p>
+</footer>
+
+</main>
+</body>
+</html>
