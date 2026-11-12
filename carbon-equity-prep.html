@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carbon Equity Gespreksvoorbereiding</title>
+<style>
+:root{
+  --bg:#f7f6f2; --surface:#ffffff; --surface-2:#eef1ec; --text:#1d2421; --muted:#5b6660;
+  --border:#d9ddd6; --accent:#1f7a55; --accent-soft:#dcefe5; --warn:#a15c00; --warn-soft:#fdf0d9;
+  --danger:#b3261e; --danger-soft:#fbe4e2; --info:#1d5c96; --info-soft:#e1ecf7; --code:#f1f3ef;
+  --shadow:0 1px 2px rgba(0,0,0,.06),0 2px 8px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121614; --surface:#1a201d; --surface-2:#222a26; --text:#e6ebe8; --muted:#9aa7a0;
+    --border:#2f3833; --accent:#5cc79a; --accent-soft:#1f3a2e; --warn:#f0b35a; --warn-soft:#3a2d17;
+    --danger:#f28b82; --danger-soft:#3d1f1d; --info:#8ab8e8; --info-soft:#1b2c3e; --code:#202724;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121614; --surface:#1a201d; --surface-2:#222a26; --text:#e6ebe8; --muted:#9aa7a0;
+  --border:#2f3833; --accent:#5cc79a; --accent-soft:#1f3a2e; --warn:#f0b35a; --warn-soft:#3a2d17;
+  --danger:#f28b82; --danger-soft:#3d1f1d; --info:#8ab8e8; --info-soft:#1b2c3e; --code:#202724;
+  --shadow:none;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:16px}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
+a{color:var(--accent)}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:32px;max-width:1240px;margin:0 auto;padding:24px 16px 64px}
+nav.toc{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--shadow);font-size:14px}
+nav.toc h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 8px}
+nav.toc ol{margin:0;padding-left:20px}
+nav.toc li{margin:4px 0}
+nav.toc a{text-decoration:none;color:var(--text)}
+nav.toc a:hover{color:var(--accent)}
+.themebtn{margin-top:12px;width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);cursor:pointer;font:inherit}
+main{min-width:0}
+header.hero{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;box-shadow:var(--shadow);margin-bottom:24px}
+header.hero h1{margin:0 0 4px;font-size:clamp(22px,4vw,32px);line-height:1.2}
+header.hero p{margin:4px 0;color:var(--muted)}
+section{margin:0 0 28px}
+section>h2{font-size:clamp(20px,3vw,26px);margin:32px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--accent)}
+h3{font-size:18px;margin:20px 0 8px}
+h4{font-size:16px;margin:16px 0 6px}
+details{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin:10px 0;box-shadow:var(--shadow)}
+details>summary{cursor:pointer;padding:12px 16px;font-weight:600;list-style:none;display:flex;gap:8px;align-items:center}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";color:var(--accent);transition:transform .15s}
+details[open]>summary::before{transform:rotate(90deg)}
+details>.body{padding:0 16px 16px}
+.tbl{overflow-x:auto;margin:10px 0;border:1px solid var(--border);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14px;background:var(--surface)}
+th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-weight:600;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;border-radius:6px;vertical-align:1px;white-space:nowrap}
+.check{background:var(--warn-soft);color:var(--warn)}
+.unsure{background:var(--info-soft);color:var(--info)}
+.ok{background:var(--accent-soft);color:var(--accent)}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 14px;border-radius:8px;margin:12px 0}
+.callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+.callout.danger{border-color:var(--danger);background:var(--danger-soft)}
+.tldr{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;counter-reset:t;padding:0;margin:0;list-style:none}
+.tldr li{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 12px 8px 40px;position:relative;font-size:14px;line-height:1.45}
+.tldr li::before{counter-increment:t;content:counter(t);position:absolute;left:10px;top:8px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--bg);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em;background:var(--code);padding:1px 5px;border-radius:5px}
+pre{background:var(--code);padding:12px;border-radius:8px;overflow-x:auto;font-size:13px;line-height:1.5}
+.small{font-size:13px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.card h4{margin-top:0}
+svg text{fill:var(--text);font-family:system-ui,sans-serif}
+.svgbox{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;overflow-x:auto}
+.flash{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.fc{perspective:900px;height:150px;cursor:pointer;border:none;background:none;padding:0;font:inherit;color:inherit;text-align:left}
+.fc .in{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.fc.flip .in{transform:rotateY(180deg)}
+.fc .f,.fc .b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:10px;border:1px solid var(--border);padding:12px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:auto}
+.fc .f{background:var(--surface);font-weight:600}
+.fc .b{background:var(--accent-soft);transform:rotateY(180deg);font-size:13px;line-height:1.4}
+.fcbar{display:flex;gap:8px;margin:8px 0 12px;flex-wrap:wrap}
+.fcbar button{padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font:inherit;font-size:14px}
+ol.src{font-size:13px;padding-left:22px}
+ol.src li{margin:4px 0;word-break:break-word}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:13px}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;gap:16px}
+  nav.toc{position:relative;top:0;max-height:none}
+}
+@media print{nav.toc{display:none}.layout{display:block}details{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc" aria-label="Inhoudsopgave">
+  <h2>Inhoud</h2>
+  <p style="margin:0 0 6px"><a href="#tldr"><b>TL;DR – 20 dingen</b></a></p>
+  <ol>
+    <li><a href="#rol">Vacature &amp; rol</a></li>
+    <li><a href="#bedrijf">Bedrijfsanalyse</a></li>
+    <li><a href="#fof">Fund-of-funds structuur</a></li>
+    <li><a href="#portefeuille">Portefeuille &amp; fondsen</a></li>
+    <li><a href="#vak">Vakkennis (spiekbrief)</a></li>
+    <li><a href="#persoon">Persoonsonderzoek</a></li>
+    <li><a href="#coach">Interviewcoach</a></li>
+    <li><a href="#factcheck">Fact-check &amp; laatste check</a></li>
+    <li><a href="#flashcards">Flashcards</a></li>
+    <li><a href="#bronnen">Bronnen</a></li>
+  </ol>
+  <button class="themebtn" id="themebtn" type="button">Thema wisselen</button>
+</nav>
+
+<main>
+<header class="hero">
+  <h1>Investment Analyst – Carbon Equity</h1>
+  <p>Gespreksvoorbereiding: rol, bedrijf, fund-of-funds-mechaniek, portefeuille, vakkennis en oefenvragen.</p>
+  <p class="small">Onderzoek uitgevoerd op 12 november 2026. Labels: <span class="tag check">CHECK</span> = zelf nakijken / bronnen spreken elkaar tegen · <span class="tag unsure">ONZEKER</span> = niet hard bevestigd · <span class="tag ok">BEVESTIGD</span> = door fact-checker bevestigd.</p>
+</header>
+
+<!-- ============ TL;DR ============ -->
+<section id="tldr">
+<h2>TL;DR – de 20 dingen die ik moet weten</h2>
+<ol class="tldr">
+  <li><b>Wat ze zijn:</b> Amsterdams climate-investment platform + <b>eigen AIFM (AFM-vergunning)</b>; bundelt kapitaal van (semi-)professionele beleggers in climate VC/PE/infra/debt-fondsen.</li>
+  <li><b>Schaal (homepage, nov 2026):</b> ~€470M AUM, 1.900+ beleggers, 330+ portfoliobedrijven, 13 eigen fondsen. Doel: &gt;€1 mrd AUM binnen ~3 jaar.</li>
+  <li><b>Oprichters/leiding:</b> Jacqueline van den Ende (CEO; ex-HAL, Peak Capital <span class="tag check">CHECK</span>), Lara Koole (CFO), Liza Rubinstein (Chief Impact Officer), Saskia Bruysten (Co-Founder International).</li>
+  <li><b>Investment team:</b> Wiebe Visser (CIO), Bas van Beijeren (MD), Idse Luirink &amp; Eva van Hilten (Sr. Investment Associates), Sam van der Linden (Investment Associate).</li>
+  <li><b>"Michael White" staat niet op de teampagina</b> en is niet aan Carbon Equity te koppelen → vraag de recruiter wie hij is. <span class="tag check">CHECK</span></li>
+  <li><b>De rol:</b> financiële én climate-impact due diligence op fondsen (team, strategie, track record, organisatie, impact-aanpak) en op co-investments (tech, markt, financieel model, impact).</li>
+  <li><b>Vacature (gepubliceerd 9 nov 2026):</b> master (finance/engineering/climate), sterke GPA, ≤2 jaar ervaring, "independent thinker who will stand your ground", €3.700–4.100 bruto/mnd, 1-jaarscontract met intentie tot vast.</li>
+  <li><b>Flagship:</b> Climate Tech Portfolio Fund IV — 6–8 fondsen + 8–12 co-investments, 60% Noord-Amerika / 40% Europa, target 12–15% net IRR, <b>final close 31-12-2026</b>.</li>
+  <li><b>Fund IV-managers:</b> Energy Impact Partners (Frontier II), Capricorn, DCVC (Climate Select II), Activate Capital (Fund III), Lightrock.</li>
+  <li><b>Track record vintages:</b> Fund I (2021/22, ~€42–45M), Fund II (2023, €100M), Fund III (2024, ruim €100M, SFDR art. 8). <span class="tag check">CHECK</span> exacte cijfers.</li>
+  <li><b>Productverbreding sinds 2024:</b> Climate Infrastructure Fund I (€45M, art. 9 volgens pers), ELTIF (Access to Climate Tech Fund II, vanaf €20k — eerste ELTIF van NL), Co-Invest Fund I ($70M, Voltus/Harbinger/Palmetto/Reverion), Energy Transition Debt Fund I (2026).</li>
+  <li><b>Fees (Fund IV):</b> mgmt fee 1,00% → 0,40% gestaffeld op commitment, 1% setup fee, expenses-cap ~0,3%/jr, <b>geen eigen carry</b>; daaronder betaal je de ~2/20 van de onderliggende GP's.</li>
+  <li><b>Minimum:</b> €100k (€50k professioneel) voor de flagship; €20k voor de ELTIF; $250k voor Co-Invest I.</li>
+  <li><b>Structuur:</b> Nederlandse fondsen (CV met Carbon Equity als beherend vennoot; stichting houdt juridisch eigendom), fiscaal niet-transparant; NL-particulieren in Box 3. <span class="tag check">CHECK</span></li>
+  <li><b>Impactframework:</b> eigen impact scorecard (min. 3,0 op 5); doel &gt;70% "critical net-zero technologies"; gebruiken avoided emissions bewust niet in rapportage.</li>
+  <li><b>Sectorgewicht:</b> energie &amp; industrie (elektrificatie, grid, opslag, geothermie) domineren; carbon removal ≤5%. Narratief 2026: "ESG = Energy, Security &amp; Geopolitics", AI-stroomvraag.</li>
+  <li><b>Funding van het bedrijf zelf:</b> Series A €6M (okt 2023, BlackFin; totaal ~€9M), eerdere seed (~€1,8M, 2022 <span class="tag check">CHECK</span>), uitbreiding aandeelhouders nov 2025 (o.a. Duitse family offices) — expansie naar Duitsland.</li>
+  <li><b>Concurrenten:</b> Moonfare, Titanbay, iCapital (generalisten). Onderscheid: puur climate, multi-asset climate-platform, eigen AIFM + ELTIF, lage minima.</li>
+  <li><b>Waarden:</b> Mission driven, Pragmatic, Proactive, Optimistic, Honest → combineer klimaatmotivatie met commerciële nuchterheid ("rendement én impact").</li>
+  <li><b>Kernrisico's om te kunnen bespreken:</b> double layer of fees, diepe J-curve, illiquiditeit (ook ELTIF-redemptions), adverse selection bij co-invest, climate-VC-cyclus, concentratie in VS-managers.</li>
+</ol>
+</section>
+
+<!-- ============ ROL ============ -->
+<section id="rol">
+<h2>1. Vacature &amp; rol</h2>
+<p class="small">Bron: officiële vacature op het HiBob-portaal van Carbon Equity (gepubliceerd 2026-11-09) en de kopie op ImpactAlpha (geldig t/m 2026-12-09). Geraadpleegd 2026-11-12.</p>
+
+<details open><summary>Vacature in het kort</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Onderdeel</th><th>Inhoud</th></tr>
+<tr><td>Afdeling / plek</td><td>Investment; Amsterdam HQ (bij de Nieuwmarkt), hybride met min. 3 dagen op kantoor; 40 uur</td></tr>
+<tr><td>Contract</td><td>1 jaar, "with the intention to convert to a permanent contract"; geen visumsponsoring</td></tr>
+<tr><td>Salaris</td><td>€3.700–€4.100 bruto/maand (entry level), 25 vakantiedagen, 2 offsites per jaar</td></tr>
+<tr><td>Kern</td><td>Financiële én climate-impact DD op VC-, PE- en infrastructure funds en op co-investments</td></tr>
+<tr><td>Taken</td><td><b>Sourcing &amp; screening</b> (intro calls, market mapping, bv. voor de recente infrastructure debt fund-of-funds) · <b>DD-executie</b> (leiden van fund- en co-invest-DD, reference calls) · <b>Proces &amp; research</b> (databases, research naar nieuwe strategieën/asset classes/impactthema's) · <b>Communicatie</b> (stukken over portfoliobedrijven, kwartaalrapportage financiële &amp; impactperformance, presentaties voor het commerciële team)</td></tr>
+<tr><td>Eisen</td><td>Master (bij voorkeur finance, engineering of climate) met sterke GPA; relevante stage(s), max. 2 jaar werkervaring; begrip van/drive voor VC/PE en "what it takes to get to net-zero"; superieure analytische vaardigheden en detailgerichtheid; "strong independent thinker who will stand your ground in a discussion"; proactief; professionele teamspeler richting fondsen en klanten; woonachtig in NL of bereid te verhuizen</td></tr>
+<tr><td>Nice-to-haves</td><td>Geen aparte sectie in de huidige versie. Oudere versie (~2024 <span class="tag unsure">ONZEKER</span>): GPA 8+, stages in VC/consulting/climate startups/IB, studies als environmental studies, chemistry, econometrics; GPA vermelden in motivatie</td></tr>
+<tr><td>Team-alumni</td><td>AlpInvest, JP Morgan, McKinsey, HAL Investments, Loyens &amp; Loeff (volgens vacature)</td></tr>
+</table></div>
+</div></details>
+
+<details><summary>Per eis: wat bedoelen ze &amp; hoe laat ik het zien?</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Eis</th><th>Wat ze bedoelen</th><th>Hoe ik het laat zien</th></tr>
+<tr><td>VC/PE-begrip + net-zero</td><td>Je snapt fondseconomie (J-curve, TVPI/DPI/IRR, fees/carry, vintages, quartiles) én welke technologieën decarbonisatie aandrijven</td><td>Teken spontaan de LP→FoF→GP→bedrijf-keten; noem 1–2 moeilijk te decarboniseren sectoren (staal, cement, warmte) met hun kostencurve en bottleneck</td></tr>
+<tr><td>Superieure analyse, oog voor detail</td><td>Je rekent track records na, ziet cherry-picking (gross vs net, gerealiseerd vs ongerealiseerd, één outlier)</td><td>Voorbeeld van een fout/inconsistentie die jij in data vond; vraag in een case altijd "is dit gross of net, en welk deel is gerealiseerd?"</td></tr>
+<tr><td>Independent thinker</td><td>Je komt met een onderbouwd invest/no-invest-oordeel en houdt het vast onder druk — maar beweegt bij nieuwe feiten</td><td>Sluit elke case af met: aanbeveling → 3 argumenten → 2 grootste risico's → "wat zou mijn mening veranderen"</td></tr>
+<tr><td>Proactief</td><td>Zelf processen, databases en research oppakken</td><td>Concreet voorbeeld van iets dat je verbeterde/automatiseerde; idee voor hun DD-tracker of kwartaalrapportage</td></tr>
+<tr><td>Professionele teamspeler</td><td>Je zit al snel zelf in calls met GP's en (retail-)beleggers</td><td>Voorbeeld van een stakeholdergesprek; stel scherpe maar respectvolle vragen</td></tr>
+<tr><td>Sterke GPA, ≤2 jaar ervaring</td><td>Junior, academisch sterk, leerbaar</td><td>Cijfers paraat; koppel scriptie/stages aan climate en finance</td></tr>
+<tr><td>Schrijven/communicatie</td><td>Kwartaalrapportage en portfolio-stukken voor niet-professionele beleggers</td><td>Kun je een complex bedrijf (bv. Fervo) in 3 zinnen uitleggen aan een tandarts met €100k?</td></tr>
+</table></div>
+</div></details>
+
+<details><summary>Analist bij een fund-of-funds / LP-platform vs. bij een direct VC/PE-fonds</summary><div class="body">
+<div class="tbl"><table>
+<tr><th></th><th>FoF / LP-platform (Carbon Equity)</th><th>Direct VC/PE-fonds</th></tr>
+<tr><td>Je beoordeelt vooral</td><td>Managers (GP's): team, strategie, track record, terms, organisatie, impact-aanpak</td><td>Bedrijven: product, markt, team, unit economics</td></tr>
+<tr><td>Modellen</td><td>Cashflow/pacing-modellen, track-record-analyse, portefeuilleconstructie</td><td>Operationele modellen, cap tables, exit-scenario's</td></tr>
+<tr><td>Deals</td><td>Fund commitments + co-investments naast bestaande GP's (minder "lead")</td><td>Lead/follow, term sheets onderhandelen, board seats</td></tr>
+<tr><td>Monitoring</td><td>Kwartaalrapporten van GP's, NAV's, impactdata over 300+ bedrijven aggregeren</td><td>Actief board-werk per bedrijf</td></tr>
+<tr><td>Klanten</td><td>Veel (semi-)particuliere LP's → heldere communicatie, rapportage</td><td>Institutionele LP's</td></tr>
+<tr><td>Voordeel</td><td>Breed zicht op de hele climate-markt en op veel managers</td><td>Diepte per bedrijf</td></tr>
+</table></div>
+</div></details>
+
+<details><summary>Wat wordt waarschijnlijk getest? <span class="tag unsure">ONZEKER</span> (afgeleid)</summary><div class="body">
+<ul>
+<li><b>Manager-DD-case:</b> een GP-deck/track record beoordelen (TVPI/DPI/IRR, quartile, gross vs net, team-stabiliteit, impact-fit). Volgt direct uit de kerntaak.</li>
+<li><b>Co-investment / Excel:</b> een financieel model van een growth-stage bedrijf kritisch doorlopen (aannames, unit economics, kapitaalbehoefte, impactpotentieel).</li>
+<li><b>Schrijfopdracht:</b> korte memo of portfolio-update voor beleggers.</li>
+<li><b>Market mapping:</b> bv. een nieuw thema (infra debt, long-duration storage) in kaart brengen.</li>
+<li><b>Druktest:</b> "stand your ground" → verwacht tegenargumenten op je standpunt.</li>
+<li>Glassdoor-snippets (2025): online sollicitatie, ~3 weken doorlooptijd; geen bevestiging van een case-opdracht gevonden <span class="tag check">CHECK bij recruiter</span>.</li>
+</ul>
+</div></details>
+</section>
+
+<!-- ============ BEDRIJF ============ -->
+<section id="bedrijf">
+<h2>2. Bedrijfsanalyse Carbon Equity</h2>
+
+<details open><summary>Kerngegevens</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Onderwerp</th><th>Feit</th><th>Bron / recentheid</th></tr>
+<tr><td>Opgericht</td><td>2021 volgens de meeste bronnen; I amsterdam (apr 2025) suggereert ~2020 <span class="tag check">CHECK</span></td><td>ESG Today 05/2026, Silicon Canals 2025</td></tr>
+<tr><td>Adres</td><td>Geldersekade 101-F, Amsterdam (KvK 77772784)</td><td>carbonequity.com/faq, nov 2026</td></tr>
+<tr><td>Oprichters</td><td>Huidige teampagina: Jacqueline van den Ende (CEO), Lara Koole (CFO), Liza Rubinstein (Chief Impact Officer), Saskia Bruysten (Co-Founder International). Silicon Canals 2022 noemde ook Tim Molendijk en Jeff Gomez</td><td>Teampagina nov 2026; Silicon Canals 07/2022</td></tr>
+<tr><td>Management</td><td>Paul de Raad (CCO), Dennis Schäfer (Chief Legal &amp; Risk Officer), Tom Carrick (Head of Engineering), Adriaan Schiphorst (Head of Product &amp; AI), Gijs Hoonhout (Head of Marketing), Thorsten Kud (Country Manager Germany), Nick Sluiter (Head of Compliance)</td><td>Teampagina nov 2026</td></tr>
+<tr><td>Investment team</td><td>Wiebe Visser (CIO), Bas van Beijeren (Managing Director), Idse Luirink, Eva van Hilten (Sr. Investment Associates), Sam van der Linden (Investment Associate)</td><td>Teampagina nov 2026</td></tr>
+<tr><td>Teamgrootte</td><td>~34 mensen op de teampagina</td><td>nov 2026</td></tr>
+<tr><td>Let op</td><td>De naam "Willem Willemstein" komt in geen enkele bron voor → <b>niet noemen</b></td><td>—</td></tr>
+</table></div>
+</div></details>
+
+<details><summary>Funding van Carbon Equity B.V. zelf</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Datum</th><th>Ronde</th><th>Investeerders</th></tr>
+<tr><td>2021</td><td>Eerdere ronde, bedrag niet gevonden</td><td>—</td></tr>
+<tr><td>Jul 2022</td><td>Seed €1,8M (oversubscribed) <span class="tag check">CHECK</span> alleen databases</td><td>Lead 4Impact; WiVenture, AENU; angels (o.a. oprichters Bloomon, SkyNRG)</td></tr>
+<tr><td>Okt 2023</td><td>Series A €6M (totaal ~€9M)</td><td>Lead BlackFin Capital Partners; 4Impact. Mede bedoeld voor ELTIF</td></tr>
+<tr><td>Nov 2025</td><td>Uitbreiding aandeelhoudersbasis, bedrag onbekend</td><td>Aurum Impact (Goldbeck family office), Elemental Beteiligungs, 2MS Family Office; angels o.a. Feike Sijbesma</td></tr>
+</table></div>
+</div></details>
+
+<details><summary>Businessmodel: hoe verdienen ze geld?</summary><div class="body">
+<p>Carbon Equity is beheerder (AIFM) van eigen closed-end fondsen (10–12 jaar). Het verdient aan <b>management fees</b> en <b>setup fees</b>; op de flagship wordt geen eigen carried interest vermeld. De onderliggende GP's rekenen hun eigen fees (~2% + 20% carry).</p>
+<div class="tbl"><table>
+<tr><th>Product</th><th>Minimum</th><th>Fees (Carbon Equity-laag)</th><th>Target</th></tr>
+<tr><td>Climate Tech Portfolio Fund IV</td><td>€100k (€50k professioneel)</td><td>1,00% → 0,40% p.j. gestaffeld op commitment; 1% setup (25% korting terugkerend); expenses &lt;0,3% p.j.</td><td>12–15% net IRR</td></tr>
+<tr><td>Access to Climate Tech Fund II (ELTIF)</td><td>€20k</td><td>1,1% mgmt; 1% setup; expenses &lt;0,5%</td><td>8–12% net IRR</td></tr>
+<tr><td>Co-Invest Fund I</td><td>$250k</td><td>1,25% / 1,00% mgmt + 10% performance fee boven 1,25x DPI</td><td>25% net IRR</td></tr>
+<tr><td>Energy Transition Debt Fund I</td><td>€100k</td><td>0,85% → 0,45% mgmt</td><td>7–8% net IRR</td></tr>
+</table></div>
+<ul>
+<li><b>Capital calls (FAQ):</b> Fund IV eerste call 38%, daarna halfjaarlijks 5–10%, 21 dagen betaaltermijn. Fees lopen via capital calls.</li>
+<li><b>Doelgroep:</b> (semi-)professionele beleggers, HNWI's, bv's/holdings; family offices (Co-Invest); retail via ELTIF.</li>
+<li><b>Landen:</b> NL, BE, DE; Frankrijk gepland voor Co-Invest I; elders alleen via reverse solicitation.</li>
+</ul>
+</div></details>
+
+<details><summary>Regulering &amp; structuur</summary><div class="body">
+<ul>
+<li><b>AIFMD:</b> Carbon Equity B.V. heeft een AIFM-vergunning van de AFM (art. 2:65 Wft; registratie 15005329; volgens pers verleend dec 2023).</li>
+<li><b>ELTIF:</b> Access to Climate Tech Fund II, vergunning onder Verordening (EU) 2015/760 (ELTIF 2.0-regime), gelanceerd 2025; geclaimd als eerste Nederlandse ELTIF. Kan met paspoort aan retail in de EU worden aangeboden.</li>
+<li><b>Vehikels:</b> recente fondsen zijn "limited partnerships under Dutch law" (dus CV-vorm), Carbon Equity als beherend vennoot (GP), beleggers als commanditaire vennoten (LP); juridisch eigendom bij een stichting. Geen Luxemburgse SCSp/feeders gevonden. Fiscaal niet-transparant <span class="tag check">CHECK</span> in fondsdocumentatie.</li>
+<li><b>SFDR:</b> Fund III = artikel 8; Climate Infrastructure Fund I = artikel 9. Overige fondsen: <span class="tag check">CHECK</span> pre-contractual disclosures. Weet dat de EU met <b>SFDR 2.0</b> art. 8/9 wil vervangen door productcategorieën.</li>
+</ul>
+</div></details>
+
+<details><summary>Concurrenten &amp; onderscheid</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Speler</th><th>Profiel</th><th>Verschil met Carbon Equity</th></tr>
+<tr><td>Moonfare (Berlijn)</td><td>Feeders in grote PE-fondsen voor vermogende beleggers</td><td>Generalist, single-fund feeders, geen climate-focus</td></tr>
+<tr><td>Titanbay</td><td>B2B2C-platform, via wealth managers</td><td>Generalist, distributie via intermediairs</td></tr>
+<tr><td>iCapital</td><td>Grote VS-infrastructuur voor alternatives</td><td>Technologie/distributie, geen eigen thematische FoF</td></tr>
+</table></div>
+<p><b>Onderscheid:</b> (1) puur climate met impactframework; (2) gediversifieerde FoF met toegang tot moeilijk bereikbare GP's (EIP, DCVC, Activate, Capricorn, Breakthrough Energy Ventures); (3) eigen AIFM + eerste NL-ELTIF; (4) lage minima en digitale onboarding; (5) multi-asset climate-platform (VC, PE, infra, debt, co-invest). Climate-specifieke directe peers: weinig gevonden <span class="tag unsure">ONZEKER</span>.</p>
+</div></details>
+
+<details><summary>Groei &amp; recent nieuws</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Peildatum</th><th class="num">AUM / opgehaald</th><th class="num">Beleggers</th><th>Bron</th></tr>
+<tr><td>Aug 2024</td><td class="num">€260M</td><td class="num">900</td><td>Private Equity Wire</td></tr>
+<tr><td>Apr/mei 2025</td><td class="num">&gt;€300M</td><td class="num">1.250</td><td>Carbon Equity / I amsterdam</td></tr>
+<tr><td>Jan 2026</td><td class="num">€365M</td><td class="num">1.600</td><td>Impact Investor</td></tr>
+<tr><td>Mei 2026</td><td class="num">&gt;€420M</td><td class="num">&gt;1.600</td><td>ESG Today</td></tr>
+<tr><td>Nov 2026</td><td class="num">€470M</td><td class="num">1.900+</td><td>Homepage</td></tr>
+</table></div>
+<ul>
+<li>Fund IV: first close sep 2025; &gt;€60M van &gt;200 beleggers (2 nov 2026); final close 31-12-2026; investor evening 9 december.</li>
+<li>Co-Invest Fund I (jan 2026, doel $50M) → $70M opgehaald.</li>
+<li>Energy Transition Debt Fund I gelanceerd mei 2026 (~€15M doel).</li>
+<li>Expansie Duitsland (country manager, Duitse aandeelhouders); Carbon Equity Summit 12 mei 2026.</li>
+<li>Blogs okt/nov 2026: "Why we invested in Voltus", Reverion; sep 2026: "ESG is now Energy, Security &amp; Geopolitics".</li>
+</ul>
+<p><b>Uitdagingen (eigen analyse, geen bronfeit):</b> fondsgroottes blijven ~€100M per vintage; ELTIF-markt in Benelux komt traag op gang; climate-VC-fundraising onder druk; fee-stapeling; politieke tegenwind VS (IRA-wijzigingen) bij 60% VS-allocatie.</p>
+</div></details>
+
+<details><summary>Missie, cultuur &amp; hoe ik me presenteer</summary><div class="body">
+<p><b>Missie:</b> privaat kapitaal naar klimaatoplossingen sturen mét rendement ("We want to help people make good money" — Van den Ende, mei 2026). <b>Waarden:</b> Mission driven · Pragmatic · Proactive · Optimistic · Honest. B Corp: niet gevonden.</p>
+<div class="grid2">
+<div class="card"><h4>Mission driven + pragmatic</h4>Laat zien dat je climate serieus neemt én dat rendement de motor is: "impact schaalt alleen als het rendeert".</div>
+<div class="card"><h4>Proactive</h4>Kom met één concreet idee (bv. een thema voor research, een verbetering in kwartaalrapportage).</div>
+<div class="card"><h4>Optimistic</h4>Concrete succesverhalen paraat: Fervo (geothermie), Form Energy (opslag), Voltus (VPP).</div>
+<div class="card"><h4>Honest</h4>Benoem risico's zelf: illiquiditeit, fees, J-curve, hardware-risico. Zeg "dat weet ik niet, maar zo zou ik het uitzoeken".</div>
+</div>
+</div></details>
+</section>
+
+<!-- ============ FOF ============ -->
+<section id="fof">
+<h2>3. Fund-of-funds structuur (whiteboard-niveau)</h2>
+
+<div class="svgbox">
+<svg viewBox="0 0 760 440" width="100%" role="img" aria-label="Diagram fund-of-funds structuur: beleggers via Carbon Equity fonds naar onderliggende GP-fondsen en co-investments naar bedrijven">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--accent)"/></marker>
+    <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--warn)"/></marker>
+  </defs>
+  <g style="stroke:var(--border);stroke-width:1.5">
+    <rect x="230" y="10" width="300" height="56" rx="10" style="fill:var(--info-soft);stroke:var(--info)"/>
+    <rect x="230" y="120" width="300" height="70" rx="10" style="fill:var(--accent-soft);stroke:var(--accent)"/>
+    <rect x="20" y="250" width="150" height="62" rx="10" style="fill:var(--surface-2)"/>
+    <rect x="190" y="250" width="150" height="62" rx="10" style="fill:var(--surface-2)"/>
+    <rect x="360" y="250" width="150" height="62" rx="10" style="fill:var(--surface-2)"/>
+    <rect x="560" y="250" width="180" height="62" rx="10" style="fill:var(--warn-soft);stroke:var(--warn)"/>
+    <rect x="20" y="370" width="490" height="56" rx="10" style="fill:var(--surface)"/>
+    <rect x="560" y="370" width="180" height="56" rx="10" style="fill:var(--surface)"/>
+    <rect x="560" y="120" width="180" height="70" rx="10" style="fill:var(--surface);stroke-dasharray:4 3"/>
+  </g>
+  <text x="380" y="34" text-anchor="middle" font-weight="700" font-size="15">Beleggers (LP's)</text>
+  <text x="380" y="54" text-anchor="middle" font-size="12">~1.900 particulieren, HNWI's, bv's · min. €100k</text>
+  <text x="380" y="146" text-anchor="middle" font-weight="700" font-size="15">Carbon Equity fonds (bv. Fund IV)</text>
+  <text x="380" y="164" text-anchor="middle" font-size="12">NL CV · Carbon Equity = GP/AIFM</text>
+  <text x="380" y="180" text-anchor="middle" font-size="12">fee-laag 1: 0,4–1,0% + 1% setup, geen carry</text>
+  <text x="650" y="146" text-anchor="middle" font-weight="700" font-size="13">Stichting</text>
+  <text x="650" y="164" text-anchor="middle" font-size="12">juridisch eigenaar</text>
+  <text x="650" y="180" text-anchor="middle" font-size="12">(bewaring activa)</text>
+  <text x="95" y="276" text-anchor="middle" font-weight="700" font-size="13">GP-fonds A</text>
+  <text x="95" y="294" text-anchor="middle" font-size="11">bv. EIP Frontier II</text>
+  <text x="265" y="276" text-anchor="middle" font-weight="700" font-size="13">GP-fonds B</text>
+  <text x="265" y="294" text-anchor="middle" font-size="11">bv. DCVC Climate Select II</text>
+  <text x="435" y="276" text-anchor="middle" font-weight="700" font-size="13">GP-fonds C…</text>
+  <text x="435" y="294" text-anchor="middle" font-size="11">6–8 fondsen totaal</text>
+  <text x="650" y="276" text-anchor="middle" font-weight="700" font-size="13">Co-investments</text>
+  <text x="650" y="294" text-anchor="middle" font-size="11">naast GP's · geen 2e fee-laag</text>
+  <text x="265" y="394" text-anchor="middle" font-weight="700" font-size="13">Portfoliobedrijven (300+)</text>
+  <text x="265" y="412" text-anchor="middle" font-size="11">fee-laag 2: ~2% mgmt + 20% carry per GP-fonds</text>
+  <text x="650" y="394" text-anchor="middle" font-weight="700" font-size="13">Bv. Fervo, XNRGY,</text>
+  <text x="650" y="412" text-anchor="middle" font-size="11">Voltus, Reverion</text>
+  <g style="stroke:var(--accent);stroke-width:2;fill:none" marker-end="url(#ar)">
+    <path d="M360,66 L360,118"/>
+    <path d="M300,190 L110,248"/>
+    <path d="M360,190 L270,248"/>
+    <path d="M420,190 L435,248"/>
+    <path d="M480,190 L610,248"/>
+    <path d="M95,312 L150,368"/>
+    <path d="M265,312 L265,368"/>
+    <path d="M435,312 L380,368"/>
+    <path d="M650,312 L650,368"/>
+  </g>
+  <g style="stroke:var(--warn);stroke-width:2;fill:none;stroke-dasharray:6 4" marker-end="url(#ar2)">
+    <path d="M400,118 L400,68"/>
+  </g>
+  <path d="M530,155 L558,155" style="stroke:var(--muted);stroke-width:1.5;stroke-dasharray:4 3"/>
+  <text x="150" y="100" font-size="12" style="fill:var(--accent)">capital calls ↓</text>
+  <text x="410" y="100" font-size="12" style="fill:var(--warn)">distributions ↑</text>
+</svg>
+<p class="small">Groen = kapitaal naar beneden (calls), oranje = uitkeringen naar boven. Elk niveau heeft eigen commitment, calls en distributions.</p>
+</div>
+
+<details open><summary>Bouwstenen: GP/LP, feeder, FoF, co-invest, secondaries</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Begrip</th><th>Uitleg</th><th>Bij Carbon Equity</th></tr>
+<tr><td>GP / LP</td><td>General Partner beheert en is (onbeperkt) aansprakelijk; Limited Partners leveren kapitaal, aansprakelijk tot hun inleg. Afgesproken in de LPA</td><td>Carbon Equity is GP/beheerder van eigen fondsen én LP in de onderliggende fondsen</td></tr>
+<tr><td>Feeder fund</td><td>Vehikel dat kapitaal van veel kleine beleggers bundelt in <i>één</i> master/doelfonds</td><td>Vroege single-fund producten (Built Environment, Agrifood, Growth, North America via ArcTern)</td></tr>
+<tr><td>Fund-of-funds</td><td>Belegt in meerdere onderliggende fondsen → diversificatie over managers, stadia, sectoren</td><td>Climate Tech Portfolio Funds I–IV, ACT I/II, Infra I, Debt I</td></tr>
+<tr><td>Co-investment</td><td>Directe minderheidsbelegging in een bedrijf naast een GP, meestal zonder (of met lage) fee/carry</td><td>Sleeve in Fund III/IV; Co-Invest Fund I</td></tr>
+<tr><td>Secondaries</td><td>Kopen van bestaande LP-belangen (vaak met korting, kortere J-curve, meer zicht op portefeuille)</td><td>Bv. 2150 Urban Tech Sustainability Fund I (secondary) in een eerder fonds</td></tr>
+</table></div>
+</div></details>
+
+<details><summary>Juridische vehikels</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Vehikel</th><th>Land</th><th>Kenmerk</th></tr>
+<tr><td>CV (commanditaire vennootschap)</td><td>NL</td><td>Beherend + commanditaire vennoten; kan fiscaal transparant of (bij vrije toetreding/overdracht) niet-transparant zijn. <b>Door Carbon Equity gebruikt.</b></td></tr>
+<tr><td>FGR (fonds voor gemene rekening)</td><td>NL</td><td>Contractuele structuur; beheerder + bewaarder (stichting) houdt juridisch eigendom</td></tr>
+<tr><td>Stichting (bewaarder)</td><td>NL</td><td>Houdt juridisch eigendom, beschermt beleggers bij faillissement beheerder</td></tr>
+<tr><td>SCSp / SCS</td><td>LU</td><td>Luxemburgse LP, fiscaal transparant, populair voor internationale PE/VC; niet gevonden bij Carbon Equity</td></tr>
+<tr><td>ELTIF</td><td>EU</td><td>Gereguleerd label voor langetermijnbeleggingen, retailpaspoort; ELTIF 2.0 (2024) maakte het flexibeler</td></tr>
+</table></div>
+<p class="small">FBI-status (fiscale beleggingsinstelling) wordt in bronnen genoemd <span class="tag check">CHECK</span> — vraag liever "hoe hebben jullie de fiscale structuur gekozen?" dan het zelf te poneren.</p>
+</div></details>
+
+<details><summary>Cashflows: commitments, calls, distributions, uncalled, recycling</summary><div class="body">
+<ul>
+<li><b>Commitment</b>: toegezegd bedrag; wordt niet in één keer gestort.</li>
+<li><b>Capital call / drawdown</b>: GP vraagt een deel op (bv. Fund IV: 38% bij start, daarna halfjaarlijks 5–10%).</li>
+<li><b>Uncalled capital / dry powder</b>: nog niet opgevraagd deel. Risico voor de LP: je moet liquide blijven (default = sancties, verlies van belang).</li>
+<li><b>Distributions</b>: uitkeringen bij exits; in een FoF komen ze pas binnen als de onderliggende GP's uitkeren.</li>
+<li><b>Recycling</b>: vroege opbrengsten herbeleggen (vaak gemaximeerd, bv. tot 100–120% van commitments) → meer kapitaal aan het werk, fees gedekt.</li>
+<li><b>Over-commitment</b>: FoF's committeren soms &gt;100% aan onderliggende fondsen omdat niet alles tegelijk wordt opgevraagd.</li>
+</ul>
+</div></details>
+
+<details><summary>De J-curve (en waarom dieper/langer bij FoF)</summary><div class="body">
+<p>Eerste jaren negatief rendement: fees en kosten worden direct betaald, waardering op kostprijs, verliezers worden eerder afgeschreven dan winnaars opgewaardeerd. Later exits → curve stijgt.</p>
+<p><b>Bij een FoF dieper en langer</b>, omdat: (1) twee fee-lagen in de vroege jaren; (2) kapitaal pas na twee stappen (FoF → fonds → bedrijf) aan het werk is; (3) onderliggende fondsen hun commitments over meerdere jaren spreiden; (4) uitkeringen pas na exits in alle onderliggende fondsen terugstromen. <b>Mitigatie:</b> co-investments (geen fee-laag, direct aan het werk), secondaries, recycling — precies wat Carbon Equity in Fund III/IV toevoegt.</p>
+</div></details>
+
+<details><summary>Fees, carried interest, hurdle, waterfall &amp; "double layer of fees"</summary><div class="body">
+<ul>
+<li><b>Management fee</b>: % per jaar, in de investeringsperiode vaak op commitment, daarna op invested capital/NAV.</li>
+<li><b>Carried interest</b>: winstaandeel GP (meestal 20%).</li>
+<li><b>Hurdle / preferred return</b>: minimumrendement voor LP's (vaak 8%) voordat carry gaat lopen; met <b>catch-up</b> haalt de GP daarna zijn 20% in.</li>
+<li><b>European (whole-fund) waterfall</b>: eerst al het gestorte kapitaal + pref terug aan LP's, dan pas carry → LP-vriendelijk, gebruikelijk in Europa en VC.</li>
+<li><b>American (deal-by-deal) waterfall</b>: carry per exit → GP krijgt eerder geld; vergt <b>clawback</b> en escrow.</li>
+<li><b>Double layer</b>: in een FoF betaal je fee van de FoF + fee/carry van elk onderliggend fonds. <b>Carbon Equity mitigeert</b>: gestaffelde lage fee (tot 0,40%), geen eigen carry, co-investments zonder fee-laag, schaal om lagere fees bij GP's te bedingen <span class="tag unsure">ONZEKER</span> (laatste niet bevestigd).</li>
+</ul>
+</div></details>
+
+<details><summary>Rendementsmaatstaven met rekenvoorbeeld</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Maat</th><th>Formule</th><th>Voorbeeld (paid-in 87, uitgekeerd 10, NAV 95)</th></tr>
+<tr><td>DPI</td><td>Distributions / Paid-in</td><td>10 / 87 = 0,11x (cash terug)</td></tr>
+<tr><td>RVPI</td><td>NAV / Paid-in</td><td>95 / 87 = 1,09x (op papier)</td></tr>
+<tr><td>TVPI</td><td>(Distributions + NAV) / Paid-in = DPI + RVPI</td><td>105 / 87 = 1,21x</td></tr>
+<tr><td>MOIC</td><td>Totale waarde / geïnvesteerd (vaak gross, per deal)</td><td>Deal: €10M in, €30M waarde → 3,0x</td></tr>
+<tr><td>IRR</td><td>Discontovoet waarbij NPV van cashflows = 0 (tijdsgewogen)</td><td>€10 in jaar 0 → €25 in jaar 5: 2,5<sup>1/5</sup> − 1 = 20,1%</td></tr>
+<tr><td>PME</td><td>Public Market Equivalent: zelfde cashflows "beleggen" in index. Kaplan-Schoar PME = PV(distributions+NAV)/PV(calls) met index-rendement als discontovoet; &gt;1 = beter dan beurs</td><td>KS-PME 1,2 → 20% meer waarde dan index</td></tr>
+</table></div>
+<p class="small">Valkuilen: IRR is gevoelig voor timing (subscription lines blazen IRR op), TVPI zegt niets over tijd, DPI is de enige "echte" maatstaf. Altijd vragen: gross of net? Gerealiseerd of ongerealiseerd? Quartile t.o.v. vintage-peers?</p>
+</div></details>
+
+<details open><summary>Getallenvoorbeeld: fictieve FoF van €100M over 10 jaar</summary><div class="body">
+<p><b>Aannames (illustratief):</b> beleggers committeren €100M. FoF-fees: 1% setup + 0,8% p.j. op commitment = €9M over 10 jaar. €91M gaat naar 6 onderliggende fondsen, die (na hún fees en carry) 2,2x netto opleveren = €200M uitkeringen.</p>
+<div class="tbl"><table>
+<tr><th>Jaar</th><th class="num">Calls naar GP's</th><th class="num">FoF-fees</th><th class="num">Uitkeringen</th><th class="num">Netto cashflow LP</th><th class="num">Cumulatief</th></tr>
+<tr><td>1</td><td class="num">−15,0</td><td class="num">−1,8</td><td class="num">0</td><td class="num">−16,8</td><td class="num">−16,8</td></tr>
+<tr><td>2</td><td class="num">−20,0</td><td class="num">−0,8</td><td class="num">0</td><td class="num">−20,8</td><td class="num">−37,6</td></tr>
+<tr><td>3</td><td class="num">−20,0</td><td class="num">−0,8</td><td class="num">0</td><td class="num">−20,8</td><td class="num">−58,4</td></tr>
+<tr><td>4</td><td class="num">−15,0</td><td class="num">−0,8</td><td class="num">2</td><td class="num">−13,8</td><td class="num">−72,2</td></tr>
+<tr><td>5</td><td class="num">−12,0</td><td class="num">−0,8</td><td class="num">8</td><td class="num">−4,8</td><td class="num"><b>−77,0</b> (dieptepunt)</td></tr>
+<tr><td>6</td><td class="num">−6,0</td><td class="num">−0,8</td><td class="num">20</td><td class="num">+13,2</td><td class="num">−63,8</td></tr>
+<tr><td>7</td><td class="num">−3,0</td><td class="num">−0,8</td><td class="num">35</td><td class="num">+31,2</td><td class="num">−32,6</td></tr>
+<tr><td>8</td><td class="num">0</td><td class="num">−0,8</td><td class="num">45</td><td class="num">+44,2</td><td class="num">+11,6 (break-even)</td></tr>
+<tr><td>9</td><td class="num">0</td><td class="num">−0,8</td><td class="num">50</td><td class="num">+49,2</td><td class="num">+60,8</td></tr>
+<tr><td>10</td><td class="num">0</td><td class="num">−0,8</td><td class="num">40</td><td class="num">+39,2</td><td class="num">+100,0</td></tr>
+<tr><th>Totaal</th><th class="num">−91,0</th><th class="num">−9,0</th><th class="num">200</th><th class="num">+100,0</th><th></th></tr>
+</table></div>
+<div class="grid2">
+<div class="card"><h4>Netto voor de LP (via FoF)</h4>Paid-in 100 · uitgekeerd 200 → <b>TVPI = DPI = 2,0x</b>, <b>net IRR ≈ 15,5%</b>. Maximaal €77M tegelijk "onder water".</div>
+<div class="card"><h4>Zonder FoF-laag (direct €100M in dezelfde fondsen)</h4>220 terug → <b>2,2x</b>, IRR ≈ <b>17,3%</b>. De FoF-laag kost hier ~0,2x en ~1,8 %-punt IRR — de prijs voor toegang, diversificatie, lage minima en DD.</div>
+</div>
+<p class="small">Berekend met dezelfde jaarlijkse kasstromen; IRR via standaard NPV=0-oplossing. Niet gebaseerd op echte Carbon Equity-cijfers.</p>
+</div></details>
+
+<details><summary>Vintage-diversificatie, liquiditeitsrisico &amp; pacing</summary><div class="body">
+<ul>
+<li><b>Vintage-diversificatie:</b> rendementen verschillen sterk per instapjaar (2021-waarderingen vs 2023-dal). Elk jaar committeren middelt de cyclus uit — daarom brengt Carbon Equity jaarlijkse/tweejaarlijkse vintages uit.</li>
+<li><b>Liquiditeitsrisico:</b> 10–12 jaar vast; secundaire verkoop kan alleen met korting. ELTIF heeft beperkte redemption windows, maar onderliggende activa blijven illiquide → mismatch-risico.</li>
+<li><b>Pacing:</b> plan hoeveel je per jaar committeert om een doel-allocatie (NAV) te bereiken en te behouden, rekening houdend met calls en distributions (bv. Takahashi-Alexander-model). Te weinig = cash drag; te veel = liquiditeitsproblemen bij calls.</li>
+</ul>
+</div></details>
+</section>
+
+<!-- ============ PORTEFEUILLE ============ -->
+<section id="portefeuille">
+<h2>4. Portefeuille &amp; onderliggende fondsen</h2>
+
+<details open><summary>Eigen fondsen / vintages</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Fonds</th><th>Vintage</th><th>Omvang</th><th>Inhoud</th><th>Status</th></tr>
+<tr><td>Climate Tech Portfolio Fund I (eerst "Decarbonization Fund 1")</td><td>2021/22</td><td>€42M (persbericht) / €45M (fondspagina) <span class="tag check">CHECK</span></td><td>7–10 fondsen, ~150 bedrijven</td><td>Gesloten</td></tr>
+<tr><td>Built Environment Fund</td><td>2021</td><td>€3,6M</td><td>1 fonds (feeder)</td><td>Gesloten</td></tr>
+<tr><td>Agrifood Technology Fund</td><td>2022</td><td>€5,4M</td><td>1 fonds</td><td>Gesloten</td></tr>
+<tr><td>Climate Tech Growth Fund</td><td>2022</td><td>€3,3M</td><td>1 fonds</td><td>Gesloten</td></tr>
+<tr><td>North America Climate Tech Fund</td><td>2022</td><td>$35M</td><td>ArcTern Ventures</td><td>Gesloten</td></tr>
+<tr><td>Climate Tech Portfolio Fund II</td><td>2023</td><td>€100M (doel €75M)</td><td>7–10 fondsen</td><td>Gesloten mrt 2024</td></tr>
+<tr><td>Access to Climate Tech Fund I</td><td>2023</td><td>€3,3M</td><td>3–5 fondsen</td><td>Gesloten</td></tr>
+<tr><td>Climate Tech Portfolio Fund III</td><td>2024</td><td>€105M / €107M (zelfde persbericht) / €110M (fondspagina) → "ruim €100M" <span class="tag check">CHECK</span></td><td>7–10 fondsen; SFDR art. 8</td><td>Gesloten</td></tr>
+<tr><td>Climate Infrastructure Fund I</td><td>2024</td><td>€45M</td><td>4 infra-fondsen; SFDR art. 9</td><td>Gesloten</td></tr>
+<tr><td>Climate Tech Portfolio Fund IV</td><td>2025/26</td><td>&gt;€60M (nov 2026), doel ~€125M</td><td>6–8 fondsen + 8–12 co-invests</td><td><b>Open, final close 31-12-2026</b></td></tr>
+<tr><td>Access to Climate Tech Fund II (ELTIF)</td><td>first close 2-7-2025</td><td>niet vermeld</td><td>5–10 fondsen; VC 30 / PE 50 / infra 20</td><td>Open</td></tr>
+<tr><td>Co-Invest Fund I</td><td>2026</td><td>$70M (doel $50M)</td><td>Direct: Voltus, Harbinger, Palmetto, Reverion</td><td>Open</td></tr>
+<tr><td>Energy Transition Debt Fund I</td><td>2026</td><td>doel ~€15M (pers; niet op site)</td><td>≥3 Europese private-debt fondsen, 45–60 leningen</td><td>Open</td></tr>
+</table></div>
+</div></details>
+
+<details open><summary>Onderliggende managers (alleen bevestigd)</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Manager / fonds</th><th>In CE-fonds</th><th>Strategie · focus · regio</th><th>Bekende bedrijven</th><th>Slimme vraag</th></tr>
+<tr><td><b>Energy Impact Partners</b> – Deep Decarbonization Frontier Fund I &amp; II</td><td>I, II, IV</td><td>Early-stage VC, energie/industrie, VS; Frontier I $485M; utilities als strategische LP's</td><td>Form Energy, Electric Hydrogen, Boston Metal, Zap Energy; Frontier II: Reframe, Emerald AI</td><td>Hoeveel waarde zit er in hun utility-LP's voor commerciële tractie — en is dat een conflict?</td></tr>
+<tr><td><b>Breakthrough Energy Ventures</b></td><td>eerder fonds (I–III) <span class="tag check">CHECK</span></td><td>VC, breed climate, geduldig kapitaal</td><td>niet per fonds genoemd</td><td>Hoe kijken jullie naar re-ups bij een manager met zo'n groot, geduldig kapitaal?</td></tr>
+<tr><td><b>Ara Partners</b></td><td>eerder fonds (I–III) <span class="tag check">CHECK</span></td><td>Industriële decarbonisatie (buyout/value-add) <span class="tag check">CHECK</span></td><td>niet genoemd</td><td>Hoe meten jullie impact bij buyouts van bestaande (vervuilende) bedrijven?</td></tr>
+<tr><td><b>2150</b> – o.a. Urban Tech Sustainability Fund I (secondary)</td><td>II, ACT II (III <span class="tag unsure">ONZEKER</span>)</td><td>VC, gebouwde omgeving/steden, Europa</td><td>Biomason, CarbonCure, 1KOMMA5°, Normative</td><td>Wat leerden jullie van de secondary in 2150 — is dat een herhaalbare strategie?</td></tr>
+<tr><td><b>Lightrock</b> – climate fund</td><td>II, IV</td><td>Growth equity; eerste klimaatfonds €860M</td><td>niet genoemd</td><td>Welke rol speelt een Europese growth-manager in een VS-gewogen Fund IV?</td></tr>
+<tr><td><b>Astanor Ventures</b></td><td>II</td><td>Agrifood VC, Europa</td><td>niet bevestigd</td><td>Agrifood is 15% van Fund IV — waarom geen agrifood-manager meer?</td></tr>
+<tr><td><b>Capricorn Investment Group</b> – Technology Impact Fund III &amp; Growth Fund III</td><td>IV</td><td>VC + growth; vroeg in Tesla, SpaceX, QuantumScape</td><td>niet genoemd</td><td>Twee vehikels bij één manager: hoe denken jullie over manager-concentratie?</td></tr>
+<tr><td><b>DCVC</b> – Climate Select II</td><td>IV (III <span class="tag unsure">ONZEKER</span>)</td><td>Deep tech; &gt;$4 mrd AUM; steunde Fervo vroeg</td><td>Fervo</td><td>Hoe weeg je kapitaalintensiteit en technologierisico in deep-tech climate?</td></tr>
+<tr><td><b>Activate Capital</b> – Fund III</td><td>IV</td><td>Growth equity climate tech, VS</td><td>XNRGY, Aerones, Crusoe, Muon Space, Infravision</td><td>Overlap tussen Activate-holdings en jullie co-invests — bewust? Risico op concentratie?</td></tr>
+<tr><td><b>Giant Ventures</b> – Early Growth</td><td>III</td><td>Early growth, VK/Europa</td><td>niet genoemd</td><td>Waarom in Fund III Europese managers en in Fund IV 60% VS?</td></tr>
+<tr><td><b>ArcTern Ventures</b></td><td>North America fund</td><td>VC commerciële fase, Noord-Amerika</td><td>niet genoemd</td><td>Wat leerden jullie van single-manager feeders vs FoF?</td></tr>
+<tr><td><b>Forbion</b> – BioEconomy Fund I</td><td>ACT II</td><td>Bio-economie &amp; food</td><td>Tropic Biosciences, Eeden, Solasta Bio</td><td>Waarom bio-economie in de ELTIF en niet in Fund IV?</td></tr>
+<tr><td><b>White Summit Capital</b> – Decarbonisation Infrastructure Fund II</td><td>CIF I, ACT II</td><td>Infra, Europa</td><td>Zunder, Powesco</td><td>Hoe past de Impact Scorecard op core-plus infra waar additionaliteit lager is?</td></tr>
+<tr><td><b>RGreen</b> – Infragreen V</td><td>CIF I, ACT II</td><td>Hernieuwbare-energie-infra, Europa</td><td>Renalfa, Econergy</td><td>Hoe beoordelen jullie merchant- vs gecontracteerde-opbrengst-risico?</td></tr>
+<tr><td><b>Omnes Capital</b> – Capenergie 5</td><td>CIF I</td><td>Energie-infra, Europa</td><td><span class="tag unsure">ONZEKER</span></td><td>Hoe groot is het rente-risico in de infra-waarderingen?</td></tr>
+</table></div>
+<p class="small"><b>Niet bevestigd</b> (niet noemen als Carbon Equity-belegging): Lowercarbon, Pale Blue Dot, Systemiq Capital, World Fund, Climentum, Planet A, Blue Bear, Generate, TPG Rise Climate, Summa, Infranity, Ambienta. Homepage-logo's "Glide Equity Management" en Extantia: vehikel onbekend <span class="tag check">CHECK</span>. Verdane, Voyager, Banyan (Fund III) alleen via aggregator <span class="tag unsure">ONZEKER</span>.</p>
+</div></details>
+
+<details><summary>Directe co-investments &amp; vaak genoemde bedrijven</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Bedrijf</th><th>Wat</th><th>Vehikel</th></tr>
+<tr><td>Fervo Energy</td><td>Next-gen geothermie (VS)</td><td>Fund III/IV-sleeve, Co-Invest</td></tr>
+<tr><td>XNRGY</td><td>Koeling voor datacenters/HVAC</td><td>Fund IV-sleeve</td></tr>
+<tr><td>Aerones</td><td>Robots voor windturbine-onderhoud</td><td>Fund III/IV</td></tr>
+<tr><td>Voltus</td><td>Virtual power plant / demand response (Series D)</td><td>Co-Invest I, Fund IV</td></tr>
+<tr><td>Harbinger</td><td>Elektrische middelzware trucks (Series C)</td><td>Co-Invest I, Fund IV</td></tr>
+<tr><td>Palmetto</td><td>Thuisenergie: zon, batterij, warmtepomp (Series C)</td><td>Co-Invest I, Fund IV</td></tr>
+<tr><td>Reverion</td><td>Biogas-krachtcentrales met dubbele output (Series B, DE)</td><td>Co-Invest I, Fund IV</td></tr>
+</table></div>
+<p>Ook genoemd op de site: Form Energy, Koloma, Woltair, CarbonCure, Twelve, Sunfire, KoBold Metals, Radiant, AssetCool. Co-invest-doelprofiel: $5–20M omzet, 3–5 jaar tot exit.</p>
+<p><b>Prestatie-signaal:</b> eerste 19 beleggingen Fund IV op 3,2x cost (Q2 2026), gross, ongerealiseerd, ~15% van de portefeuille → interpreteer voorzichtig.</p>
+</div></details>
+
+<details><summary>Sectoren, thema's &amp; allocatie</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Fonds</th><th>Allocatie</th></tr>
+<tr><td>Fund IV – sector</td><td>Energie 25% · Industrie 25% · Food &amp; land use 15% · Transport 15% · Gebouwen 15% · Carbon management 5%</td></tr>
+<tr><td>Fund IV – fase / regio</td><td>Early stage 15% · Early growth 60% · Late stage 25% · 60% Noord-Amerika / 40% Europa</td></tr>
+<tr><td>Co-Invest I</td><td>Elektrificatie 35% · Energie 35% · Kritieke materialen 15% · Grid 15%; Series C+ 60% / Series B 40%</td></tr>
+<tr><td>ACT II (ELTIF)</td><td>VC 30% · PE 50% · Infra 20%; 80% Europa / 20% Noord-Amerika</td></tr>
+<tr><td>Infra I / Debt I</td><td>Energie ~80% / energieopwekking ~85%</td></tr>
+</table></div>
+<p><b>Conclusie:</b> energie en industrie wegen het zwaarst (elektrificatie, grid, opslag, geothermie, AI-stroomvraag). Carbon removal is klein.</p>
+</div></details>
+
+<details><summary>Manager-selectie &amp; impactframework</summary><div class="body">
+<ol>
+<li><b>Twee sporen:</b> general diligence (rendement/risico) + impact diligence.</li>
+<li><b>Impact scorecard</b> (naam in documenten <span class="tag check">CHECK</span>): scoort mandaat, strategie, processen en team (1–5); minimaal 3,0 om te beleggen.</li>
+<li><b>ESG-analyse</b> op basis van UN PRI, ILPA, Invest Europe en ESG_VC — zowel op de portefeuille als op de eigen praktijk van de manager.</li>
+<li><b>Investment Committee</b> neemt het besluit.</li>
+<li><b>Impactmethode:</b> 2023 nog GHG-forecasting volgens Project Frame besproken; in okt 2024 legde Liza Rubinstein uit dat ze avoided emissions <b>niet gebruiken voor rapportage</b> (niet verifieerbaar/vergelijkbaar) — "altijd al" niet. In plaats daarvan: (a) <i>scale of challenge</i> — tech zit in een IPCC/IEA/EU-Taxonomy/Drawdown-pathway of adresseert ≥50 Mt CO₂e/jr; (b) <i>contribution to net zero</i> — volledig schoon of materiële reductie zonder lock-in. Doel: &gt;70% "critical net-zero technologies".</li>
+<li>PAI's worden niet op entiteitsniveau meegewogen (blind pools, te weinig data).</li>
+</ol>
+</div></details>
+</section>
+
+<!-- ============ VAK ============ -->
+<section id="vak">
+<h2>5. Vakkennis – spiekbrief</h2>
+
+<details><summary>Jaarrekening: drie staten en hoe ze samenhangen</summary><div class="body">
+<div class="grid2">
+<div class="card"><h4>Balans</h4>Momentopname: Activa = Passiva (eigen vermogen + schulden). Vaste activa, werkkapitaal, cash; equity, debt.</div>
+<div class="card"><h4>W&amp;V (P&amp;L)</h4>Periode: omzet − COGS = brutowinst − opex = EBITDA − D&amp;A = EBIT − rente − belasting = nettowinst.</div>
+<div class="card"><h4>Kasstroomoverzicht</h4>Operationeel (nettowinst + D&amp;A ± Δwerkkapitaal) · investeringen (capex) · financiering (equity, debt, dividend).</div>
+</div>
+<p><b>Koppelingen:</b> nettowinst → ingehouden winst (balans) en start kasstroom; D&amp;A verlaagt winst maar niet cash; stijging debiteuren/voorraad = cash-uitstroom; eindsaldo kasstroom = cash op balans. Klassieke oefening: "D&amp;A +€10 bij 25% belasting" → nettowinst −7,5; cash +2,5; vaste activa −10, eigen vermogen −7,5, cash +2,5 → balans klopt.</p>
+</div></details>
+
+<details><summary>Werkkapitaal: DSO, DPO, DIO, CCC — met nuance</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Metric</th><th>Formule</th><th>Bij voorkeur</th><th>Waarom</th></tr>
+<tr><td>DSO</td><td>Debiteuren / omzet × 365</td><td>Laag</td><td>Klanten betalen snel → minder cash vast, minder kredietrisico</td></tr>
+<tr><td>DIO</td><td>Voorraad / COGS × 365</td><td>Laag</td><td>Minder kapitaal in voorraad, minder veroudering/afboeking</td></tr>
+<tr><td>DPO</td><td>Crediteuren / COGS × 365</td><td>Relatief hoog</td><td>Leveranciers financieren je gratis</td></tr>
+<tr><td>CCC</td><td>DSO + DIO − DPO</td><td>Laag/negatief</td><td>Dagen tussen betalen leverancier en ontvangen klantgeld</td></tr>
+</table></div>
+<p><b>Voorbeeld:</b> omzet 12, COGS 8, debiteuren 2, voorraad 1,5, crediteuren 1 → DSO 61, DIO 68, DPO 46 → CCC ≈ 84 dagen.</p>
+<div class="callout warn"><b>Nuance – wanneer hoge AP (DPO) een rode vlag is:</b>
+<ul>
+<li>DPO stijgt plots terwijl cash daalt → bedrijf <b>kan</b> niet betalen (liquiditeitsstress), niet "slim financieren".</li>
+<li>Ver boven sectornorm / boven afgesproken betaaltermijnen → achterstallige facturen, boetes, leveranciers eisen vooruitbetaling of stoppen met leveren.</li>
+<li>Schade aan relaties en duurzaamheid van de keten (MKB-leveranciers); ook een ESG/governance-punt.</li>
+<li>Window-dressing rond kwartaaleinde: betalingen uitstellen om cash/FCF mooier te laten lijken.</li>
+<li>Bij climate-hardware: kritieke componentleveranciers kunnen productie stilleggen.</li>
+</ul>
+Evenzo: lage DSO kan wijzen op strenge voorwaarden die omzet kosten; lage DIO kan leveringsproblemen geven. <b>Altijd: trend + sectorvergelijking + kasstroom.</b></div>
+</div></details>
+
+<details><summary>Kernratio's</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Ratio</th><th>Formule / betekenis</th></tr>
+<tr><td>Brutomarge</td><td>(Omzet − COGS) / omzet. Software 70–85%; hardware vaak 20–40% (in opschaling soms negatief)</td></tr>
+<tr><td>EBITDA(-marge)</td><td>Operationele winst vóór afschrijvingen; proxy voor operationele kasstroom (let op: negeert capex en werkkapitaal)</td></tr>
+<tr><td>Free cash flow</td><td>Operationele kasstroom − capex (FCF to firm: EBIT(1−t) + D&amp;A − capex − ΔNWC)</td></tr>
+<tr><td>Burn rate</td><td>Netto cash-uitstroom per maand</td></tr>
+<tr><td>Runway</td><td>Cash / net burn (maanden); &lt;12–18 mnd = fundraise-druk</td></tr>
+<tr><td>Leverage</td><td>Net debt / EBITDA; interest coverage = EBIT / rente</td></tr>
+<tr><td>ROIC</td><td>NOPAT / invested capital; &gt; WACC = waardecreatie</td></tr>
+</table></div>
+</div></details>
+
+<details><summary>Startup/VC-metrics</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Metric</th><th>Uitleg / vuistregel</th></tr>
+<tr><td>ARR / groei</td><td>Jaarlijks terugkerende omzet; "T2D3" (3x,3x,2x,2x,2x) als top-groei voor SaaS</td></tr>
+<tr><td>CAC</td><td>Sales &amp; marketing / nieuwe klanten</td></tr>
+<tr><td>LTV</td><td>ARPU × brutomarge / churn; LTV/CAC &gt; 3, CAC-payback &lt;12–18 mnd</td></tr>
+<tr><td>Net revenue retention</td><td>Omzet bestaande klanten na 12 mnd incl. upsell − churn; &gt;110–120% is sterk</td></tr>
+<tr><td>Rule of 40</td><td>Groei% + FCF-marge% ≥ 40</td></tr>
+<tr><td>Hardware vs software</td><td>Hardware: lagere brutomarge, capex, werkkapitaal (voorraad), FOAK-risico, langere salescycli; waarde in "learning curve" (kosten per unit dalen met volume)</td></tr>
+</table></div>
+</div></details>
+
+<details><summary>Waardering, cap tables &amp; term sheets</summary><div class="body">
+<ul>
+<li><b>DCF:</b> EV = Σ FCF/(1+WACC)<sup>t</sup> + terminal value (Gordon: FCF<sub>n+1</sub>/(WACC−g) of exit-multiple). Gevoelig voor WACC en g.</li>
+<li><b>Multiples:</b> EV/Revenue (groei), EV/EBITDA (volwassen), P/E. Kies peers op groei, marge, business model.</li>
+<li><b>VC-methode:</b> post-money nu = verwachte exitwaarde / target-multiple (of /(1+IRR)<sup>n</sup>), gecorrigeerd voor verwatering. Bv. exit €500M, doel 10x → post-money €50M.</li>
+<li><b>Pre/post-money:</b> post = pre + investering; stake = investering / post. €10M op €40M pre → post €50M → 20%.</li>
+<li><b>Verwatering:</b> nieuwe ronde 20% → bestaande houders × 0,8. ESOP-pool vaak pre-money ("option pool shuffle").</li>
+<li><b>Liquidation preference:</b> 1x non-participating: investeerder krijgt max(inleg, pro-rata). Participating: eerst inleg terug én pro-rata deel. Stapelingen in late rondes (Series C/D!) bepalen wie bij een middelmatige exit iets krijgt — relevant voor Co-Invest I.</li>
+<li><b>Anti-dilution:</b> full ratchet vs broad-based weighted average.</li>
+<li><b>Cap table:</b> overzicht aandelen per houder per klasse, fully diluted incl. opties/warrants/converteerbare leningen.</li>
+</ul>
+</div></details>
+
+<details><summary>Climate tech specifiek</summary><div class="body">
+<ul>
+<li><b>Hardware- &amp; projectrisico:</b> technologie- (werkt het op schaal?), uitvoerings- (bouw, supply chain), markt- (prijs grondstof/energie) en beleidsrisico.</li>
+<li><b>Valley of death:</b> gat tussen pilot en first-of-a-kind (FOAK) commerciële fabriek: te groot voor VC, te riskant voor project finance. Oplossingen: overheidsleningen/grants, strategische partners, blended finance, offtake-contracten.</li>
+<li><b>Beleid:</b> VS — Inflation Reduction Act (tax credits, deels teruggedraaid/afgezwakt in 2025 <span class="tag check">CHECK</span> actuele status), DOE Loan Programs Office. EU — Green Deal, Net-Zero Industry Act, EU ETS (en CBAM), Innovation Fund, EU Taxonomy, SFDR. NL — SDE++, Nationaal Groeifonds.</li>
+<li><b>Impactmeting:</b> Scope 1 (eigen uitstoot), 2 (ingekochte energie), 3 (keten). Avoided emissions ("Scope 4") = t.o.v. baseline — Carbon Equity gebruikt dit bewust niet in rapportage. Ken attributie, additionaliteit, rebound en lock-in.</li>
+<li><b>Huidige thema's:</b> elektrificatie, grid &amp; flexibiliteit (VPP's), opslag, geothermie, AI/datacenter-stroomvraag, kritieke mineralen, industriële warmte, "energy security".</li>
+</ul>
+</div></details>
+
+<details><summary>Due diligence op een fondsmanager (checklist)</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Gebied</th><th>Waar kijk je naar?</th></tr>
+<tr><td>Team</td><td>Ervaring, attributie (wie deed welke deal?), stabiliteit, opvolging, incentives (carry-verdeling), GP-commitment (1–2%+)</td></tr>
+<tr><td>Track record</td><td>Net TVPI/DPI/IRR per fonds en vintage; quartile vs peers; spreiding (één outlier?); gerealiseerd vs ongerealiseerd; loss ratio; waarderingsbeleid</td></tr>
+<tr><td>Strategie</td><td>Edge in sourcing, fit met fondsgrootte, consistentie (style drift), fase/sector/geo, follow-on reserves</td></tr>
+<tr><td>Terms (LPA)</td><td>Fee, carry, hurdle, waterfall, key-person, no-fault removal, investeringsperiode, recycling, co-invest-rechten, LPAC, side letters (MFN)</td></tr>
+<tr><td>ESG/impact</td><td>Impact-thesis in mandaat, meetmethode, ESG-beleid (PRI), carry gekoppeld aan impact?</td></tr>
+<tr><td>Operationeel (ODD)</td><td>Fondsadministratie, auditor, waardering, compliance, cybersecurity, AML, conflicten</td></tr>
+<tr><td>Referenties</td><td>Founders (ook mislukte), co-investeerders, andere LP's, ex-teamleden</td></tr>
+</table></div>
+</div></details>
+
+<details><summary>Investment memo: structuur + voorbeeld op 1 pagina</summary><div class="body">
+<p><b>Structuur:</b> 1) Aanbeveling &amp; ticket · 2) Fonds/bedrijf in het kort · 3) Investeringsthese (3 punten) · 4) Team · 5) Track record / financials · 6) Impact · 7) Terms · 8) Risico's &amp; mitigaties · 9) Portfolio-fit · 10) Open punten / next steps.</p>
+<pre>MEMO – Fictief: "GridForward Fund II" (early growth, grid &amp; flex, EU)
+1. Aanbeveling: commit €8M uit Fund V (≈7%), onder voorbehoud van ODD.
+2. Fonds: €300M target, Series A–B, 15–18 bedrijven, EU+VK, 2/20, 8% hurdle,
+   European waterfall, GP-commit 2%.
+3. These: (a) netcongestie maakt flex-software onmisbaar; (b) team heeft
+   sourcing-edge via ex-TSO-netwerk; (c) instapwaarderingen 30-40% onder 2021.
+4. Team: 3 partners, 12 jaar samen; 1 key-person-risico (managing partner).
+5. Track record Fund I (2019): net TVPI 2,1x / DPI 0,6x / IRR 19% → 1e kwartiel;
+   1 exit = 45% van waarde → concentratierisico.
+6. Impact: scorecard 3,8/5; 80% "critical net-zero tech".
+7. Terms: marktconform; vraag fee-korting op commitments &gt; €5M.
+8. Risico's: regulering netbeheer (mitigatie: spreiding landen); exit-markt
+   (mitigatie: strategische kopers); key-person (clausule aanwezig).
+9. Fit: vult gat in grid-blootstelling Europa; geen overlap met bestaande GP's.
+10. Open: referentie 2 founders, check waarderingsbeleid, side letter MFN.</pre>
+</div></details>
+</section>
+
+<!-- ============ PERSOON ============ -->
+<section id="persoon">
+<h2>6. Persoonsonderzoek – Michael White</h2>
+<div class="callout danger">
+<b>Niet gevonden bij Carbon Equity.</b> Er staat geen Michael White (en geen enkele "Michael" of "White") op de officiële teampagina (34 personen, nov 2026), en zoekopdrachten in combinatie met Carbon Equity leveren geen profiel, interview of podcast op. Er bestaan andere mensen met deze naam in finance/climate (o.a. een partner bij Planet Ocean Fund / Ocean Risk Alliance) — <b>niet aan Carbon Equity koppelen</b>. <span class="tag check">CHECK</span>
+</div>
+<p><b>Mogelijke verklaringen:</b> naam verkeerd doorgekregen · nieuwe medewerker die nog niet op de site staat · externe recruiter · iemand van een partner/GP. <b>Actie:</b> bevestig via de uitnodiging of de recruiter wie hij is en welke rol hij heeft. Je eigen info over hem was in de opdracht nog niet ingevuld.</p>
+<p><b>Wél bekende investment-mensen (kans dat je hen spreekt):</b> Wiebe Visser (CIO), Bas van Beijeren (MD), Idse Luirink, Eva van Hilten (Sr. Investment Associates), Sam van der Linden (Investment Associate); daarnaast Jacqueline van den Ende (CEO), Liza Rubinstein (Chief Impact Officer).</p>
+<h4>3 openers (generiek, niet op de persoon gebaseerd)</h4>
+<ol>
+<li>"Hoe weegt het team climate impact tegen financieel rendement in de DD op een manager — wanneer haalt een fonds met sterk track record de impact-drempel van 3,0 níet?"</li>
+<li>"Met co-investments, infra en debt naast de FoF: hoe verandert dat het werk van een analist ten opzichte van twee jaar geleden?"</li>
+<li>"Welke climate-thema's of managers zijn volgens jullie op dit moment ondergewaardeerd door de markt?"</li>
+</ol>
+</section>
+
+<!-- ============ COACH ============ -->
+<section id="coach">
+<h2>7. Interviewcoach</h2>
+
+<details open><summary>15 waarschijnlijke vragen + antwoordstructuur</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>#</th><th>Vraag</th><th>Structuur &amp; kernpunten</th></tr>
+<tr><td>1</td><td>Waarom Carbon Equity?</td><td>Missie (kapitaal naar climate) × model (toegang + diversificatie) × moment (Fund IV, co-invest, ELTIF, groei naar €1 mrd) → wat jij leert en bijdraagt</td></tr>
+<tr><td>2</td><td>Waarom climate?</td><td>Persoonlijke trigger → waarom kapitaal de bottleneck is → waarom rendement en impact samengaan</td></tr>
+<tr><td>3</td><td>Waarom FoF i.p.v. direct VC?</td><td>Breedte (veel managers, hele markt zien), portefeuilledenken, impact via kapitaalallocatie; co-invest geeft bedrijfsdiepte</td></tr>
+<tr><td>4</td><td>Loop me door je cv.</td><td>2 min, chronologisch, elke stap → skill die relevant is voor DD/analyse/schrijven</td></tr>
+<tr><td>5</td><td>Leg een fund-of-funds uit aan een belegger met €100k.</td><td>Eenvoudig: "jij → ons fonds → 6–8 topfondsen → 300+ bedrijven"; calls, 10–12 jaar, J-curve, fees eerlijk benoemen</td></tr>
+<tr><td>6</td><td>Hoe beoordeel je een fondsmanager?</td><td>Team · track record (net, quartile, spreiding) · strategie/edge · terms · impact · ODD · referenties → conclusie</td></tr>
+<tr><td>7</td><td>Wat is het verschil tussen TVPI, DPI en IRR — welke vertrouw je het meest?</td><td>Definities; DPI = cash; IRR timing-gevoelig; combineer + PME/quartile</td></tr>
+<tr><td>8</td><td>Wat is de double layer of fees en is het het waard?</td><td>Uitleg + getal (~0,2x/1,5–2%-pt) → waard als toegang tot topkwartiel-managers, diversificatie en DD dit compenseren; CE-mitigaties</td></tr>
+<tr><td>9</td><td>Pitch een climate tech bedrijf/thema.</td><td>Probleem (Mt CO₂) → oplossing → waarom nu → business model/unit economics → risico's → wie investeert (bv. Fervo of VPP's)</td></tr>
+<tr><td>10</td><td>Hoe meet je impact — wat vind je van avoided emissions?</td><td>Scope 1-2-3, avoided emissions-problemen (baseline, attributie) → waardeer CE's keuze (scale of challenge + contribution)</td></tr>
+<tr><td>11</td><td>Hoe zie je de climate-VC-markt nu?</td><td>Correctie na 2021, VS-beleidsonzekerheid, verschuiving naar energy security/AI-stroom, kansen in growth/infra → genuanceerd optimistisch</td></tr>
+<tr><td>12</td><td>Vertel over een keer dat je het oneens was met iemand senior.</td><td>STAR; onderbouwd met data, respectvol, uitkomst — sluit aan op "stand your ground"</td></tr>
+<tr><td>13</td><td>Je grootste fout in een analyse?</td><td>Eerlijk, klein-maar-echt, wat je nu anders doet (checks, gross/net)</td></tr>
+<tr><td>14</td><td>Hoe ga je om met veel parallelle DD's en deadlines?</td><td>Prioriteren op IC-data, checklists/templates, vroeg escaleren</td></tr>
+<tr><td>15</td><td>Case: zou je in dit fonds investeren?</td><td>Zie mini-case: framework → getallen → oordeel → risico's → wat je nog wilt weten</td></tr>
+</table></div>
+</div></details>
+
+<details><summary>5 technische oefenvragen met uitwerking</summary><div class="body">
+<h4>1. TVPI / DPI / RVPI</h4>
+<p>Paid-in €60M, uitgekeerd €30M, NAV €75M. → DPI 0,50x · RVPI 1,25x · TVPI 1,75x.</p>
+<h4>2. IRR-schatting</h4>
+<p>€10M in, na 4 jaar €20M terug. IRR = 2<sup>1/4</sup> − 1 ≈ 18,9%. (Vuistregel: 2x in 3 jr ≈ 26%, 2x in 5 jr ≈ 15%, 3x in 5 jr ≈ 25%.)</p>
+<h4>3. European waterfall</h4>
+<p>Fonds €100M, alles gestort in jaar 0, €200M terug in jaar 5. 8% hurdle (samengesteld), 100% catch-up, 20% carry.</p>
+<ol><li>Return of capital: €100M aan LP's</li><li>Pref: 100 × (1,08<sup>5</sup> − 1) = €46,9M aan LP's</li><li>Catch-up: GP krijgt c zodat c = 20% × (46,9 + c) → c = €11,7M</li><li>Rest €41,3M: 80/20 → LP €33,1M, GP €8,3M</li></ol>
+<p>GP totaal €20M (=20% van €100M winst); LP €180M → net 1,8x vs gross 2,0x.</p>
+<h4>4. Werkkapitaal</h4>
+<p>Omzet €50M, COGS €30M, debiteuren €10M, voorraad €6M, crediteuren €9M. → DSO 73, DIO 73, DPO 110, CCC 36 dagen. Vraag-verdieping: DPO 110 terwijl sectornorm 45 → vraag of dit afgesproken termijnen zijn of betalingsproblemen (check cash, ouderdom crediteuren, leveranciersconcentratie).</p>
+<h4>5. Verwatering &amp; liquidation preference</h4>
+<p>Series A: €5M op €15M pre → 25%. Series B: €20M op €60M pre → A-investeerder verwatert naar 25% × 0,75 = 18,75%. Exit €40M, B heeft 1x non-participating preference (€20M) en 25%: B kiest max(20; 10) = €20M; rest €20M pro rata over overige 75% → A krijgt 18,75/75 × 20 = €5M → A haalt alleen 1,0x terug.</p>
+</div></details>
+
+<details><summary>Mini-case: "Terra Ventures Fund III" — zou jij investeren?</summary><div class="body">
+<p><b>Casus (fictief):</b> Europese climate-VC, seed/Series A, €250M target (Fund II was €80M). 3 partners, 1 partner vertrekt na close. Fund I (2016): net TVPI 3,1x, DPI 1,8x — 70% van de waarde komt uit één exit. Fund II (2020): net TVPI 1,2x, DPI 0,0x. Terms: 2,5% fee op commitments, 20% carry, geen hurdle, American waterfall. Sectoren: energie, food, "climate-adjacent" fintech. Impact: geen meetkader, wel PRI-ondertekenaar.</p>
+<p><b>Modelantwoord (structuur):</b></p>
+<ol>
+<li><b>Conclusie vooraf:</b> nu niet investeren (of: alleen met forse aanpassingen) — "pass, revisit Fund IV".</li>
+<li><b>Team:</b> key-person-risico (vertrekkende partner); wie maakte de Fund I-exit? Attributie onduidelijk.</li>
+<li><b>Track record:</b> Fund I sterk maar geconcentreerd (één outlier → herhaalbaarheid?); Fund II 1,2x na 6 jaar is middelmatig; vergelijk met quartiles van vintage 2020.</li>
+<li><b>Strategie:</b> fondsgrootte ×3 → style drift (grotere tickets, latere fases?); "climate-adjacent fintech" scoort laag op impact.</li>
+<li><b>Terms:</b> 2,5% fee bovengemiddeld, geen hurdle, deal-by-deal waterfall → niet LP-vriendelijk; extra zwaar in FoF met double layer.</li>
+<li><b>Impact:</b> geen kader → waarschijnlijk onder scorecard-drempel 3,0.</li>
+<li><b>Wat zou mijn mening veranderen:</b> nieuwe senior partner met track record, fondsgrootte ≤€150M, European waterfall + 8% hurdle, impact-mandaat in LPA, sterke Fund II-markups bij recente rondes.</li>
+</ol>
+</div></details>
+
+<details><summary>Bouwstenen voor mijn verhaal (waarom CE / climate / deze rol)</summary><div class="body">
+<div class="grid2">
+<div class="card"><h4>Waarom climate</h4>Persoonlijk moment/ervaring → inzicht dat technologie bestaat maar kapitaal en schaal ontbreken → finance als hefboom.</div>
+<div class="card"><h4>Waarom Carbon Equity</h4>Uniek: brede climate-markt zien via topmanagers + co-invests; democratiseren van toegang; snelle groei (€470M, nieuwe asset classes) = veel verantwoordelijkheid voor een junior.</div>
+<div class="card"><h4>Waarom deze rol</h4>Combinatie analyse (DD, modellen) + schrijven (rapportage) + research (nieuwe strategieën) past bij mijn [studie/stage]; leer van team met AlpInvest/HAL/McKinsey-achtergrond.</div>
+<div class="card"><h4>Bewijs</h4>2–3 korte STAR-verhalen: analytisch (fout gevonden), onafhankelijk standpunt, proactief verbeterd proces.</div>
+</div>
+</div></details>
+
+<details><summary>10 slimme vragen om zelf te stellen</summary><div class="body">
+<ol>
+<li>Hoe ziet de eerste 3–6 maanden eruit — welke DD's of projecten zou ik oppakken?</li>
+<li>Hoe verdeel je analist-tijd tussen fund-DD, co-invest-DD, monitoring en rapportage?</li>
+<li>Wanneer haalde een manager met sterk track record de Impact Scorecard níet — en wat leerde het team daarvan?</li>
+<li>Hoe voorkomen jullie adverse selection bij co-investments die GP's aanbieden?</li>
+<li>Fund IV verschuift naar 60% Noord-Amerika: hoe kijken jullie naar het Amerikaanse beleidsrisico?</li>
+<li>Welke nieuwe strategieën of asset classes onderzoekt het team voor de komende 2 jaar?</li>
+<li>Hoe managen jullie liquiditeit in de ELTIF met redemptions tegenover illiquide onderliggende fondsen?</li>
+<li>Hoe ziet het IC-proces eruit en welke rol heeft een analist daarin?</li>
+<li>Wat onderscheidt een analist die na het eerste jaar een vast contract krijgt?</li>
+<li>Wat is de grootste uitdaging om naar €1 mrd AUM te groeien?</li>
+</ol>
+</div></details>
+
+<details><summary>Rode vlaggen: NIET zeggen</summary><div class="body">
+<div class="callout danger"><ul>
+<li>"Ik wil eigenlijk naar direct VC/een fonds zelf" (FoF als springplank).</li>
+<li>Impact óf rendement als tegenstelling neerzetten ("rendement is minder belangrijk").</li>
+<li>Namen/fondsen noemen die niet kloppen (Willem Willemstein; Lowercarbon of World Fund als CE-belegging).</li>
+<li>Avoided emissions als hét impactbewijs presenteren — CE gebruikt dat bewust niet.</li>
+<li>De 3,2x van Fund IV als bewezen rendement noemen (gross, ongerealiseerd, 15% van portfolio).</li>
+<li>Fees bagatelliseren of juist afkraken zonder nuance.</li>
+<li>"Ik heb geen vragen" of vragen naar salaris/vakantie in het eerste gesprek.</li>
+<li>Politiek activistische toon over klimaat; houd het feitelijk en optimistisch.</li>
+<li>Bluffen over technische vragen — zeg liever hoe je het zou uitzoeken.</li>
+</ul></div>
+</div></details>
+</section>
+
+<!-- ============ FACTCHECK ============ -->
+<section id="factcheck">
+<h2>8. Fact-check &amp; laatste check vóór het gesprek</h2>
+<div id="fc-results">
+<details open><summary>Resultaten fact-check (agent 8)</summary><div class="body">
+<div class="tbl"><table>
+<tr><th>Claim</th><th>Oordeel</th><th>Toelichting</th></tr>
+<tr><td>Opgericht 2021</td><td><span class="tag ok">BEVESTIGD</span></td><td>Pers zegt 2021; site noemt geen jaar; KvK-inschrijving mogelijk eind 2020. Zeg "2021".</td></tr>
+<tr><td>Co-founders, investment team, 34 mensen</td><td><span class="tag ok">BEVESTIGD</span></td><td>Saskia <b>van den Ende</b> = People &amp; Culture Director, géén co-founder (niet verwarren met Saskia Bruysten). Geen Michael White / Willem Willemstein.</td></tr>
+<tr><td>€470M AUM, 1.900+ beleggers, 330+ bedrijven, 13 fondsen</td><td><span class="tag ok">BEVESTIGD</span></td><td>Fund IV-blog (2-11-2026) zegt "2,000+ investors".</td></tr>
+<tr><td>Series A €6M (BlackFin, okt 2023), totaal ~€9M</td><td><span class="tag ok">BEVESTIGD</span></td><td>Seed €1,8M (2022) alleen in databases; bedrag/datum wisselen → niet stellig noemen.</td></tr>
+<tr><td>Aandeelhoudersuitbreiding nov 2025</td><td><span class="tag ok">BEVESTIGD</span></td><td>Aurum Impact, Elemental, 2MS, Feike Sijbesma; geen bedrag.</td></tr>
+<tr><td>AIFM-vergunning (AFM, art. 2:65 Wft)</td><td><span class="tag ok">BEVESTIGD</span></td><td>Registratie 15005329; volgens pers verleend dec 2023.</td></tr>
+<tr><td>Structuur</td><td><span class="tag ok">BEVESTIGD</span></td><td>Site: "limited partnerships under Dutch law" + aparte stichting houdt juridisch eigendom. Het woord "CV" staat niet letterlijk op de site.</td></tr>
+<tr><td>ELTIF "eerste in NL"</td><td><span class="tag check">CHECK</span></td><td>ELTIF-vergunning bevestigd; "eerste" alleen in pers.</td></tr>
+<tr><td>SFDR</td><td>Gemengd</td><td>Fund III art. 8 bevestigd; Infra I art. 9 alleen in pers; Fund IV niet te verifiëren (DocSend-documenten per fonds).</td></tr>
+<tr><td>Fund IV-terms en managers</td><td><span class="tag ok">BEVESTIGD</span></td><td>7 fee-staffels 1,00→0,40%, 1% setup, &lt;0,3% kosten, co-invest max 20%, 3,2x gross unrealised (19 beleggingen, Q2 2026). Geen eigen carry vermeld.</td></tr>
+<tr><td>ACT II, Co-Invest I, Debt Fund I</td><td><span class="tag ok">BEVESTIGD</span> grotendeels</td><td>ACT II first close 2-7-2025, fee 1,1%. Co-Invest I: fee 1,25%/1,00% + 10% performance fee boven 1,25x DPI. Debt Fund I: fee 0,85–0,45%, 7–8% net IRR; doelomvang €15M niet op site.</td></tr>
+<tr><td>Fund I / Fund III omvang</td><td><span class="tag check">CHECK</span></td><td>Fund I €42M (pers) vs €45M (site) → "ruim €40M". Fund III €105M/€107M/€110M → "ruim €100M".</td></tr>
+<tr><td>Impact: min 3,0 op 5, &gt;70% critical net-zero</td><td><span class="tag ok">BEVESTIGD</span></td><td>Naam "Climate Impact Scorecard" niet te verifiëren → zeg "impact scorecard". Avoided emissions: "nooit gebruikt voor rapportage" (blog okt 2024), geen nieuw besluit.</td></tr>
+<tr><td>Homepage-logo's</td><td><span class="tag ok">BEVESTIGD</span></td><td>"Glide Equity Management" (niet Gilde); Breakthrough Energy en Ara Partners als logo's — in welk fonds onbekend.</td></tr>
+<tr><td>Vacature</td><td><span class="tag ok">BEVESTIGD</span></td><td>Salaris, contract, 3 dagen kantoor, ≤2 jaar ervaring, master. Publicatiedatum afgeleid ("posted 3 days ago").</td></tr>
+</table></div>
+</div></details>
+<div class="callout warn"><h3 style="margin-top:0">Laatste check vóór het gesprek</h3>
+<ol>
+<li><b>Wie is Michael White?</b> Bevestig naam en rol via de uitnodiging/recruiter.</li>
+<li>Lees de Fund IV-blog van 2-11-2026 en check op de dag zelf of er nieuwere cijfers zijn (final close 31-12).</li>
+<li>Fund III: zeg "ruim €100M"; Fund I: "ruim €40M".</li>
+<li>Open de SFDR-documenten via /legal/company-policies/ vóór je een artikelnummer noemt voor Fund IV of Infra I.</li>
+<li>Gebruik "impact scorecard (minimum 3,0 op 5)", niet een eigen productnaam.</li>
+<li>Check op LinkedIn je gesprekspartners (Visser, Van Beijeren, Luirink, Van Hilten, Van der Linden).</li>
+<li>Check of de vacature nog openstaat en of salaris/contract ongewijzigd zijn.</li>
+<li>Bekijk de logo's op de homepage (Glide, Breakthrough Energy, Ara, Extantia, Voyager) — weet welke managers ze tonen.</li>
+<li>Noem het seed-bedrag niet stellig; Series A €6M (BlackFin, 2023) is solide.</li>
+<li>Check actuele status van de IRA/VS-klimaatbeleid (60% VS-allocatie in Fund IV).</li>
+</ol></div>
+</div>
+</section>
+
+<!-- ============ FLASHCARDS ============ -->
+<section id="flashcards">
+<h2>9. Flashcards</h2>
+<div class="fcbar"><button type="button" id="fc-shuffle">Schudden</button><button type="button" id="fc-reset">Alles terugdraaien</button></div>
+<div class="flash" id="flash"></div>
+</section>
+
+<!-- ============ BRONNEN ============ -->
+<section id="bronnen">
+<h2>10. Bronnen</h2>
+<p class="small">Alle bronnen geraadpleegd op 12-11-2026 tenzij anders vermeld; tussen haakjes de publicatiedatum.</p>
+<ol class="src">
+<li><a href="https://carbonequity.careers.hibob.com/jobs/23966932-0cde-4ab9-b9f3-74f0668e3579">Carbon Equity – vacature Investment Analyst (HiBob)</a> (09-11-2026)</li>
+<li><a href="https://impactalpha.com/job/investment-analyst-35/">ImpactAlpha – Investment Analyst, Carbon Equity</a> (09-11-2026)</li>
+<li><a href="https://johngannonblog.com/job/vc-analyst-carbon-equity-in-amsterdam-netherlands/">John Gannon blog – oudere vacature VC Analyst</a> (~2024, onzeker)</li>
+<li><a href="https://www.carbonequity.com/">carbonequity.com – homepage</a> (nov 2026)</li>
+<li><a href="https://carbonequity.com/team/">carbonequity.com/team</a> (nov 2026)</li>
+<li><a href="https://carbonequity.com/faq/">carbonequity.com/faq</a> (nov 2026)</li>
+<li><a href="https://carbonequity.com/funds/">carbonequity.com/funds</a> (lastmod 03-11-2026)</li>
+<li><a href="https://carbonequity.com/funds/climate-tech-portfolio-fund-iv/">Climate Tech Portfolio Fund IV</a> (11-11-2026)</li>
+<li><a href="https://carbonequity.com/insights/climate-tech-portfolio-fund-iv-closes-on-december-31-heres-whats-inside/">Fund IV closes on December 31 – here's what's inside</a> (02-11-2026)</li>
+<li><a href="https://carbonequity.com/funds/access-to-climate-tech-fund-ii/">Access to Climate Tech Fund II (ELTIF)</a> (05-11-2026)</li>
+<li><a href="https://carbonequity.com/funds/co-investment-fund-i/">Co-Investment Fund I</a> (03-11-2026)</li>
+<li><a href="https://carbonequity.com/funds/climate-infrastructure-fund-i/">Climate Infrastructure Fund I</a> (03-11-2026)</li>
+<li><a href="https://carbonequity.com/funds/energy-transition-debt-fund-i/">Energy Transition Debt Fund I</a> (03-11-2026)</li>
+<li><a href="https://carbonequity.com/legal/company-policies/">Company policies / SFDR-disclosures</a> (02-09-2026)</li>
+<li><a href="https://carbonequity.com/insights/we-dont-report-on-greenhouse-gas-emissions-yet-and-were-proud-of-it/">We don't report on GHG emissions yet</a> (09-10-2024)</li>
+<li><a href="https://carbonequity.com/insights/how-we-avoid-greenwashing-a-framework-to-assess-impact/">How we avoid greenwashing</a> (31-05-2023)</li>
+<li><a href="https://carbonequity.com/insights/why-we-invested-in-voltus/">Why we invested in Voltus</a> (nov 2026)</li>
+<li><a href="https://carbonequity.com/insights/esg-is-now-energy-security-and-geopolitics/">ESG is now Energy, Security &amp; Geopolitics</a> (sep 2026)</li>
+<li><a href="https://carbonequity.com/insights/carbon-equity-surpasses-300-million-aum-with-closing-of-third-climate-tech-fund/">Carbon Equity surpasses €300M AUM (Fund III close)</a> (01-05-2025)</li>
+<li><a href="https://carbonequity.com/insights/carbon-equity-raises-60m-in-four-months-for-its-new-climate-tech-fund/">€60M in four months for Fund III</a> (26-06-2024)</li>
+<li><a href="https://carbonequity.com/insights/carbon-equity-raises-an-additional-100-million-for-climate-solutions/">Additional €100M (Fund II)</a> (05-03-2024)</li>
+<li><a href="https://carbonequity.com/insights/carbon-equitys-portfolio-fund-ii-reaches-50m-from-100-investors-in-its-first-close/">Fund II first close €50M</a> (28-06-2023)</li>
+<li><a href="https://carbonequity.com/insights/carbon-equity-launches-its-75m-climate-tech-portfolio-fund-ii/">Launch Fund II</a> (01-05-2023)</li>
+<li><a href="https://carbonequity.com/insights/85-frontrunners-join-decarbonization-fund-1-to-use-their-capital-to-fight-climate-change/">85 frontrunners join Decarbonization Fund 1</a> (14-02-2022)</li>
+<li><a href="https://www.esgtoday.com/carbon-equity-launches-fund-giving-investors-access-to-energy-transition-loans/">ESG Today – Energy transition debt fund</a> (19-05-2026)</li>
+<li><a href="https://onestopesg.com/esg-news/carbon-equity-energy-transition-debt-fund">OneStopESG – Energy Transition Debt Fund</a> (19-05-2026)</li>
+<li><a href="https://impact-investor.com/carbon-equity-launches-50m-climate-tech-co-investment-fund/">Impact Investor – $50M co-investment fund</a> (05-01-2026)</li>
+<li><a href="https://www.privateequitywire.co.uk/carbon-equity-launches-50m-co-investment-fund-targeting-growth-stage-climate-tech/">Private Equity Wire – co-investment fund</a> (05-01-2026)</li>
+<li><a href="https://siliconcanals.com/carbon-equity-expands-shareholder-base/">Silicon Canals – shareholder base expansion</a> (13-11-2025)</li>
+<li><a href="https://www.iamsterdam.com/en/business/carbon-equity-closes-climate-tech-portfolio-fund-iii-at-105m">I amsterdam – Fund III closes at €105M</a> (17-04-2025)</li>
+<li><a href="https://siliconcanals.com/carbon-equity-opens-climate-tech-investment/">Silicon Canals – ELTIF launch</a> (2025)</li>
+<li><a href="https://privateequitywire.com/carbon-equity-launches-infrastructure-fund/">Private Equity Wire – Climate Infrastructure Fund</a> (29-08-2024)</li>
+<li><a href="https://impactalpha.com/?p=105975">ImpactAlpha – Fund II close</a> (06-03-2024)</li>
+<li><a href="https://www.eu-startups.com/2024/03/amsterdam-based-carbon-equity-raises-an-additional-e100-million-for-its-second-climate-tech-solutions-fund/">EU-Startups – Fund II €100M</a> (03-2024)</li>
+<li><a href="https://www.eu-startups.com/2023/10/amsterdam-based-carbon-equity-secures-e6-million-to-make-individual-investors-power-climate-tech-companies/">EU-Startups – Series A €6M</a> (10-2023)</li>
+<li><a href="https://newprivatemarkets.com/in-brief-carbon-equity-to-launch-eltif-after-e6m-funding-round">New Private Markets – ELTIF na €6M ronde</a> (2023)</li>
+<li><a href="https://siliconcanals.com/amsterdam-carbon-equity-raise-1-8m/">Silicon Canals – seed €1,8M</a> (14-07-2022)</li>
+<li><a href="https://newprivatemarkets.com/in-brief-purpose-driven-giant-ventures-adds-lps-to-early-growth-fund">New Private Markets – Giant Ventures LP's</a> (17-09-2024)</li>
+<li><a href="https://cms.investmentofficer.com/en/news/dutch-pioneer-tests-eltif-waters-benelux-momentum-lags">Investment Officer – ELTIF Benelux</a> (datum onbekend)</li>
+<li><a href="https://fundscouter.com/funds/carbon-equity/carbon-equity-climate-tech-portfolio-fund-iii">Fundscouter – Fund III (aggregator, niet geverifieerd)</a></li>
+<li><a href="https://www.cbinsights.com/company/carbon-equity/alternatives-competitors">CB Insights – competitors</a> (aggregator)</li>
+<li><a href="https://oceanriskalliance.org/team/michael-white/">Ocean Risk Alliance – andere Michael White (niet gerelateerd)</a></li>
+</ol>
+</section>
+
+<footer>
+<p>Onderzoek uitgevoerd op <b>12 november 2026</b> door een team van research-agents (vacature, bedrijf, portefeuille, persoon) met fact-check. Rekenvoorbeelden en de mini-case zijn fictief/illustratief. Controleer cijfers met <span class="tag check">CHECK</span> zelf vóór het gesprek.</p>
+</footer>
+</main>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('themebtn');
+  try{var s=localStorage.getItem('ce-theme'); if(s) root.setAttribute('data-theme',s);}catch(e){}
+  btn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    if(!cur){cur=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+    var next=cur==='dark'?'light':'dark';
+    root.setAttribute('data-theme',next);
+    try{localStorage.setItem('ce-theme',next);}catch(e){}
+  });
+
+  var cards=[
+    ["GP vs LP","GP beheert het fonds en neemt beslissingen; LP's leveren kapitaal en zijn aansprakelijk tot hun inleg."],
+    ["Fund-of-funds","Fonds dat belegt in meerdere onderliggende fondsen → diversificatie, toegang, maar extra fee-laag."],
+    ["Feeder fund","Bundelt kleine beleggers in één doelfonds (master)."],
+    ["Co-investment","Directe belegging naast een GP in één bedrijf, meestal zonder of met lage fee/carry."],
+    ["Secondary","Aankoop van bestaand LP-belang; vaak korting, kortere J-curve."],
+    ["Capital call","Opvraging van een deel van de commitment door de GP."],
+    ["Uncalled capital","Toegezegd maar nog niet opgevraagd kapitaal (dry powder)."],
+    ["Recycling","Vroege opbrengsten herbeleggen binnen een cap."],
+    ["J-curve","Negatief rendement in vroege jaren (fees, kostprijswaardering), later stijgend door exits. Dieper bij FoF."],
+    ["DPI","Distributions / Paid-in. Cash terug; de 'echte' maatstaf."],
+    ["RVPI","NAV / Paid-in. Nog ongerealiseerde waarde."],
+    ["TVPI","(Distributions + NAV) / Paid-in = DPI + RVPI."],
+    ["MOIC","Totale waarde / geïnvesteerd kapitaal, vaak gross per deal."],
+    ["IRR","Discontovoet waarbij NPV van alle kasstromen 0 is; timing-gevoelig."],
+    ["PME (Kaplan-Schoar)","PV(distributions + NAV) / PV(calls) met index-rendement; >1 = beter dan beurs."],
+    ["Hurdle rate","Minimumrendement voor LP's (vaak 8%) vóór carry."],
+    ["Catch-up","Na de hurdle krijgt de GP (bijna) alles tot hij zijn 20% van de winst heeft."],
+    ["European waterfall","Whole-fund: eerst alle kapitaal + pref terug, dan carry. LP-vriendelijk."],
+    ["American waterfall","Deal-by-deal carry; vergt clawback."],
+    ["Clawback","GP moet te veel ontvangen carry terugbetalen aan het eind."],
+    ["Key-person clause","Investeringsperiode schort op als sleutelpersonen vertrekken."],
+    ["Vintage year","Jaar van eerste investering/close; basis voor peer-vergelijking."],
+    ["Pacing","Plannen van jaarlijkse commitments om doelallocatie te halen zonder liquiditeitsproblemen."],
+    ["Double layer of fees","FoF-fee + fees/carry van onderliggende fondsen."],
+    ["CE Fund IV fees","Mgmt 1,00%→0,40% gestaffeld, 1% setup, expenses <0,3%, geen eigen carry."],
+    ["CE Impact Scorecard","Scoort mandaat, strategie, processen, team (1–5); min. 3,0."],
+    ["Critical net-zero tech","CE-doel: >70% van beleggingen; toets: scale of challenge + contribution to net zero."],
+    ["AIFMD","EU-richtlijn voor beheerders van alternatieve beleggingsfondsen; CE heeft AFM-vergunning."],
+    ["ELTIF","EU-label voor langetermijnfondsen met retailpaspoort; CE's ACT II = eerste NL-ELTIF."],
+    ["SFDR art. 8 vs 9","Art. 8 promoot E/S-kenmerken; art. 9 heeft duurzame belegging als doel."],
+    ["DSO","Debiteuren / omzet × 365. Laag = goed."],
+    ["DPO","Crediteuren / COGS × 365. Hoog = goed, tenzij betalingsproblemen."],
+    ["DIO","Voorraad / COGS × 365. Laag = goed."],
+    ["Cash conversion cycle","DSO + DIO − DPO."],
+    ["Runway","Cash / maandelijkse net burn."],
+    ["Net revenue retention","Omzet bestaande klanten na 12 mnd incl. upsell/churn; >110% sterk."],
+    ["LTV/CAC","Klantwaarde vs acquisitiekosten; >3 gezond."],
+    ["Liquidation preference","Recht om eerst inleg (x-maal) terug te krijgen bij exit; participating of non-participating."],
+    ["Valley of death","Financieringsgat tussen pilot en eerste commerciële fabriek (FOAK)."],
+    ["Scope 1/2/3","Eigen uitstoot / ingekochte energie / waardeketen."]
+  ];
+  var wrap=document.getElementById('flash');
+  function render(list){
+    wrap.innerHTML='';
+    list.forEach(function(c){
+      var b=document.createElement('button'); b.type='button'; b.className='fc'; b.setAttribute('aria-label','Flashcard: '+c[0]);
+      b.innerHTML='<div class="in"><div class="f"></div><div class="b"></div></div>';
+      b.querySelector('.f').textContent=c[0]; b.querySelector('.b').textContent=c[1];
+      b.addEventListener('click',function(){b.classList.toggle('flip');});
+      wrap.appendChild(b);
+    });
+  }
+  render(cards);
+  document.getElementById('fc-shuffle').addEventListener('click',function(){
+    var a=cards.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} render(a);
+  });
+  document.getElementById('fc-reset').addEventListener('click',function(){
+    wrap.querySelectorAll('.fc.flip').forEach(function(x){x.classList.remove('flip');});
+  });
+})();
+</script>
+</body>
+</html>
